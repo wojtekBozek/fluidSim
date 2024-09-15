@@ -9,4 +9,9 @@ file(GLOB_RECURSE _main CONFIGURE_DEPENDS
 
 add_executable(${PROJECT_NAME} ${_main})
 add_definitions(-DGLEW_STATIC)
-target_link_libraries(${PROJECT_NAME} opengl32 glfw libglew_static glm)
+
+if (WIN32)
+    target_link_libraries(${PROJECT_NAME} opengl32 glfw libglew_static glm)
+elseif (UNIX)
+    target_link_libraries(${PROJECT_NAME} GL glfw GLEW glm)
+endif()
