@@ -6,8 +6,9 @@
 #include <string.h>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
-
-
+#include "headers/commons/shaderProgram.hpp"
+#include "headers/geometry/vertexData.hpp"
+#include "headers/geometry/mesh.hpp"
 //Window dimensions
 constexpr GLint WIDTH = 800, HEIGHT = 600;
 
@@ -15,11 +16,15 @@ GLuint VAO, VBO, shader;
 
 void CreateTriangle()
 {
-    GLfloat vertices[] = {
-        -1.0f, -1.0f, 0.0f,
-        1.0f, -1.0f, 0.0f,
-        0.0f, 1.0f, 0.0f
-    };
+    //GLfloat vertices[] = {
+    //    -1.0f, -0.5f, 0.0f,
+    //    1.0f, -1.0f, 0.0f,
+    //    0.0f, 1.0f, 0.0f
+    //};
+
+    PosColVertex vertices[] = {{{-1.0f, -0.5f, 0.0f},{1.0f, 0.0f, 0.0f}},
+                                {{1.0f, -1.0f, 0.0f},{0.0f, 1.0f, 0.0f}}, 
+                                {{0.0f, 1.0f, 0.0f},{0.0f, 0.0f, 1.0f}}};
 
     glGenVertexArrays(1, &VAO);
     glBindVertexArray(VAO);
@@ -32,92 +37,10 @@ void CreateTriangle()
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     glEnableVertexAttribArray(0);
 
+    glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(1);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
-}
-
-// Vertexshader
-static const char* vShader = "\n\
-#version 330\n\
-layout  (location = 0) in vec3 pos;\n\
-\n\
-void  main()\n\
-{\n\
-    gl_Position = vec4(pos.x, pos.y, pos.z, 1.0);\n\
-}\n";
-
-static const char* fShader = "\n\
-#version 330\n\
-out vec4 color;\n\
-\n\
-void main()\n\
-{\n\
-    color = vec4(1.0, 0.0, 0.0, 1.0);\n\
-}\n";
-
-
-void addShader(GLuint theProgram, const char* shaderCode, GLenum shaderType)
-{
-    GLuint theShader = glCreateShader(shaderType);
-
-    const GLchar *theCode[1];
-    theCode[0] = shaderCode;
-
-    GLint codeLength[1];
-    codeLength[0] = strlen(shaderCode);
-
-    glShaderSource(theShader, 1, theCode, codeLength);
-
-    glCompileShader(theShader);
-    
-    GLint result = 0;
-    GLchar eLog[1024] = { 0 };
-
-    glGetShaderiv(theShader, GL_COMPILE_STATUS, &result);
-    if (!result)
-    {
-        glGetShaderInfoLog(theShader, sizeof(eLog), NULL, eLog);
-        printf("Error Compiling the %d shader!!: %s \n", shaderType, eLog);
-        return;
-    }
-
-    glAttachShader(theProgram, theShader);
-}
-
-void compileShaders() 
-{
-    shader = glCreateProgram();
-    if (!shader)
-    {
-        printf("Error creating shaders");
-        return;
-    }
-    addShader(shader, vShader, GL_VERTEX_SHADER);
-    addShader(shader, fShader, GL_FRAGMENT_SHADER);
-
-    GLint result = 0;
-    GLchar eLog[1024] = { 0 };
-
-    glLinkProgram(shader);
-
-    //linking error
-    glGetProgramiv(shader, GL_LINK_STATUS, &result);
-    if (!result)
-    {
-        glGetProgramInfoLog(shader, sizeof(eLog), NULL, eLog);
-        printf("Error Linkig Program!!: %s \n", eLog);
-        return;
-    }
-
-    //linking validation
-    glValidateProgram(shader);
-    glGetProgramiv(shader, GL_VALIDATE_STATUS, &result);
-    if (!result)
-    {
-        glGetProgramInfoLog(shader, sizeof(eLog), NULL, eLog);
-        printf("Error Validating Program!!: %s \n", eLog);
-        return;
-    }
 }
 
 int main()
@@ -167,18 +90,45 @@ int main()
         return 1;
     }
 
+    
     //Setup Viewport Size
 
     glViewport(0, 0, bufferWidth, bufferHeight);
 
-    CreateTriangle();
+    //CreateTriangle();
 
-    compileShaders();
+    //compileShaders();
 
+    ShaderProgram program;
+    program.addShader(GL_VERTEX_SHADER, "../shaders/location/vertex.shader");
+    program.addShader(GL_FRAGMENT_SHADER, "../shaders/location/fragment.shader");
+    program.linkProgram();
     //Loop until window close
+    vertex3D vertices[] = {{{-1.0f, -0.5f, 0.0f},{1.0f, 0.0f, 0.0f},{0.0f,0.0f},{0.0f,0.0f,0.0f}},
+                                {{1.0f, -1.0f, 0.0f},{0.0f, 1.0f, 0.0f},{0.0f,0.0f},{0.0f,0.0f,0.0f}}, 
+                                {{0.0f, 1.0f, 0.0f},{0.0f, 0.0f, 1.0f},{0.0f,0.0f},{0.0f,0.0f,0.0f}},
+                                {{-1.0f, 1.0f, 0.0f},{0.0f, 1.0f, 0.0f},{0.0f,0.0f},{0.0f,0.0f,0.0f}}};
 
+    int vertices_size = sizeof(vertices)/sizeof(vertices[0]);
+    std::cout << vertices_size << "\n";
+    std::vector<vertex3D> vertices_vect(vertices_size);
+    std::copy(vertices,vertices+vertices_size,vertices_vect.begin());
+    std::vector<uint32_t> indices;
+    indices.push_back(0);
+    indices.push_back(1);
+    indices.push_back(2);
+    indices.push_back(0);
+    indices.push_back(2);
+    indices.push_back(3);
+    
+    Mesh mesh(vertices_vect, indices);
+    mesh.bind(0,-1,-1,1);
+
+    int vertexColorLocation = program.getUniformLocation("inColor");
     while (!glfwWindowShouldClose(mainWindow))
     {
+        float timeValue = glfwGetTime();
+        float greenValue = (sin(timeValue)/2.0f) +0.5f;
         // get + handel user input events
         glfwPollEvents();
 
@@ -186,12 +136,13 @@ int main()
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(shader);
+        glUseProgram(program.getProgramId());
+        //glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
 
-        glBindVertexArray(VAO);
+        //glBindVertexArray(VAO);
 
-        glDrawArrays(GL_TRIANGLES, 0, 3);
-
+        //glDrawArrays(GL_TRIANGLES, 0, 3);
+        mesh.draw();
         glBindVertexArray(0);
 
         glUseProgram(0);
@@ -204,14 +155,3 @@ int main()
 
     return 0;
 }
-
-// Uruchomienie programu: Ctrl + F5 lub menu Debugowanie > Uruchom bez debugowania
-// Debugowanie programu: F5 lub menu Debugowanie > Rozpocznij debugowanie
-
-// Porady dotyczące rozpoczynania pracy:
-//   1. Użyj okna Eksploratora rozwiązań, aby dodać pliki i zarządzać nimi
-//   2. Użyj okna programu Team Explorer, aby nawiązać połączenie z kontrolą źródła
-//   3. Użyj okna Dane wyjściowe, aby sprawdzić dane wyjściowe kompilacji i inne komunikaty
-//   4. Użyj okna Lista błędów, aby zobaczyć n błędy
-//   5. Wybierz pozycję Projekt > Dodaj nowy element, aby utworzyć nowe pliki kodu, lub wybierz pozycję Projekt > Dodaj istniejący element, aby dodać istniejące pliku kodu do projektu
-//   6. Aby w przyszłości ponownie otworzyć ten projekt, przejdź do pozycji Plik > Otwórz > Projekt i wybierz plik sln

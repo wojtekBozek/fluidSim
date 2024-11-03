@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.14)
-# Fetch and include glfw
+
+# Include FetchContent to fetch external dependencies
 include(FetchContent)
 FetchContent_Declare(
     glfw

@@ -1,5 +1,6 @@
-#include "headers/commons/shaderProgram.hpp"
+#include "commons/shaderProgram.hpp"
 #include <iostream>
+
 ShaderProgram::ShaderProgram() : m_programID(glCreateProgram())
 {}
 
@@ -9,7 +10,7 @@ bool ShaderProgram::linkProgram()
 
     // Check the program for link errors
     GLint result = GL_FALSE;
-    int infoLogLength;
+    int infoLogLength = 0;
     glGetProgramiv(m_programID, GL_LINK_STATUS, &result);
     glGetProgramiv(m_programID, GL_INFO_LOG_LENGTH, &infoLogLength);
 
@@ -20,7 +21,7 @@ bool ShaderProgram::linkProgram()
         return false;
     }
 
-    if(!result)
+    if(result == GL_FALSE)
     {
         std::cerr << "Program link error of unknown origin!" << std::endl;
         return false;
@@ -58,6 +59,24 @@ bool ShaderProgram::addShader(GLuint shaderType, const std::string &shaderPath)
     return true;
 }
 
+int ShaderProgram::getProgramId()
+{
+    return m_programID;
+}
+
+void ShaderProgram::useProgram()
+{
+    glUseProgram(m_programID);
+}
+
+void ShaderProgram::dropProgram()
+{
+    glUseProgram(0);
+}
+int ShaderProgram::getUniformLocation(const std::string &uniformName)
+{
+    return glGetUniformLocation(m_programID, uniformName.c_str());
+}
 ShaderProgram::~ShaderProgram()
 {
     if (m_programID != 0) 
