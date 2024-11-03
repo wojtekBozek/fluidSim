@@ -1,0 +1,10 @@
+1. Wartości wektorowe, stanowiące własności wierzchołków przesyłane są poprzez wykorzystanie składni "layout location"
+2. Wartości macierzowe, dotyczące przekształceń geometrii w/i/oraz przestrzeni przesyłane są z użyciem "uniform location"
+
+3. Wartości wejsciowe do shaderów opisujące właściwości geometrii (wierzchołków) anonsowane są przedrostkiem in (inLoc, inPos, inColor etc.).
+4. Dla przekształceń prawdopodobnie użyta zostanie ta sama notacja, ale będzie to potwierdzone później na posdstawie praktyki.
+
+5. Wartości przekazywane z jednego shadera do drugiego anonsowane są poprzez wykorzystanie przedrostka stanowaiące skrót shadera Z którego
+dana wartość jest przesyłana. Po stronie shadera odbierającego należy poprawnie zdefiniować nazwę zgodną z nazwą shadera z którego dana
+wartość będzie pochodzić.
+

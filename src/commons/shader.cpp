@@ -1,5 +1,5 @@
-#include "headers/commons/shader.hpp"
-#include "headers/commons/debugOpengl.hpp"
+#include "commons/shader.hpp"
+#include "commons/debugOpengl.hpp"
 #include <fstream>
 #include <sstream>
 #include <iostream>
@@ -19,7 +19,7 @@ bool Shader::loadShader(const std::string& filePath)
     if (!shaderStream.is_open()) 
     {
         std::cerr << "Failed to open shader file: " << filePath << '\n';
-        return -1;
+        return false;
     }
 
     std::stringstream sstr;
@@ -27,7 +27,7 @@ bool Shader::loadShader(const std::string& filePath)
     m_shaderCode = sstr.str();
     shaderStream.close();
 
-    return 0;
+    return true;
 }
 
 bool Shader::compileShader()
@@ -46,16 +46,16 @@ bool Shader::compileShader()
         std::vector<char> shaderErrorMessage(infoLogLength + 1);
         glGetShaderInfoLog(m_shaderID, infoLogLength, nullptr, shaderErrorMessage.data());
         std::cerr << "Error compiling shader:\n" << shaderErrorMessage.data() << '\n';
-        return -1;
+        return false;
     }
 
     if (result == GL_FALSE) 
     {
         std::cerr << "Shader compilation failed without additional info.\n";
-        return -1;
+        return false;
     }
 
-    return 0;
+    return true;
 }
 
 void Shader::attachShader(GLuint programID)
