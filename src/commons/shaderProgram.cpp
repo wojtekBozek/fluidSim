@@ -1,4 +1,4 @@
-#include "commons/shaderProgram.hpp"
+#include "shaderProgram.hpp"
 #include <iostream>
 
 ShaderProgram::ShaderProgram() : m_programID(glCreateProgram())

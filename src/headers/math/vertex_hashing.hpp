@@ -4,11 +4,11 @@
 namespace wojtek_math {
 	constexpr size_t golden_ratio = 0x9e3779b9;
 	template <typename T>
-	void combined_hash(size_t& seed, const T& value)
+	inline void combined_hash(size_t& seed, const T& value)
 	{
 		seed ^= std::hash<T>()(value) + golden_ratio + (seed << 6) + (seed >> 2);
 	}
-	size_t vertexHash(const vertex3D& vertex)
+	inline size_t vertexHash(const vertex3D& vertex)
 	{
 		size_t hash_value = 0;
 		combined_hash(hash_value, static_cast<uint32_t>(vertex.xyz.x));
