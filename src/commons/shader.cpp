@@ -1,5 +1,5 @@
-#include "commons/shader.hpp"
-#include "commons/debugOpengl.hpp"
+#include "shader.hpp"
+#include "debugOpengl.hpp"
 #include <fstream>
 #include <sstream>
 #include <iostream>

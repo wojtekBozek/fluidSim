@@ -1,4 +1,4 @@
-#include "geometry/vertex.hpp"
+#include "vertex.hpp"
 
 using namespace rendering;
 
@@ -9,7 +9,6 @@ void VerticesContainer::add_vertex(const vertex3D& vertex)
 void VerticesContainer::add_vertices(const std::vector<vertex3D>& vertices_)
 {
     vertices.insert(vertices.end(), vertices_.begin(), vertices_.end());
-    std::cout << vertices.size() << "\n";
 }
 const uint32_t& VerticesContainer::get_current_next_index() const
 {

@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.7.2)
 
 project(FluidSimulator)
 
@@ -7,7 +7,6 @@ set(IMGUI_VERSION 1.87)
 if(POLICY CMP0135)
   cmake_policy(SET CMP0135 NEW)
 endif()
-
 add_subdirectory(external)
 
 # Set the path to the shaders folder relative to the CMakeLists.txt file
@@ -20,9 +19,24 @@ add_executable(${PROJECT_NAME} ${_main}
 ${CMAKE_SOURCE_DIR}/src/commons/shader.cpp
 ${CMAKE_SOURCE_DIR}/src/commons/shaderProgram.cpp
 ${CMAKE_SOURCE_DIR}/src/geometry/vertex.cpp 
-${CMAKE_SOURCE_DIR}/src/geometry/mesh.cpp )
+${CMAKE_SOURCE_DIR}/src/geometry/mesh.cpp 
+${CMAKE_SOURCE_DIR}/src/camera/camera3D.cpp 
+${CMAKE_SOURCE_DIR}/src/objects/object.cpp 
+${CMAKE_SOURCE_DIR}/src/objects/objectsMeneger.cpp 
+${CMAKE_SOURCE_DIR}/src/program/sceneLoader.cpp 
+${CMAKE_SOURCE_DIR}/src/program/mesh_loader.cpp 
+${CMAKE_SOURCE_DIR}/src/properties/physics.cpp
+)
 
-target_include_directories(${PROJECT_NAME} PRIVATE ${CMAKE_SOURCE_DIR}/src/headers)
+target_include_directories(${PROJECT_NAME} PRIVATE 
+${CMAKE_SOURCE_DIR}/src/headers/camera/
+${CMAKE_SOURCE_DIR}/src/headers/geometry/
+${CMAKE_SOURCE_DIR}/src/headers/math/
+${CMAKE_SOURCE_DIR}/src/headers/objects/
+${CMAKE_SOURCE_DIR}/src/headers/commons/
+${CMAKE_SOURCE_DIR}/src/headers/program/
+${CMAKE_SOURCE_DIR}/src/headers/properties/
+)
 
 add_definitions(-DGLEW_STATIC)
 
@@ -32,6 +46,7 @@ elseif (UNIX)
     target_link_libraries(${PROJECT_NAME} GL glfw libglew_static glm stb_image imgui_glfw tinyobjloader)
 endif()
 
+target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
 # Copy shader files to the build folder
 # configure_file(${SHADERS_DIR}/vertex.shader ${CMAKE_BINARY_DIR}/shaders/vertex.shader COPYONLY)

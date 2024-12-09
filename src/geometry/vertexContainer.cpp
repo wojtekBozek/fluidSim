@@ -1,4 +1,3 @@
-#include "headers/geometry/vertexContainer.hpp"
 #include "vertexContainer.hpp"
 
 template <typename T>
