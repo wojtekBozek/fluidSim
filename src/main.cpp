@@ -81,40 +81,16 @@ int main()
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST);  
 
-
-    //compileShaders();
-
     ShaderProgram program;
     program.addShader(GL_VERTEX_SHADER, "C:/Users/Wojtek/Desktop/Programowanie/Magisterka/FluidSimulator/shaders/location/vertex.shader");
     program.addShader(GL_FRAGMENT_SHADER, "C:/Users/Wojtek/Desktop/Programowanie/Magisterka/FluidSimulator/shaders/location/fragment.shader");
     program.linkProgram();
-    //Loop until window close
-    vertex3D vertices[] = {{{-1.0f, -0.5f, 0.0f},{1.0f, 0.0f, 0.0f},{0.0f,0.0f},{0.0f,0.0f,0.0f}},
-                                {{1.0f, -1.0f, 0.0f},{0.0f, 1.0f, 0.0f},{0.0f,0.0f},{0.0f,0.0f,0.0f}}, 
-                                {{0.0f, 1.0f, 0.0f},{0.0f, 0.0f, 1.0f},{0.0f,0.0f},{0.0f,0.0f,0.0f}},
-                                {{-1.0f, 1.0f, 0.0f},{0.0f, 1.0f, 0.0f},{0.0f,0.0f},{0.0f,0.0f,0.0f}}};
-
-    int vertices_size = sizeof(vertices)/sizeof(vertices[0]);
-    std::cout << vertices_size << "\n";
-    std::vector<vertex3D> vertices_vect(vertices_size);
-    std::copy(vertices,vertices+vertices_size,vertices_vect.begin());
-    std::vector<uint32_t> indices;
-    indices.push_back(0);
-    indices.push_back(1);
-    indices.push_back(2);
-    indices.push_back(0);
-    indices.push_back(2);
-    indices.push_back(3);
     
-    Mesh mesh(vertices_vect, indices);
-    mesh.bind(0,-1,-1,1);
     MeshLoader loader;
-    std::shared_ptr<Mesh> cube_ptr = std::make_shared<Mesh>(loader.load("C:/Users/Wojtek/Desktop/Programowanie/projektyCpp/opengl/obj/cube.obj"));
-    cube_ptr->bind(0,-1,-1,1);
-    Object cube_obj(cube_ptr);
-    //std::shared_ptr<PhysicalProperties> prop = std::make_shared<PhysicalProperties>(1.0f, glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(0.0f,0.0f,0.0f));
-    //std::shared_ptr<PhysicalProperties> prop2 = std::make_shared<PhysicalProperties>(1.0f, glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(0.0f,1.0f,0.0f));
-    //cube_obj.addProperty("physics", prop);
+    
+    std::shared_ptr<PhysicalProperties> prop = std::make_shared<PhysicalProperties>(1.0f, glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(0.0f,0.0f,0.0f));
+    std::shared_ptr<PhysicalProperties> prop2 = std::make_shared<PhysicalProperties>(1.0f, glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(0.0f,1.0f,0.0f));
+
     auto state = std::make_shared<ProgramState>(ProgramState::MAIN_MENU);
     std::vector<std::shared_ptr<BaseUI>> UIs;
     UIs.push_back(std::make_shared<MainWindow>(mainWindow,state));
@@ -126,26 +102,26 @@ int main()
     std::vector<Mesh> meshes;
     SceneLoader<SceneLoaderObj>::loadScene("C:/Users/Wojtek/Desktop/Programowanie/Magisterka/FluidSimulator/obj/", 
                             objectMeneger, meshes);
-    std::cout << meshes.size() << " mothefff\n";
-    std::cout << &meshes << "addres vector" << &(meshes.back()) << " pointer";
+                            
     rendering::CameraHandler::setActiveCamera(std::move(camera));
     glfwSetInputMode(mainWindow, GLFW_STICKY_KEYS, GL_TRUE);
     rendering::CameraHandler::connectCallbacs(mainWindow);
     int vertexColorLocation = program.getUniformLocation("inColor");
     float lastFrame = 0.0f;
-    //cube_obj.uniform_scale(2.0,glm::vec3(1.0f,1.0f,1.0f));
+
     GLuint uniform_MVP_id = glGetUniformLocation(program.getProgramId(), "MVP");
     float currentFrame = static_cast<float>(glfwGetTime());
-    //objectMeneger.addObject("Cube", std::make_unique<Object>(cube_obj));
     for (auto& mesha : meshes)
-            {
-                std::cout <<"trying draw\n";
-                mesha.bind(0,-1,-1,1);
-            }
+    {
+        mesha.bind(0,-1,-1,1);
+    }
 
-    //objectMeneger.addProperty("cube", "physics", prop2);
+    objectMeneger.addProperty("cube", "physics", prop2);
     
     setup::setupImGui(mainWindow);
+    
+    glCullFace(GL_BACK);
+
     while (!glfwWindowShouldClose(mainWindow))
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
@@ -161,31 +137,17 @@ int main()
         rendering::CameraHandler::processMovement(mainWindow);
         currentFrame = static_cast<float>(glfwGetTime());
         rendering::CameraHandler::setCurrentSpeed(currentFrame - lastFrame);
-        //prop->applyForces(glm::vec3(0,-glm::cos(timeValue),0));
-        cube_obj.updateProperties(currentFrame - lastFrame);
-        
-
-
+        prop2->applyForces(glm::vec3(0,-glm::cos(timeValue),0));
         objectMeneger.update(currentFrame - lastFrame);
         lastFrame = currentFrame;
-        // clear window
+        
+        objectMeneger.rotate("cube", glm::vec3(0.0f, 0.0f, 1.0f),1.5);
+        objectMeneger.move("cube", glm::vec3(0,0,glm::sin(timeValue)));
+
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(program.getProgramId());
-        //glUniform4f(vertexColorLocation, 0.0f, greenValue, 0.0f, 1.0f);
-        //cube_obj.rotate(1.5f, glm::vec3(0.0f, 0.0f, 1.0f));
-        objectMeneger.rotate("cube", glm::vec3(0.0f, 0.0f, 1.0f),1.5);
-        objectMeneger.move("cube", glm::vec3(0,0,glm::sin(timeValue)));
-        //cube_obj.translate(glm::vec3(0,0,glm::sin(timeValue)));
-        //glBindVertexArray(VAO);
-        //glDrawArrays(GL_TRIANGLES, 0, 3);
-        cube_obj.update();
-        cube_ptr->computeMVPs(rendering::CameraHandler::calculateMVP);
-        cube_ptr->drawInstances(uniform_MVP_id);
-        glDisable(GL_CULL_FACE);
-        mesh.draw(uniform_MVP_id, rendering::CameraHandler::calculateMVP);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
+
         for (auto& mesha : meshes)
         {
             mesha.computeMVPs(rendering::CameraHandler::calculateMVP);
@@ -206,10 +168,10 @@ int main()
         glfwSwapBuffers(mainWindow);
     }
 
-    glfwDestroyWindow(mainWindow);
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-
+    glfwDestroyWindow(mainWindow);
+    glfwTerminate();
     return 0;
 }

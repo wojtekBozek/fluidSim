@@ -12,6 +12,57 @@ class Mesh
     Mesh(const std::vector<vertex3D>& vertices, const std::vector<uint32_t>& indices);
     Mesh(vertex3D&& vertices);
 
+    Mesh(const Mesh& other) 
+        : m_vertices(other.m_vertices), m_indices(other.m_indices) 
+    {
+        std::cout << "Mesh Copy Constructor Called" << std::endl;
+        
+        // Generate new OpenGL resources (deep copy)
+        glGenVertexArrays(1, &(this->m_VAO));
+        glGenBuffers(1, &(this->m_VBO));
+        glGenBuffers(1, &(this->m_EBO));
+    }
+
+    Mesh(Mesh&& other) noexcept
+        : m_VAO(other.m_VAO), m_VBO(other.m_VBO), m_EBO(other.m_EBO),
+          m_vertices(std::move(other.m_vertices)), m_indices(std::move(other.m_indices)) 
+    {
+        std::cout << "Mesh Move Constructor Called" << std::endl;
+
+        // Invalidate the OpenGL resources of 'other' to avoid double deletion
+        other.m_VAO = 0;
+        other.m_VBO = 0;
+        other.m_EBO = 0;
+    }
+
+    Mesh& operator=(Mesh&& other) noexcept {
+        std::cout << "Mesh Move Assignment Operator Called" << std::endl;
+
+        if (this != &other) { // Prevent self-assignment
+            // Free existing OpenGL resources
+            if (m_VAO) glDeleteVertexArrays(1, &(this->m_VAO));
+            if (m_VBO) glDeleteBuffers(1, &(this->m_VBO));
+            if (m_EBO) glDeleteBuffers(1, &(this->m_EBO));
+ 
+            // Move ownership of OpenGL resources
+            m_VAO = other.m_VAO;
+            m_VBO = other.m_VBO;
+            m_EBO = other.m_EBO;
+
+            // Move vertex/index data
+            m_vertices = std::move(other.m_vertices);
+            m_indices = std::move(other.m_indices);
+
+            // Invalidate `other`'s OpenGL handles to prevent double deletion
+            other.m_VAO = 0;
+            other.m_VBO = 0;
+            other.m_EBO = 0;
+        }
+        return *this;
+    }
+
+
+    ~Mesh();
     uint32_t addNewInstance(const glm::mat4& data);
     void detachInstance(uint32_t id);
     void removeInstances();
@@ -57,5 +108,6 @@ class Mesh
     std::vector<glm::mat4> m_instancesMVPs;
     glm::mat4 m_basic_instance = glm::mat4(1.0f);
     glm::mat4 m_basic_instance_mvp = glm::mat4(1.0f);
-    uint32_t m_VAO, m_VBO, m_EBO;
+    GLuint m_VAO = 0, m_VBO = 0, m_EBO = 0;
+    //GLuint m_VAO, m_VBO, m_EBO;
 };

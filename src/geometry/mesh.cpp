@@ -8,8 +8,6 @@ Mesh::Mesh()
     glGenVertexArrays(1, &(this->m_VAO));
     glGenBuffers(1, &(this->m_VBO));
     glGenBuffers(1, &(this->m_EBO));
-    //m_instances.push_back(glm::mat4(1.0f));
-    //m_instancesMVPs.push_back(glm::mat4(1.0f));
 }
 
 Mesh::Mesh(const std::vector<vertex3D> &vertices , const std::vector<uint32_t>& indices) : Mesh()
@@ -21,6 +19,14 @@ Mesh::Mesh(const std::vector<vertex3D> &vertices , const std::vector<uint32_t>& 
 Mesh::Mesh(vertex3D &&vertices) : Mesh()
 {
     //todo
+}
+
+Mesh::~Mesh()
+{
+    std::cout << "Deleting mesh\n";
+    if (m_VAO) glDeleteVertexArrays(1, &m_VAO);
+    if (m_VBO) glDeleteBuffers(1, &m_VBO);
+    if (m_EBO) glDeleteBuffers(1, &m_EBO);
 }
 
 void Mesh::removeInstances() 
@@ -37,10 +43,8 @@ void Mesh::removeInstances()
 
 uint32_t Mesh::addNewInstance(const glm::mat4& data)
 {
-    std::cout <<"adding new instance\n";
     m_instances.push_back(glm::mat4(1.0f));
     m_instancesMVPs.push_back(glm::mat4(1.0f));
-    std::cout << "instances: " << m_instances.size();
     return m_instances.size()-1;
 }
 

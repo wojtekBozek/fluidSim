@@ -29,6 +29,34 @@ namespace rendering {
     class VerticesContainer {
     public:
         VerticesContainer() = default;
+
+        VerticesContainer(const VerticesContainer& other) 
+        : vertices(other.vertices), // Move vector ownership
+          current_max_vertex(other.current_max_vertex) // Copy simple integer
+    {
+        std::cout << "VerticesContainer Copy Constructor Called" << std::endl;
+    }
+
+        VerticesContainer(VerticesContainer&& other) noexcept
+        : vertices(std::move(other.vertices)), // Move vector ownership
+          current_max_vertex(other.current_max_vertex) // Copy simple integer
+    {
+        std::cout << "VerticesContainer Move Constructor Called" << std::endl;
+        other.current_max_vertex = 0; // Optional: Reset other to a default state
+    }
+
+    // Move assignment operator
+    VerticesContainer& operator=(VerticesContainer&& other) noexcept {
+        std::cout << "VerticesContainer Move Assignment Operator Called" << std::endl;
+
+        if (this != &other) { // Prevent self-assignment
+            vertices = std::move(other.vertices);
+            current_max_vertex = other.current_max_vertex; // Copy simple integer
+            other.current_max_vertex = 0; // Optional: Reset other
+        }
+        return *this;
+    }
+
         void add_vertex(const vertex3D& vertex);
 
         void add_vertices(const std::vector<vertex3D>& vertices_);
