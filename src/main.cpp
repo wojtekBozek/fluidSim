@@ -16,8 +16,14 @@
 #include "objectsMeneger.hpp"
 #include "sceneLoader.hpp"
 #include "physics.hpp"
+#include "setup.hpp"
+#include "mainWindow.hpp"
+#include "simulationUI.hpp"
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_opengl3.h>
 //Window dimensions
-constexpr GLint WIDTH = 800, HEIGHT = 600;
+constexpr GLint WIDTH = 1200, HEIGHT = 900;
 
 
 void closeWindow(GLFWwindow* window, int value)
@@ -38,12 +44,7 @@ int main()
     // Setup GLFW window properties
     //Opengl version
 
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
-    // core profile = no backwards compatibility
-    glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    // allow foreward compatybility
-    glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+    setup::setupGLFW();
 
     GLFWwindow *mainWindow = glfwCreateWindow(WIDTH, HEIGHT, "First window", NULL, NULL);
 
@@ -77,7 +78,9 @@ int main()
 
     glViewport(0, 0, bufferWidth, bufferHeight);
 
-    //CreateTriangle();
+    glEnable(GL_CULL_FACE);
+    glEnable(GL_DEPTH_TEST);  
+
 
     //compileShaders();
 
@@ -109,8 +112,13 @@ int main()
     std::shared_ptr<Mesh> cube_ptr = std::make_shared<Mesh>(loader.load("C:/Users/Wojtek/Desktop/Programowanie/projektyCpp/opengl/obj/cube.obj"));
     cube_ptr->bind(0,-1,-1,1);
     Object cube_obj(cube_ptr);
-    std::shared_ptr<PhysicalProperties> prop = std::make_shared<PhysicalProperties>(1.0f, glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(0.0f,0.0f,0.0f));
-    cube_obj.addProperty("physics", prop);
+    //std::shared_ptr<PhysicalProperties> prop = std::make_shared<PhysicalProperties>(1.0f, glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(0.0f,0.0f,0.0f));
+    //std::shared_ptr<PhysicalProperties> prop2 = std::make_shared<PhysicalProperties>(1.0f, glm::vec3(1.0f), glm::vec3(0.0f), glm::vec3(0.0f,1.0f,0.0f));
+    //cube_obj.addProperty("physics", prop);
+    auto state = std::make_shared<ProgramState>(ProgramState::MAIN_MENU);
+    std::vector<std::shared_ptr<BaseUI>> UIs;
+    UIs.push_back(std::make_shared<MainWindow>(mainWindow,state));
+    UIs.push_back(std::make_shared<SimulationUI>(mainWindow,state));
     std::unique_ptr<rendering::PerspectiveCamera> camera(new rendering::PerspectiveCamera(glm::vec3(0, 0, 5), glm::vec3(0, 1, 0),
         float(WIDTH)/float(HEIGHT), 0.1f, 100.0f, 45.0f));
     glfwSetInputMode(mainWindow, GLFW_STICKY_KEYS, GL_TRUE);
@@ -134,16 +142,31 @@ int main()
                 std::cout <<"trying draw\n";
                 mesha.bind(0,-1,-1,1);
             }
+
+    //objectMeneger.addProperty("cube", "physics", prop2);
+    
+    setup::setupImGui(mainWindow);
     while (!glfwWindowShouldClose(mainWindow))
     {
-        float timeValue = glfwGetTime();
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
+
+        float timeValue = static_cast<float>(glfwGetTime());
         // get + handel user input events
         glfwPollEvents();
+        // (Your code calls glfwPollEvents())
+        // ...
+        // Start the Dear ImGui frame
+        
+        
         rendering::CameraHandler::processMovement(mainWindow);
         currentFrame = static_cast<float>(glfwGetTime());
         rendering::CameraHandler::setCurrentSpeed(currentFrame - lastFrame);
-        prop->setForce(glm::vec3(0,-glm::cos(timeValue),0));
+        //prop->applyForces(glm::vec3(0,-glm::cos(timeValue),0));
         cube_obj.updateProperties(currentFrame - lastFrame);
+        
+
+
+        objectMeneger.update(currentFrame - lastFrame);
         lastFrame = currentFrame;
         // clear window
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
@@ -159,30 +182,34 @@ int main()
         cube_obj.update();
         cube_ptr->computeMVPs(rendering::CameraHandler::calculateMVP);
         cube_ptr->drawInstances(uniform_MVP_id);
-        if(static_cast<int64_t>(timeValue)%3 ==0)
+        glDisable(GL_CULL_FACE);
+        mesh.draw(uniform_MVP_id, rendering::CameraHandler::calculateMVP);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        for (auto& mesha : meshes)
         {
-            //cube_ptr->computeMVPs(rendering::CameraHandler::calculateMVP);
-            //cube_ptr->drawInstances(uniform_MVP_id);
-            mesh.draw(uniform_MVP_id, rendering::CameraHandler::calculateMVP);
-        }
-        else
-        { 
-            for (auto& mesha : meshes)
-            {
-                mesha.computeMVPs(rendering::CameraHandler::calculateMVP);
-                mesha.drawInstances(uniform_MVP_id);
-            }
+            mesha.computeMVPs(rendering::CameraHandler::calculateMVP);
+            mesha.drawInstances(uniform_MVP_id);
         }
         ProcessInput(mainWindow, GLFW_KEY_ESCAPE, GLFW_PRESS, closeWindow, mainWindow, GLFW_TRUE);
         glBindVertexArray(0);
 
         glUseProgram(0);
-
+        for(const auto& ui : UIs)
+        {
+            ui->showUI();
+        }
+        // Rendering
+        // (Your code clears your framebuffer, renders your other stuff etc.)
+        
+        // (Your code calls glfwSwapBuffers() etc.)
         glfwSwapBuffers(mainWindow);
     }
 
     glfwDestroyWindow(mainWindow);
-
+    ImGui_ImplOpenGL3_Shutdown();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
 
     return 0;
 }

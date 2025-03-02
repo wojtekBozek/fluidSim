@@ -2,7 +2,7 @@
 #include <vector>
 #include "object.hpp"
 #include <unordered_map>
-
+#include "properties.hpp"
 class ObjectMenager
 {
 public:
@@ -24,7 +24,6 @@ ObjectMenager();
      */
     void move(const std::string& objectName, glm::vec3 axis);
 
-
     void rotate(const std::string& objectName, glm::vec3 axis, float angle);
     /**
      * @brief add singular object
@@ -33,9 +32,13 @@ ObjectMenager();
      * @param object 
      * @return int -1 if object under given name already exsists, 0 on success
      */
-    int addObject(const std::string& objectName, std::unique_ptr<Object> object);
+    int addObject(const std::string& objectName, const Object& object);
     int removeObject(const std::string& objectName);
     
+    int addProperty(const std::string& name, const std::string& propName, std::shared_ptr<Property> prop);
+    void update(float deltaTime);
+
 private:
-    std::unordered_map<std::string, std::unique_ptr<Object>> m_object_map;
+    std::unordered_map<std::string, size_t> m_object_map;
+    std::vector<Object> m_objectVector;
 };

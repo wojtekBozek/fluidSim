@@ -19,8 +19,8 @@ void ObjectMenager::move(const std::string &object, glm::vec3 axis, float magnit
     }
     axis = glm::normalize(axis);
     axis = axis * magnitude;
-    object_it->second->translate(axis); 
-    object_it->second->update();  
+    m_objectVector.at(object_it->second).translate(axis); 
+    m_objectVector.at(object_it->second).update();  
 }
 
 void ObjectMenager::move(const std::string &object, glm::vec3 axis)
@@ -36,8 +36,8 @@ void ObjectMenager::move(const std::string &object, glm::vec3 axis)
         std::cerr << "Len(axis) = " << glm::length(axis) << " invalid. Aborting operation move.\n";
         return;
     }
-    object_it->second->translate(axis); 
-    object_it->second->update(); 
+    m_objectVector.at(object_it->second).translate(axis); 
+    m_objectVector.at(object_it->second).update(); 
 }
 
 void ObjectMenager::rotate(const std::string &objectName, glm::vec3 axis, float angle)
@@ -53,16 +53,17 @@ void ObjectMenager::rotate(const std::string &objectName, glm::vec3 axis, float 
         std::cerr << "Len(axis) = " << glm::length(axis) << " invalid. Aborting operation move.\n";
         return;
     }
-    object_it->second->rotate(angle, axis); 
-    object_it->second->update();
+    m_objectVector.at(object_it->second).rotate(angle, axis); 
+    m_objectVector.at(object_it->second).update();
 }
 
-int ObjectMenager::addObject(const std::string &objectName, std::unique_ptr<Object> object)
+int ObjectMenager::addObject(const std::string &objectName,const Object& object)
 {
     auto object_it = m_object_map.find(objectName);
     if(object_it == m_object_map.end())
     {
-        m_object_map.emplace(objectName, std::move(object));
+        m_objectVector.push_back(object);
+        m_object_map.emplace(objectName, m_objectVector.size()-1);
         return 0;
     }
     return -1;
@@ -76,6 +77,27 @@ int ObjectMenager::removeObject(const std::string &objectName)
         std::cerr << "No object named: " << objectName << " to be deleted! Aborting deletion\n";
         return -1;
     }
+    m_objectVector.erase(m_objectVector.begin() + object_it->second);
     m_object_map.erase(objectName);
     return 0;
+}
+
+int ObjectMenager::addProperty(const std::string& objectName, const std::string& propName, std::shared_ptr<Property> prop)
+{
+    auto object_it  = m_object_map.find(objectName);
+    if(object_it == m_object_map.end())
+    {
+        std::cerr << "No object named: " << objectName << " to add properrty! Aborting\n";
+        return -1;
+    }
+    m_objectVector.at(object_it->second).addProperty(propName, prop);
+    return 0;
+}
+
+void ObjectMenager::update(float deltaTime)
+{
+    for(auto& object : m_objectVector)
+    {
+        object.updateProperties(deltaTime);
+    }
 }
