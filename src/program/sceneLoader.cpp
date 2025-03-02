@@ -32,10 +32,7 @@ int SceneLoaderObj::loadScene(const std::string &dirPath, ObjectMenager &objectM
             meshVector.push_back(meshLoader.load(entry.path().string()));
             std::shared_ptr<Mesh> mesh_ptr = std::shared_ptr<Mesh>(&(meshVector).back());
             // Create an Object for this mesh
-            auto newObject = std::make_unique<Object>(mesh_ptr);
-            std::cout << mesh_ptr.get() << " mesh pointer" << &(meshVector.back()) << "\n";
-            // Add the object to the ObjectManager
-            if (objectManager.addObject(filename, std::move(newObject)) == 0)
+            if (objectManager.addObject(filename, Object(mesh_ptr)) == 0)
             {
                 std::cout << "Added object: " << filename << std::endl;
                 objectCount++;

@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14)
 
 set(OpenGL_GL_PREFERENCE "LEGACY")
-find_package(OpenGL 2 REQUIRED)
+find_package(OpenGL 4.6 REQUIRED)
 
 # Add the ImGui library with GLFW and OpenGL backend support
 add_library(imgui_glfw STATIC
@@ -12,7 +12,7 @@ add_library(imgui_glfw STATIC
   imgui/imgui_widgets.cpp
 
   imgui/backends/imgui_impl_glfw.cpp
-  imgui/backends/imgui_impl_opengl2.cpp
+  imgui/backends/imgui_impl_opengl3.cpp
 )
 
 # Link ImGui with glfw and OpenGL libraries

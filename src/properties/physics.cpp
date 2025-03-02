@@ -21,6 +21,7 @@ void PhysicalProperties::updatePhysics(float deltaTime)
     glm::vec3 acceleration = m_forces/m_mass;
     m_speed += acceleration * deltaTime;
     m_position += m_speed * deltaTime;
+    m_forces = glm::vec3(0.0f);
 }
 
 void PhysicalProperties::forcePosition(glm::vec3 position)

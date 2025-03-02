@@ -103,6 +103,14 @@ namespace rendering {
 			if (key == handler->key_rotation_on && action == handler->activation_type)
 			{
 				handler->rotation_on = !handler->rotation_on;
+				if(handler->rotation_on)
+				{
+					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+				}
+				else
+				{
+					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+				}
 			}
 		}
 

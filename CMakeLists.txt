@@ -26,6 +26,9 @@ ${CMAKE_SOURCE_DIR}/src/objects/objectsMeneger.cpp
 ${CMAKE_SOURCE_DIR}/src/program/sceneLoader.cpp 
 ${CMAKE_SOURCE_DIR}/src/program/mesh_loader.cpp 
 ${CMAKE_SOURCE_DIR}/src/properties/physics.cpp
+${CMAKE_SOURCE_DIR}/src/properties/particles.cpp 
+${CMAKE_SOURCE_DIR}/src/ui/mainWindow.cpp 
+${CMAKE_SOURCE_DIR}/src/ui/simulationUI.cpp 
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
@@ -36,6 +39,7 @@ ${CMAKE_SOURCE_DIR}/src/headers/objects/
 ${CMAKE_SOURCE_DIR}/src/headers/commons/
 ${CMAKE_SOURCE_DIR}/src/headers/program/
 ${CMAKE_SOURCE_DIR}/src/headers/properties/
+${CMAKE_SOURCE_DIR}/src/headers/ui/
 )
 
 add_definitions(-DGLEW_STATIC)
