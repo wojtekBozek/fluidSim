@@ -7,7 +7,7 @@ template <typename T>
 class SceneLoader 
 {
     public:
-    static int loadScene(const std::string& dirPath, ObjectMenager& objectManager, std::vector<Mesh>& meshVector)
+    static int loadScene(const std::string& dirPath, ObjectMenager& objectManager, std::vector<std::shared_ptr<Mesh>>& meshVector)
     {
         return T::loadScene(dirPath, objectManager, meshVector);
     }
@@ -25,5 +25,5 @@ class SceneLoaderObj
      * @param meshVector 
      * @return int 
      */
-    static int loadScene(const std::string& dirPath, ObjectMenager& objectManager, std::vector<Mesh>& meshVector);
+    static int loadScene(const std::string& dirPath, ObjectMenager& objectManager, std::vector<std::shared_ptr<Mesh>>& meshVector);
 };

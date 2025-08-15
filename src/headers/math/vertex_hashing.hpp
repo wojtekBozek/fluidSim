@@ -19,7 +19,7 @@ namespace wojtek_math {
 		combined_hash(hash_value, static_cast<uint32_t>(vertex.normal.z));
 		combined_hash(hash_value, static_cast<uint32_t>(vertex.uv.x));
 		combined_hash(hash_value, static_cast<uint32_t>(vertex.uv.y));
-		std::cout << hash_value << "\n";
+		std::cout << "hash value of Vertex: " << hash_value << "\n";
 		return hash_value;
 	}
 }

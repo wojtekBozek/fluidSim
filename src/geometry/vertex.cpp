@@ -35,7 +35,7 @@ const vertex3D& VerticesContainer::get_vertex(const uint32_t id) const
 }
 void rendering::VerticesContainer::bindAttribute(unsigned int layout, GLint size, const void *offset)
 {
-    std::cout << offset << "\n";
+    //std::cout << "Attrib offset"<< offset << "\n";
     glVertexAttribPointer(layout, size, GL_FLOAT, GL_FALSE, sizeof(vertex3D), offset);
     glEnableVertexAttribArray(layout);
 }
