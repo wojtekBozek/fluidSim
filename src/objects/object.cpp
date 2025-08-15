@@ -83,5 +83,7 @@ void Object::changeMesh(std::shared_ptr<Mesh> mesh_ptr_)
 }
 Object::~Object()
 {
+    std::cout << "Deleteing object: " << mesh_ptr.use_count() << "\n";
+    m_properties.clear();
     mesh_ptr->detachInstance(instance_id);
 }

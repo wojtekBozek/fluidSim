@@ -5,7 +5,7 @@
 
 namespace fs = std::filesystem;
 
-int SceneLoaderObj::loadScene(const std::string &dirPath, ObjectMenager &objectManager, std::vector<Mesh> &meshVector)
+int SceneLoaderObj::loadScene(const std::string &dirPath, ObjectMenager &objectManager, std::vector<std::shared_ptr<Mesh>> &meshVector)
 {
     MeshLoader meshLoader;
     int objectCount = 0;
@@ -29,10 +29,9 @@ int SceneLoaderObj::loadScene(const std::string &dirPath, ObjectMenager &objectM
 
             // Load the mesh
             //Mesh mesh = meshLoader.load(entry.path().string());
-            meshVector.push_back(meshLoader.load(entry.path().string()));
-            std::shared_ptr<Mesh> mesh_ptr = std::shared_ptr<Mesh>(&(meshVector).back());
+            meshVector.push_back(std::make_shared<Mesh>(meshLoader.load(entry.path().string())));
             // Create an Object for this mesh
-            if (objectManager.addObject(filename, Object(mesh_ptr)) == 0)
+            if (objectManager.addObject(filename, Object(meshVector.back())) == 0)
             {
                 std::cout << "Added object: " << filename << std::endl;
                 objectCount++;

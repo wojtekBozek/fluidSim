@@ -37,6 +37,7 @@ ObjectMenager();
     
     int addProperty(const std::string& name, const std::string& propName, std::shared_ptr<Property> prop);
     void update(float deltaTime);
+    void clearObjects();
 
 private:
     std::unordered_map<std::string, size_t> m_object_map;

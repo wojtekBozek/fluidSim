@@ -101,3 +101,9 @@ void ObjectMenager::update(float deltaTime)
         object.updateProperties(deltaTime);
     }
 }
+
+void ObjectMenager::clearObjects()
+{
+    m_object_map.clear();
+    m_objectVector.clear();
+}

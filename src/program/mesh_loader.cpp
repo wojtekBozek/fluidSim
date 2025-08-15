@@ -65,7 +65,7 @@ Mesh MeshLoader::load(std::string filepath)
                     auto it = vertex_map.find(newhash);
                     if (it != vertex_map.end()) {
                         // Vertex already exists, return its index
-                        std::cout << "Vertex already exists at index: " << it->first << "\n";
+                        std::cout << "Vertex already exists at hash: " << it->first << "\n";
                         indices.push_back(indices_map.at(newhash));
                     }
                     else {

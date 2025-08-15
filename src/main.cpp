@@ -82,8 +82,8 @@ int main()
     glEnable(GL_DEPTH_TEST);  
 
     ShaderProgram program;
-    program.addShader(GL_VERTEX_SHADER, "C:/Users/Wojtek/Desktop/Programowanie/Magisterka/FluidSimulator/shaders/location/vertex.shader");
-    program.addShader(GL_FRAGMENT_SHADER, "C:/Users/Wojtek/Desktop/Programowanie/Magisterka/FluidSimulator/shaders/location/fragment.shader");
+    program.addShader(GL_VERTEX_SHADER, "C:/Users/wojte/Documents/ZeStaregoKomputera/Programowanie/Magisterka/FluidSimulator/shaders/location/vertex.shader");
+    program.addShader(GL_FRAGMENT_SHADER, "C:/Users/wojte/Documents/ZeStaregoKomputera/Programowanie/Magisterka/FluidSimulator/shaders/location/fragment.shader");
     program.linkProgram();
     
     MeshLoader loader;
@@ -99,8 +99,8 @@ int main()
         float(WIDTH)/float(HEIGHT), 0.1f, 100.0f, 45.0f));
     glfwSetInputMode(mainWindow, GLFW_STICKY_KEYS, GL_TRUE);
     ObjectMenager objectMeneger;
-    std::vector<Mesh> meshes;
-    SceneLoader<SceneLoaderObj>::loadScene("C:/Users/Wojtek/Desktop/Programowanie/Magisterka/FluidSimulator/obj/", 
+    std::vector<std::shared_ptr<Mesh>> meshes;
+    SceneLoader<SceneLoaderObj>::loadScene("C:/Users/wojte/Documents/ZeStaregoKomputera/Programowanie/Magisterka/FluidSimulator/obj/", 
                             objectMeneger, meshes);
                             
     rendering::CameraHandler::setActiveCamera(std::move(camera));
@@ -113,7 +113,7 @@ int main()
     float currentFrame = static_cast<float>(glfwGetTime());
     for (auto& mesha : meshes)
     {
-        mesha.bind(0,-1,-1,1);
+        mesha->bind(0,-1,-1,1);
     }
 
     objectMeneger.addProperty("cube", "physics", prop2);
@@ -150,13 +150,15 @@ int main()
 
         for (auto& mesha : meshes)
         {
-            mesha.computeMVPs(rendering::CameraHandler::calculateMVP);
-            mesha.drawInstances(uniform_MVP_id);
+            mesha->computeMVPs(rendering::CameraHandler::calculateMVP);
+            mesha->drawInstances(uniform_MVP_id);
         }
-        ProcessInput(mainWindow, GLFW_KEY_ESCAPE, GLFW_PRESS, closeWindow, mainWindow, GLFW_TRUE);
+        
         glBindVertexArray(0);
 
         glUseProgram(0);
+
+        ProcessInput(mainWindow, GLFW_KEY_ESCAPE, GLFW_PRESS, closeWindow, mainWindow, GLFW_TRUE);
         for(const auto& ui : UIs)
         {
             ui->showUI();
@@ -167,7 +169,11 @@ int main()
         // (Your code calls glfwSwapBuffers() etc.)
         glfwSwapBuffers(mainWindow);
     }
-
+    
+    glUseProgram(0);
+    glBindVertexArray(0);
+    objectMeneger.clearObjects();
+    //meshes.clear();
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
