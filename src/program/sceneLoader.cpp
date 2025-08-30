@@ -28,7 +28,6 @@ int SceneLoaderObj::loadScene(const std::string &dirPath, ObjectMenager &objectM
             std::cout << "Loading OBJ file: " << entry.path() << std::endl;
 
             // Load the mesh
-            //Mesh mesh = meshLoader.load(entry.path().string());
             meshVector.push_back(std::make_shared<Mesh>(meshLoader.load(entry.path().string())));
             // Create an Object for this mesh
             if (objectManager.addObject(filename, Object(meshVector.back())) == 0)

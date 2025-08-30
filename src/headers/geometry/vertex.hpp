@@ -20,7 +20,7 @@ struct material {
 
 struct vertex3D {
     glm::vec3 xyz;
-    glm::vec3 rgb;
+    glm::vec3 rgb = {0.0f, 0.0f, 0.0f};
     glm::vec2 uv;
     glm::vec3 normal;
 };

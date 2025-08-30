@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.7.2)
+cmake_minimum_required(VERSION 3.19.2)
 
 project(FluidSimulator)
 
@@ -52,9 +52,46 @@ endif()
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
+option(ENABLE_ASAN "Enable AddressSanitizer (runtime memory error detection)" ON)
+
+if (ENABLE_ASAN)
+    message(STATUS "Enabling AddressSanitizer")
+
+    if (CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        # GCC and Clang
+        add_compile_options(-fsanitize=address -fno-omit-frame-pointer)
+        add_link_options(-fsanitize=address)
+
+    elseif (MSVC)
+        # MSVC (Visual Studio 2019+ with /fsanitize=address support)
+        add_compile_options(/fsanitize=address)
+        add_link_options(/fsanitize=address)
+
+    else()
+        message(WARNING "AddressSanitizer not supported on this compiler: ${CMAKE_CXX_COMPILER_ID}")
+    endif()
+endif()
+
 # Copy shader files to the build folder
 # configure_file(${SHADERS_DIR}/vertex.shader ${CMAKE_BINARY_DIR}/shaders/vertex.shader COPYONLY)
 # configure_file(${SHADERS_DIR}/fragment.shader ${CMAKE_BINARY_DIR}/shaders/fragment.shader COPYONLY)
 
 # more elaborate way to copy shaders
-file(COPY ${SHADERS_DIR} DESTINATION ${CMAKE_BINARY_DIR}/shaders)
+file(COPY ${CMAKE_SOURCE_DIR}/shaders DESTINATION ${CMAKE_BINARY_DIR})
+if (EXISTS "${CMAKE_SOURCE_DIR}/obj")
+    file(COPY ${CMAKE_SOURCE_DIR}/obj DESTINATION ${CMAKE_BINARY_DIR})
+endif()
+
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+            ${CMAKE_SOURCE_DIR}/shaders
+            $<TARGET_FILE_DIR:${PROJECT_NAME}>/shaders
+)
+
+if (EXISTS "${CMAKE_SOURCE_DIR}/obj")
+    add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+                ${CMAKE_SOURCE_DIR}/obj
+                $<TARGET_FILE_DIR:${PROJECT_NAME}>/obj
+    )
+endif()
