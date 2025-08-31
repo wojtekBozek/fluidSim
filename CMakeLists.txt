@@ -1,16 +1,13 @@
-cmake_minimum_required(VERSION 3.19.2)
+cmake_minimum_required(VERSION 3.20)
 
 project(FluidSimulator)
 
-set(IMGUI_VERSION 1.87)
+set(IMGUI_VERSION 1.92)
 
 if(POLICY CMP0135)
   cmake_policy(SET CMP0135 NEW)
 endif()
 add_subdirectory(external)
-
-# Set the path to the shaders folder relative to the CMakeLists.txt file
-set(SHADERS_DIR "${CMAKE_CURRENT_SOURCE_DIR}/shaders")
 
 file(GLOB_RECURSE _main CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/src/main.cpp)
@@ -28,7 +25,7 @@ ${CMAKE_SOURCE_DIR}/src/program/mesh_loader.cpp
 ${CMAKE_SOURCE_DIR}/src/properties/physics.cpp
 ${CMAKE_SOURCE_DIR}/src/properties/particles.cpp 
 ${CMAKE_SOURCE_DIR}/src/ui/mainWindow.cpp 
-${CMAKE_SOURCE_DIR}/src/ui/simulationUI.cpp 
+${CMAKE_SOURCE_DIR}/src/ui/simulationUI.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
@@ -44,11 +41,14 @@ ${CMAKE_SOURCE_DIR}/src/headers/ui/
 
 add_definitions(-DGLEW_STATIC)
 
+
 if (WIN32)
-    target_link_libraries(${PROJECT_NAME} opengl32 glfw libglew_static glm stb_image imgui_glfw tinyobjloader)
+    target_link_libraries(${PROJECT_NAME} PRIVATE opengl32 glfw libglew_static glm stb_image imgui_glfw tinyobjloader nfd)
 elseif (UNIX)
-    target_link_libraries(${PROJECT_NAME} GL glfw libglew_static glm stb_image imgui_glfw tinyobjloader)
+    target_link_libraries(${PROJECT_NAME} PRIVATE GL glfw libglew_static glm stb_image imgui_glfw tinyobjloader nfd)
 endif()
+
+
 
 target_compile_features(${PROJECT_NAME} PRIVATE cxx_std_17)
 
