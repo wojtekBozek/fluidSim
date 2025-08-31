@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.14)
+cmake_minimum_required(VERSION 3.20)
 
 # Include FetchContent to fetch external dependencies
 include(FetchContent)
@@ -12,3 +12,4 @@ add_subdirectory(imgui)
 add_subdirectory(tinyobjloader)
 # Include ImGui for glfw as a separate library
 add_subdirectory(imgui_glfw)
+add_subdirectory(native_file_dialog)
