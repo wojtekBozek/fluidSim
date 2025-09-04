@@ -13,19 +13,19 @@ file(GLOB_RECURSE _main CONFIGURE_DEPENDS
     ${CMAKE_SOURCE_DIR}/src/main.cpp)
 
 add_executable(${PROJECT_NAME} ${_main}
-${CMAKE_SOURCE_DIR}/src/commons/shader.cpp
-${CMAKE_SOURCE_DIR}/src/commons/shaderProgram.cpp
-${CMAKE_SOURCE_DIR}/src/geometry/vertex.cpp 
-${CMAKE_SOURCE_DIR}/src/geometry/mesh.cpp 
-${CMAKE_SOURCE_DIR}/src/camera/camera3D.cpp 
-${CMAKE_SOURCE_DIR}/src/objects/object.cpp 
-${CMAKE_SOURCE_DIR}/src/objects/objectsMeneger.cpp 
-${CMAKE_SOURCE_DIR}/src/program/sceneLoader.cpp 
-${CMAKE_SOURCE_DIR}/src/program/mesh_loader.cpp 
-${CMAKE_SOURCE_DIR}/src/properties/physics.cpp
-${CMAKE_SOURCE_DIR}/src/properties/particles.cpp 
-${CMAKE_SOURCE_DIR}/src/ui/mainWindow.cpp 
-${CMAKE_SOURCE_DIR}/src/ui/simulationUI.cpp
+${CMAKE_SOURCE_DIR}/src/src/commons/shader.cpp
+${CMAKE_SOURCE_DIR}/src/src/commons/shaderProgram.cpp
+${CMAKE_SOURCE_DIR}/src/src/geometry/vertex.cpp 
+${CMAKE_SOURCE_DIR}/src/src/geometry/mesh.cpp 
+${CMAKE_SOURCE_DIR}/src/src/camera/camera3D.cpp 
+${CMAKE_SOURCE_DIR}/src/src/objects/object.cpp 
+${CMAKE_SOURCE_DIR}/src/src/objects/objectsMeneger.cpp 
+${CMAKE_SOURCE_DIR}/src/src/program/sceneLoader.cpp 
+${CMAKE_SOURCE_DIR}/src/src/program/mesh_loader.cpp 
+${CMAKE_SOURCE_DIR}/src/src/properties/physics.cpp
+${CMAKE_SOURCE_DIR}/src/src/properties/particles.cpp 
+${CMAKE_SOURCE_DIR}/src/src/ui/mainWindow.cpp 
+${CMAKE_SOURCE_DIR}/src/src/ui/simulationUI.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
