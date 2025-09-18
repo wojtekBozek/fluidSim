@@ -35,6 +35,7 @@ class Object {
 		void changeMesh(std::shared_ptr<Mesh> mesh_ptr_);
 		~Object();
 	private:
+		std::string name;
 		bool visible = true;
 		std::shared_ptr<Mesh> mesh_ptr;
 		uint32_t instance_id;

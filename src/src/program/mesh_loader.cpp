@@ -33,7 +33,7 @@ Mesh MeshLoader::load(std::string filepath)
                 tinyobj::real_t Kd[3] = { m_materials[idm].diffuse[0],m_materials[idm].diffuse[1],m_materials[idm].diffuse[2] };
                 tinyobj::real_t Ks[3] = { m_materials[idm].specular[0],m_materials[idm].specular[1],m_materials[idm].specular[2] };
                 tinyobj::real_t Ke[3] = { m_materials[idm].emission[0],m_materials[idm].emission[1],m_materials[idm].emission[2] };
-                material color;
+                Material color;
                 color.ambient = glm::vec3(Ka[0], Ka[1], Ka[2]);
                 color.diffuse = glm::vec3(Kd[0], Kd[1], Kd[2]);
                 color.specular =glm::vec3(Ks[0], Ks[1], Ks[2]);
@@ -57,7 +57,7 @@ Mesh MeshLoader::load(std::string filepath)
                     if (idx.texcoord_index >= 0) {
                         tinyobj::real_t tx = m_attributes.texcoords[2 * idx.texcoord_index + 0];
                         tinyobj::real_t ty = m_attributes.texcoords[2 * idx.texcoord_index + 1];
-                        vert.uv = glm::vec2(tx, ty);
+                        //vert.uv = glm::vec2(tx, ty); // odkomentować, jeśli będą potrzebne UV
                     }
 
                     vert.xyz = glm::vec3(vx, vy, vz);
@@ -77,8 +77,6 @@ Mesh MeshLoader::load(std::string filepath)
                         std::cout << "Added new vertex at index: " << index << std::endl;
                         index++;
                     }
-                    //temp_vertices.push_back(vert);
-
                 }
                 index_offset += fv;
             }
@@ -86,4 +84,9 @@ Mesh MeshLoader::load(std::string filepath)
         Mesh mesh(m_tempVertices,indices);
         clean();
         return mesh;
+    }
+
+    Mesh MeshLoader::load(std::string filepath, MaterialContainer &materialContainer)
+    {
+        return Mesh();
     }

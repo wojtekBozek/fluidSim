@@ -22,9 +22,12 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
+#include "positionedLight.hpp"
+
 //Window dimensions
 constexpr GLint WIDTH = 1200, HEIGHT = 900;
-
+constexpr int layoutPos = 0;
+constexpr int layoutNormals = 1;
 
 void closeWindow(GLFWwindow* window, int value)
 {
@@ -113,14 +116,20 @@ int main()
     float currentFrame = static_cast<float>(glfwGetTime());
     for (auto& mesh : meshes)
     {
-        mesh->bind(0,-1,-1,1);
+        mesh->bind(layoutPos, layoutNormals);
     }
-
+    
     objectMeneger.addProperty("cube", "physics", prop2);
     
     setup::setupImGui(mainWindow);
     
     glCullFace(GL_BACK);
+
+    PositionedLight light;
+    light.position = glm::vec3(0.0f, 5.0f, 0.0f);
+    light.ambient = glm::vec3(0.1f);
+    light.diffuse = glm::vec3(0.8f);
+    light.specular = glm::vec3(1.0f);
 
     while (!glfwWindowShouldClose(mainWindow))
     {
@@ -150,6 +159,7 @@ int main()
 
         for (auto& mesh : meshes)
         {
+            
             mesh->computeMVPs(rendering::CameraHandler::calculateMVP);
             mesh->drawInstances(uniform_MVP_id);
         }
