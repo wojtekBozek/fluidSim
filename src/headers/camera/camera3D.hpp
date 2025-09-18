@@ -27,12 +27,14 @@ namespace rendering{
 	public:
 		virtual glm::mat4 calculateMVP(glm::mat4 model) = 0;
 		virtual void setView(glm::vec3 view) = 0;
+		virtual glm::vec3 getViewPosition() const = 0;
 	};
 	
 	class PerspectiveCamera : camera {
 	public:
 		glm::mat4 calculateMVP(glm::mat4 model) override;
 		virtual void setView(glm::vec3 view) override {};
+		virtual glm::vec3 getViewPosition() const override { return position; };
 		void setLocation(glm::vec3 location) {};
 		void setUpVector(glm::vec3 up) {};
 		void setRightVector(glm::vec3 right) {};

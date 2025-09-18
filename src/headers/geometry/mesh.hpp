@@ -3,8 +3,8 @@
 #include <GL/glew.h>
 #include <vector>
 #include "vertex.hpp"                  
-
-
+#include "shaderProgram.hpp"
+#include "positionedLight.hpp"
 class Mesh
 {
     public:
@@ -63,13 +63,14 @@ class Mesh
 
 
     ~Mesh();
-    uint32_t addNewInstance(const glm::mat4& data);
+    uint32_t addNewInstance(const glm::mat4& data = glm::mat4(1.0f));
     void detachInstance(uint32_t id);
     void removeInstances();
     const std::vector<uint32_t> &getDetachedInstances() const;//needed for indexing instances for object
     void computeMVPs(glm::mat4 (*func)(glm::mat4));
     void drawInstances(GLuint mvpLayout);
     void draw();
+    void draw(ShaderProgram& shaderProgram, const PositionedLight& light, const glm::vec3& viewPos);
     void draw(GLuint mvpLayout, glm::mat4 (*func)(glm::mat4));
     /**
      * @brief Get a reference to the transformation matrix of a specific instance.
@@ -95,19 +96,18 @@ class Mesh
      * Then some higher level object would modify bindings in case of shader change. 
      * 
      * @param layoutPos 
-     * @param layoutUV 
      * @param layoutNormals 
-     * @param layoutColor 
      */
-    void bind(int layoutPos=-1, int layoutUV=-1, int layoutNormals=-1, int layoutColor=-1);
+    void bind(int layoutPos=-1, int layoutNormals=-1);
     private:                  
     rendering::VerticesContainer m_vertices;
     std::vector<uint32_t> m_indices;
     std::vector<glm::mat4> m_instances;
-    std::vector<uint32_t> m_detachedInstances_id;
     std::vector<glm::mat4> m_instancesMVPs;
+    std::vector<std::shared_ptr<const Material>> m_materials;
+    std::vector<uint32_t> m_detachedInstances_id;
     glm::mat4 m_basic_instance = glm::mat4(1.0f);
     glm::mat4 m_basic_instance_mvp = glm::mat4(1.0f);
+    std::shared_ptr<const Material> m_defaultMaterial = std::make_shared<Material>(Material({0.2f, 0.2f, 0.2f}, {0.8f, 0.8f, 0.8f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, 32.0f));
     GLuint m_VAO = 0, m_VBO = 0, m_EBO = 0;
-    //GLuint m_VAO, m_VBO, m_EBO;
 };

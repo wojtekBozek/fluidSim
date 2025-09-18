@@ -52,15 +52,7 @@ void VerticesContainer::bindPosition(unsigned int layout)
     bindAttribute(layout, 3, (void*)offsetof(vertex3D, xyz));
 }
 
-void VerticesContainer::bindUVs(unsigned int layout)
-{
-    bindAttribute(layout, 2, (void*)offsetof(vertex3D, uv));
-}
 void VerticesContainer::bindNormals(unsigned int layout)
 {
     bindAttribute(layout, 3, (void*)offsetof(vertex3D, normal));
-}
-void VerticesContainer::bindColors(unsigned int layout)
-{
-    bindAttribute(layout, 3, (void*)offsetof(vertex3D, rgb));
 }

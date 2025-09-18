@@ -10,18 +10,19 @@
 #include <iostream>
 
 
-struct material {
-    glm::vec3 ambient;
-    glm::vec3 diffuse;
-    glm::vec3 specular;
-    glm::vec3 emissive;
-    float shininess;
+struct Material {
+    Material() = default;
+    Material(const glm::vec3& amb, const glm::vec3& diff, const glm::vec3& spec, const glm::vec3& emis, float shin)
+        : ambient(amb), diffuse(diff), specular(spec), emissive(emis), shininess(shin) {}
+    glm::vec3 ambient={0.0f, 0.0f, 0.0f};
+    glm::vec3 diffuse={0.0f, 0.0f, 0.0f};
+    glm::vec3 specular={0.0f, 0.0f, 0.0f};
+    glm::vec3 emissive={0.0f, 0.0f, 0.0f};
+    float shininess=32.0f;
 };
 
 struct vertex3D {
     glm::vec3 xyz;
-    glm::vec3 rgb = {0.0f, 0.0f, 0.0f};
-    glm::vec2 uv;
     glm::vec3 normal;
 };
 
@@ -70,9 +71,7 @@ namespace rendering {
         ~VerticesContainer() {};
         void bufferVertexData(GLuint vao, GLuint vbo);
         void bindPosition(unsigned int position_layout);
-        void bindUVs(unsigned int uvs_layout);
         void bindNormals(unsigned int normal_layout);
-        void bindColors(unsigned int color_layout);
     private:
         void bindAttribute(unsigned int layout, GLint size, const void* offset);
         std::vector<vertex3D>  vertices;

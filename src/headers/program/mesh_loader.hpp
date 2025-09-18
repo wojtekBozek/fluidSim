@@ -1,6 +1,7 @@
 #pragma once
 #include "mesh.hpp"
 #include "vertex.hpp"
+#include <materialContainer.hpp>
 #include "vertex_hashing.hpp"
 #include <map>
 #include <tiny_obj_loader.h>
@@ -8,6 +9,7 @@ class MeshLoader {
 public:
     MeshLoader() {}
     Mesh load(std::string filepath);
+    Mesh load(std::string filepath, MaterialContainer& materialContainer);
     void clean() 
     {
         m_tempVertices.clear();
@@ -19,7 +21,7 @@ public:
     }
 private:
 	std::vector<vertex3D> m_tempVertices;
-    std::vector<material> m_tempMaterial;
+    std::vector<Material> m_tempMaterial;
     tinyobj::attrib_t m_attributes;
     std::vector<tinyobj::shape_t> m_shapes;
     std::vector<tinyobj::material_t> m_materials;
