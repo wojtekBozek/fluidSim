@@ -126,7 +126,7 @@ int main()
     glCullFace(GL_BACK);
 
     PositionedLight light;
-    light.position = glm::vec3(0.0f, 5.0f, 0.0f);
+    light.position = glm::vec3(-10.00f, 5.0f, 10.0f);
     light.ambient = glm::vec3(0.1f);
     light.diffuse = glm::vec3(0.8f);
     light.specular = glm::vec3(1.0f);
@@ -146,11 +146,11 @@ int main()
         rendering::CameraHandler::processMovement(mainWindow);
         currentFrame = static_cast<float>(glfwGetTime());
         rendering::CameraHandler::setCurrentSpeed(currentFrame - lastFrame);
-        prop2->applyForces(glm::vec3(0,-glm::cos(timeValue),0));
+        //prop2->applyForces(glm::vec3(0,-glm::cos(timeValue),0));
         objectMeneger.update(currentFrame - lastFrame);
         lastFrame = currentFrame;
         
-        objectMeneger.rotate("cube", glm::vec3(0.0f, 0.0f, 1.0f),1.5);
+        //objectMeneger.rotate("cube", glm::vec3(0.0f, 0.0f, 1.0f),1.5);
         objectMeneger.move("cube", glm::vec3(0,0,glm::sin(timeValue)));
 
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
@@ -161,7 +161,7 @@ int main()
         {
             
             mesh->computeMVPs(rendering::CameraHandler::calculateMVP);
-            mesh->drawInstances(uniform_MVP_id);
+            mesh->draw(program, light, rendering::CameraHandler::getInstance()->getCameraViewPosition());
         }
         
         glBindVertexArray(0);
