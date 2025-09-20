@@ -108,6 +108,6 @@ class Mesh
     std::vector<uint32_t> m_detachedInstances_id;
     glm::mat4 m_basic_instance = glm::mat4(1.0f);
     glm::mat4 m_basic_instance_mvp = glm::mat4(1.0f);
-    std::shared_ptr<const Material> m_defaultMaterial = std::make_shared<Material>(Material({0.2f, 0.2f, 0.2f}, {0.8f, 0.8f, 0.8f}, {1.0f, 1.0f, 1.0f}, {0.0f, 0.0f, 0.0f}, 32.0f));
+    std::shared_ptr<const Material> m_defaultMaterial = std::make_shared<Material>(Material({0.6f, 0.7f, 0.1f}, {0.2f, 0.8f, 0.1f}, {0.0f, 0.0f, 0.0f}, {0.0f, 0.0f, 0.0f}, 32.0f));
     GLuint m_VAO = 0, m_VBO = 0, m_EBO = 0;
 };
