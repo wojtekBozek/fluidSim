@@ -146,12 +146,12 @@ int main()
         rendering::CameraHandler::processMovement(mainWindow);
         currentFrame = static_cast<float>(glfwGetTime());
         rendering::CameraHandler::setCurrentSpeed(currentFrame - lastFrame);
-        //prop2->applyForces(glm::vec3(0,-glm::cos(timeValue),0));
+        prop2->applyForces(glm::vec3(0,-glm::cos(timeValue),0));
         objectMeneger.update(currentFrame - lastFrame);
         lastFrame = currentFrame;
         
-        //objectMeneger.rotate("cube", glm::vec3(0.0f, 0.0f, 1.0f),1.5);
-        objectMeneger.move("cube", glm::vec3(0,0,glm::sin(timeValue)));
+        objectMeneger.rotate("cube", glm::vec3(0.0f, 0.0f, 1.0f),1.5);
+        //objectMeneger.move("cube", glm::vec3(0,0,glm::sin(timeValue)));
 
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);

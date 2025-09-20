@@ -91,6 +91,7 @@ void Mesh::draw(ShaderProgram &shaderProgram, const PositionedLight& light, cons
     for (int i = 0; i < m_instances.size(); i++)
     {
         shaderProgram.setMat4("MVP", m_instancesMVPs[i]);
+        shaderProgram.setMat4("model", m_instances[i]);
         // Set material properties if needed
         //if (m_materials[i]) {
         //    shaderProgram.setVec3("material.ambient", m_materials[i]->ambient);
