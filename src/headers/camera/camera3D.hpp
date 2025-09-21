@@ -28,6 +28,8 @@ namespace rendering{
 		virtual glm::mat4 calculateMVP(glm::mat4 model) = 0;
 		virtual void setView(glm::vec3 view) = 0;
 		virtual glm::vec3 getViewPosition() const = 0;
+		virtual glm::mat4 getProjection() const = 0;
+		virtual glm::mat4 getView() const = 0;
 	};
 	
 	class PerspectiveCamera : camera {
@@ -35,6 +37,8 @@ namespace rendering{
 		glm::mat4 calculateMVP(glm::mat4 model) override;
 		virtual void setView(glm::vec3 view) override {};
 		virtual glm::vec3 getViewPosition() const override { return position; };
+		virtual glm::mat4 getProjection() const override { return projection; };
+		virtual glm::mat4 getView() const override { return view; };
 		void setLocation(glm::vec3 location) {};
 		void setUpVector(glm::vec3 up) {};
 		void setRightVector(glm::vec3 right) {};
