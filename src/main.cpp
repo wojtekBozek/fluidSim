@@ -23,7 +23,7 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 #include "positionedLight.hpp"
-
+#include "renderer.hpp"
 //Window dimensions
 constexpr GLint WIDTH = 1200, HEIGHT = 900;
 constexpr int layoutPos = 0;
@@ -130,7 +130,7 @@ int main()
     light.ambient = glm::vec3(0.1f);
     light.diffuse = glm::vec3(0.8f);
     light.specular = glm::vec3(1.0f);
-
+    Renderer renderer;
     while (!glfwWindowShouldClose(mainWindow))
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
@@ -157,13 +157,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(program.getProgramId());
 
-        for (auto& mesh : meshes)
-        {
-            
-            mesh->computeMVPs(rendering::CameraHandler::calculateMVP);
-            mesh->draw(program, light, rendering::CameraHandler::getInstance()->getCameraViewPosition());
-        }
-        
+        renderer.render(meshes, program, light, rendering::CameraHandler::getInstance()->getCamera());
         glBindVertexArray(0);
 
         glUseProgram(0);

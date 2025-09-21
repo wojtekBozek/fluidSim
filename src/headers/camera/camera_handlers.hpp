@@ -20,13 +20,9 @@ namespace rendering {
 			return ASC_ptr;
 		}
 
-		glm::vec3 getCameraViewPosition() const 
+		PerspectiveCamera& getCamera() const 
 		{
-			if (camera_ptr.get() != nullptr)
-			{
-				return camera_ptr->getViewPosition();
-			}
-			return glm::vec3(0.0f);
+			return *camera_ptr.get();
 		}
 		static void setActiveCamera(std::unique_ptr<PerspectiveCamera> camera) 
 		{

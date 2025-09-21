@@ -62,6 +62,12 @@ class Mesh
     }
 
 
+    GLuint getVAO() const { return m_VAO; }
+    const std::vector<glm::mat4>& getInstances() const { return m_instances; }
+    const std::vector<glm::mat4>& getInstanceMVPs() const { return m_instancesMVPs; }
+    const std::vector<unsigned int>& getIndices() const { return m_indices; }
+    const std::shared_ptr<const Material>& getDefaultMaterial() const { return m_defaultMaterial; }
+
     ~Mesh();
     uint32_t addNewInstance(const glm::mat4& data = glm::mat4(1.0f));
     void detachInstance(uint32_t id);
