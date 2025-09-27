@@ -11,7 +11,7 @@
 
 namespace  setup
 {
-    void setupGLFW(int majVersion=3, int minVersion=3, int coreProfile=GLFW_OPENGL_CORE_PROFILE, int forwardComp=GL_TRUE)
+    inline void setupGLFW(int majVersion=3, int minVersion=3, int coreProfile=GLFW_OPENGL_CORE_PROFILE, int forwardComp=GL_TRUE)
     {
         glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, majVersion);
         glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, minVersion);
@@ -19,7 +19,7 @@ namespace  setup
         glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, forwardComp);
     }
 
-    void setupImGui(GLFWwindow* window)
+    inline void setupImGui(GLFWwindow* window)
     {
         IMGUI_CHECKVERSION();
         ImGui::CreateContext();
@@ -37,7 +37,7 @@ namespace  setup
         int height;
     };
 
-    FrameBufferSize getWindowFramerBufferSize(GLFWwindow* window)
+    inline FrameBufferSize getWindowFrameBufferSize(GLFWwindow* window)
     {
         FrameBufferSize size = {0,0};
         glfwGetFramebufferSize(window, &size.width, &size.height);

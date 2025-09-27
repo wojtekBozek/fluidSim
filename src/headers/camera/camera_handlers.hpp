@@ -1,5 +1,5 @@
 #pragma once
-#include "headers/camera/camera3D.hpp"
+#include "camera3D.hpp"
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
 #include <memory>
@@ -50,7 +50,7 @@ namespace rendering {
 			return handler->returnActiveMVP(mat);
 		}
 
-		static void connectCallbacs(GLFWwindow* window)
+		static void connectCallbacks(GLFWwindow* window)
 		{
 			CameraHandler* handler = CameraHandler::getInstance();
 			glfwSetWindowUserPointer(window, handler);
