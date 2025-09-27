@@ -26,6 +26,7 @@ ${CMAKE_SOURCE_DIR}/src/src/properties/physics.cpp
 ${CMAKE_SOURCE_DIR}/src/src/properties/particles.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/ui/mainWindow.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/ui/simulationUI.cpp
+${CMAKE_SOURCE_DIR}/src/src/program/application.cpp
 )
 
 target_include_directories(${PROJECT_NAME} PRIVATE 

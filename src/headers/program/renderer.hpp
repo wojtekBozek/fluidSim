@@ -6,7 +6,15 @@
 #include "shaderProgram.hpp"
 #include "positionedLight.hpp"
 
-class Renderer {
+class BaseRenderer
+{
+    //TODO
+public:
+    virtual void rendering() = 0;
+    virtual ~BaseRenderer() = default;
+};
+
+class Renderer{
 public:
     Renderer() = default;
     void render(const std::vector<std::shared_ptr<Mesh>>& meshes,
