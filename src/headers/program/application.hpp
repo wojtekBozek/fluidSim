@@ -44,7 +44,6 @@ private:
     std::vector<std::shared_ptr<BaseUI>> UIs;
     std::shared_ptr<rendering::PerspectiveCamera> camera;
     std::vector<std::shared_ptr<Mesh>> meshes;
-
     std::shared_ptr<PositionedLight> light;
 
 

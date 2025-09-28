@@ -59,6 +59,7 @@ public:
                 glDrawElements(GL_TRIANGLES, static_cast<GLsizei>(indices.size()), GL_UNSIGNED_INT, nullptr);
             }
         }
+        shaderProgram->dropProgram();
     }
     void setMeshes(const std::vector<std::shared_ptr<Mesh>>& meshes_)
     {
