@@ -1,5 +1,5 @@
 #include "particleRenderer.hpp"
-
+#include <glm/gtc/type_ptr.hpp>
 void ParticleRenderer::setupBackend()
 {
     GLuint bufsize = particlesNumber * 4 * sizeof(GLfloat);
@@ -39,6 +39,10 @@ void ParticleRenderer::render()
     glDispatchCompute(particlesNumber/1000, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
     shaderProgram->useProgram();
+    
+    glm::mat4 VP = camera->getProjection() * camera->getView();
+    GLint loc = glGetUniformLocation(shaderProgram->getProgramId(), "viewProj");
+    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(VP));
     glBindVertexArray(quadVAO);
     glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, particlesNumber);
     glBindVertexArray(0);
