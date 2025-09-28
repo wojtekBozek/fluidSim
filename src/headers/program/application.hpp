@@ -10,7 +10,7 @@
 #include "baseUI.hpp"
 #include "camera3D.hpp"
 #include "positionedLight.hpp"
-
+#include "particleRenderer.hpp"
 class Application
 {
 public:
@@ -37,7 +37,8 @@ private:
 
 
     std::vector<std::shared_ptr<BaseRenderer>> renderers;
-    std::shared_ptr<MeshRenderer> renderer;
+    std::shared_ptr<MeshRenderer> meshRenderer;
+    std::shared_ptr<ParticleRenderer> particleRenderer;
     std::shared_ptr<ShaderProgram> shaderProgram;
     std::shared_ptr<ShaderProgram> particleShaderProgram;
     std::shared_ptr<ShaderProgram> particleComputeShaderProgram;

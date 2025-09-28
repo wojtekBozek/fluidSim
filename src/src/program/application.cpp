@@ -47,8 +47,15 @@ void MyApp::setupResources()
     particleShaderProgram->addShader(GL_VERTEX_SHADER, "shaders/particleSolid/vertex.shader");
     particleShaderProgram->addShader(GL_FRAGMENT_SHADER, "shaders/particleSolid/fragment.shader");
     particleComputeShaderProgram->addShader(GL_COMPUTE_SHADER, "shaders/particleSolid/compute.shader");
+    
+    particleComputeShaderProgram->linkProgram();
     particleShaderProgram->linkProgram();
-
+    particleRenderer= std::make_shared<ParticleRenderer>();
+    particleRenderer->setShaderProgram(particleShaderProgram);
+    particleRenderer->setComputeShaderProgram(particleComputeShaderProgram); 
+    particleRenderer->generateParticles(1000000, -1.0f, 1.0f);
+    particleRenderer->setupBackend();
+    particleRenderer->setCamera(camera);    
     SceneLoader<SceneLoaderObj>::loadScene("obj/scene1/", 
                             *objectsMenager, meshes);
     for (auto& mesh : meshes)
@@ -61,8 +68,10 @@ void MyApp::setupResources()
     light->diffuse = glm::vec3(0.8f);
     light->specular = glm::vec3(1.0f);
     currentFrame = static_cast<float>(glfwGetTime());
-    renderer = std::make_shared<MeshRenderer>(meshes, shaderProgram, light, camera);
-    renderers.push_back(renderer);
+    meshRenderer = std::make_shared<MeshRenderer>(meshes, shaderProgram, light, camera);
+    renderers.push_back(particleRenderer);
+    renderers.push_back(meshRenderer);
+    setup::setupImGui(window); // needs to be called last, after creating window and opengl context
 }
 
 void MyApp::initialize()
@@ -104,9 +113,10 @@ void MyApp::initialize()
     glViewport(0, 0, bufferWidth, bufferHeight);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST); 
-    glCullFace(GL_BACK);
     
-    setup::setupImGui(window);
+    
+    
+    glCullFace(GL_BACK);
 }
 
 void MyApp::mainLoop()
@@ -129,9 +139,10 @@ void MyApp::mainLoop()
         glClear(GL_COLOR_BUFFER_BIT);
         for (const auto& renderer : renderers)
         {
-            renderer->render();
+          renderer->render();
         }
-
+        //meshRenderer->render();
+        //particleRenderer->render();
         glBindVertexArray(0);
         glUseProgram(0);
 

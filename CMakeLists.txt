@@ -22,6 +22,7 @@ ${CMAKE_SOURCE_DIR}/src/src/objects/object.cpp
 ${CMAKE_SOURCE_DIR}/src/src/objects/objectsMeneger.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/program/sceneLoader.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/program/mesh_loader.cpp 
+${CMAKE_SOURCE_DIR}/src/src/program/particleRenderer.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/properties/physics.cpp
 ${CMAKE_SOURCE_DIR}/src/src/properties/particles.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/ui/mainWindow.cpp 
