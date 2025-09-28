@@ -42,6 +42,13 @@ void MyApp::setupResources()
     shaderProgram->addShader(GL_FRAGMENT_SHADER, "shaders/location/fragment.shader");
     shaderProgram->linkProgram();
 
+    particleShaderProgram = std::make_shared<ShaderProgram>();
+    particleComputeShaderProgram = std::make_shared<ShaderProgram>();
+    particleShaderProgram->addShader(GL_VERTEX_SHADER, "shaders/particleSolid/vertex.shader");
+    particleShaderProgram->addShader(GL_FRAGMENT_SHADER, "shaders/particleSolid/fragment.shader");
+    particleComputeShaderProgram->addShader(GL_COMPUTE_SHADER, "shaders/particleSolid/compute.shader");
+    particleShaderProgram->linkProgram();
+
     SceneLoader<SceneLoaderObj>::loadScene("obj/scene1/", 
                             *objectsMenager, meshes);
     for (auto& mesh : meshes)
