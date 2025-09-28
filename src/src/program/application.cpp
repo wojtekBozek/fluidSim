@@ -25,15 +25,15 @@ void MyApp::setupResources()
 {
     objectsMenager = std::make_shared<ObjectMenager>();
     shaderProgram = std::make_shared<ShaderProgram>();
-    renderer = std::make_unique<Renderer>();
+    
     programState = std::make_shared<ProgramState>(ProgramState::MAIN_MENU);
     UIs.push_back(std::make_shared<MainWindow>(window, programState));
     UIs.push_back(std::make_shared<SimulationUI>(window, programState));
-    camera = std::make_unique<rendering::PerspectiveCamera>(glm::vec3(0, 0, 5), glm::vec3(0, 1, 0),
+    camera = std::make_shared<rendering::PerspectiveCamera>(glm::vec3(0, 0, 5), glm::vec3(0, 1, 0),
         float(WIDTH)/float(HEIGHT), 0.1f, 100.0f, 45.0f);
     
 
-    rendering::CameraHandler::setActiveCamera(std::move(camera));
+    rendering::CameraHandler::setActiveCamera(camera);
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     rendering::CameraHandler::connectCallbacks(window);
 
@@ -49,11 +49,13 @@ void MyApp::setupResources()
     {
         mesh->bind(layoutPos, layoutNormals);
     }
-    light.position = glm::vec3(-10.00f, 5.0f, 10.0f);
-    light.ambient = glm::vec3(0.1f);
-    light.diffuse = glm::vec3(0.8f);
-    light.specular = glm::vec3(1.0f);
+    light = std::make_shared<PositionedLight>();
+    light->position = glm::vec3(-10.00f, 5.0f, 10.0f);
+    light->ambient = glm::vec3(0.1f);
+    light->diffuse = glm::vec3(0.8f);
+    light->specular = glm::vec3(1.0f);
     currentFrame = static_cast<float>(glfwGetTime());
+    renderer = std::make_shared<MeshRenderer>(meshes, shaderProgram, light, camera);
 }
 
 void MyApp::initialize()
@@ -119,7 +121,7 @@ void MyApp::mainLoop()
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
         glUseProgram(shaderProgram->getProgramId());
-        renderer->render(meshes, *shaderProgram, light, rendering::CameraHandler::getInstance()->getCamera());
+        renderer->render();
 
         glBindVertexArray(0);
         glUseProgram(0);

@@ -36,15 +36,16 @@ private:
     void setupResources();
 
 
-    std::unique_ptr<Renderer> renderer;
+    std::vector<std::shared_ptr<BaseRenderer>> renderers;
+    std::shared_ptr<MeshRenderer> renderer;
     std::shared_ptr<ShaderProgram> shaderProgram;
     std::shared_ptr<ObjectMenager> objectsMenager;
     std::shared_ptr<ProgramState> programState;
     std::vector<std::shared_ptr<BaseUI>> UIs;
-    std::unique_ptr<rendering::PerspectiveCamera> camera;
+    std::shared_ptr<rendering::PerspectiveCamera> camera;
     std::vector<std::shared_ptr<Mesh>> meshes;
 
-    PositionedLight light;
+    std::shared_ptr<PositionedLight> light;
 
 
     float currentFrame = 0.0f;

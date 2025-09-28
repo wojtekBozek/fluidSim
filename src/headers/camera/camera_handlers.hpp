@@ -24,10 +24,10 @@ namespace rendering {
 		{
 			return *camera_ptr.get();
 		}
-		static void setActiveCamera(std::unique_ptr<PerspectiveCamera> camera) 
+		static void setActiveCamera(std::shared_ptr<PerspectiveCamera> camera) 
 		{
 			CameraHandler* handler = CameraHandler::getInstance();
-			handler->setCamera(std::move(camera));
+			handler->setCamera(camera);
 		}
 
 		
@@ -118,9 +118,9 @@ namespace rendering {
 			}
 		}
 
-		void setCamera(std::unique_ptr<PerspectiveCamera> camera)
+		void setCamera(std::shared_ptr<PerspectiveCamera> camera)
 		{
-			camera_ptr = std::move(camera);
+			camera_ptr = camera;
 		}
 		void setSpeed(float delta_time_) { delta_time = delta_time_; }
 		glm::mat4 returnActiveMVP(glm::mat4 model) 
@@ -147,7 +147,7 @@ namespace rendering {
 		static void moveRight() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(RIGHT, handler->delta_time); }
 		static void moveLeft() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(LEFT, handler->delta_time); }
 		static void origin() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(ORIGINAL, handler->delta_time); }
-		std::unique_ptr<PerspectiveCamera> camera_ptr;
+		std::shared_ptr<PerspectiveCamera> camera_ptr;
 		float delta_time;
 		int key_up, key_down, key_left, key_right, key_origin, key_rotation_on;
 		int activation_type = GLFW_PRESS;;
