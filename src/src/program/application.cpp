@@ -42,9 +42,8 @@ void MyApp::setupResources()
     shaderProgram->addShader(GL_FRAGMENT_SHADER, "shaders/location/fragment.shader");
     shaderProgram->linkProgram();
 
-    SceneLoader<SceneLoaderObj>::loadScene("obj/", 
+    SceneLoader<SceneLoaderObj>::loadScene("obj/scene1/", 
                             *objectsMenager, meshes);
-
     for (auto& mesh : meshes)
     {
         mesh->bind(layoutPos, layoutNormals);
@@ -56,6 +55,7 @@ void MyApp::setupResources()
     light->specular = glm::vec3(1.0f);
     currentFrame = static_cast<float>(glfwGetTime());
     renderer = std::make_shared<MeshRenderer>(meshes, shaderProgram, light, camera);
+    renderers.push_back(renderer);
 }
 
 void MyApp::initialize()
@@ -120,8 +120,10 @@ void MyApp::mainLoop()
         objectsMenager->rotate("cube", glm::vec3(0.0f, 0.0f, 1.0f),1.5);
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        glUseProgram(shaderProgram->getProgramId());
-        renderer->render();
+        for (const auto& renderer : renderers)
+        {
+            renderer->render();
+        }
 
         glBindVertexArray(0);
         glUseProgram(0);
