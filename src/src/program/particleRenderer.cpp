@@ -39,10 +39,16 @@ void ParticleRenderer::render()
     glDispatchCompute(particlesNumber/1000, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
     shaderProgram->useProgram();
-    
     glm::mat4 VP = camera->getProjection() * camera->getView();
-    GLint loc = glGetUniformLocation(shaderProgram->getProgramId(), "viewProj");
-    glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(VP));
+    glm::mat4 viewMatrix = camera->getView();
+    shaderProgram->setMat4("viewProj", VP);
+    shaderProgram->setMat4("viewMatrix", viewMatrix);
+    //GLint loc = glGetUniformLocation(shaderProgram->getProgramId(), "viewProj");
+    //glUniformMatrix4fv(loc, 1, GL_FALSE, glm::value_ptr(VP));
+    //GLint loc2 = glGetUniformLocation(shaderProgram->getProgramId(), "viewMatrix");
+    //glUniformMatrix4fv(loc2, 1, GL_FALSE, glm::value_ptr(viewMatrix));
+    //GLint loc3 = glGetUniformLocation(shaderProgram->getProgramId(), "upView");
+    //glUniform3fv(loc3, 1, glm::value_ptr(camUp));
     glBindVertexArray(quadVAO);
     glDrawArraysInstanced(GL_TRIANGLE_FAN, 0, 4, particlesNumber);
     glBindVertexArray(0);
