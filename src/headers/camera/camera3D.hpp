@@ -34,6 +34,9 @@ namespace rendering{
 	
 	class PerspectiveCamera : camera {
 	public:
+
+		glm::vec3 getRightVector() const { return right_dir; }
+		glm::vec3 getUpVector() const { return camera_up; }
 		glm::mat4 calculateMVP(glm::mat4 model) override;
 		virtual void setView(glm::vec3 view) override {};
 		virtual glm::vec3 getViewPosition() const override { return position; };
@@ -116,6 +119,12 @@ namespace rendering{
 			far_plane = far_plane_;
 			fov = fov_;
 			movement_speed = 2.5f;
+			glm::vec3 front_;
+			front_.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+			front_.y = sin(glm::radians(pitch));
+			front_.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+			front = glm::normalize(front_);
+			right_dir = glm::normalize(glm::cross(front, world_up));
 			makeProjectionMatrix();
 			updateCameraVectors();
 		}
@@ -129,7 +138,8 @@ namespace rendering{
 			near_plane( camera.near_plane),
 			far_plane (camera.far_plane),
 			fov(camera.fov),
-			front(camera.front)
+			front(camera.front),
+			right_dir(camera.right_dir)
 		{
 			makeProjectionMatrix();
 			updateCameraVectors();
