@@ -1,8 +1,8 @@
 #include "FluidSPHSimulation.hpp"
 
 FluidSPHSimulation::FluidSPHSimulation(std::unique_ptr<ShaderProgram> computeShader, Domain simulationDomain, Fluid fluid, uint32_t numOfParticles)
+: m_computeShader(std::move(computeShader))
 {
-    m_computeShader = std::make_unique<ShaderProgram>(std::move(computeShader));
     m_simulationDomain = simulationDomain;
     m_fluid = fluid;
     m_numOfParticles = numOfParticles;
@@ -11,12 +11,12 @@ FluidSPHSimulation::FluidSPHSimulation(std::unique_ptr<ShaderProgram> computeSha
 
 void FluidSPHSimulation::setFluidAndParticles()
 {
-    FluidParticle particle;
-    particle.mass = m_fluid.fluidDensity * m_fluid.volume /static_cast<float>(m_numOfParticles);
+    FluidParticle initialParticle;
+    initialParticle.mass = m_fluid.fluidDensity * m_fluid.volume /static_cast<float>(m_numOfParticles); // masa cząstki
     float domainVolume = m_initialDomain.size.x*m_initialDomain.size.y*m_initialDomain.size.z;
     float particleDiameter = std::cbrt(domainVolume/m_numOfParticles);
     float particleRadius = particleDiameter/2;
-    particle.position = m_initialDomain.posittion + glm::vec3(particleDiameter/2.0f);
+    initialParticle.position = m_initialDomain.posittion + glm::vec3(particleDiameter/2.0f);
     uint32_t xMax = std::floor(m_initialDomain.size.x/particleDiameter);
     uint32_t yMax = std::floor(m_initialDomain.size.y/particleDiameter);
     uint32_t zMax = std::floor(m_initialDomain.size.z/particleDiameter);
@@ -37,11 +37,10 @@ void FluidSPHSimulation::setFluidAndParticles()
     }
     
     uint32_t a =0, b=0, c=0;
-    //TODO dodać a,b,c i pierwszą logikę populowania domeny płynu
     for(int i=0; i<m_numOfParticles; ++i)
     {
-        particle.position += glm::vec3(a*particleDiameter, b*particleDiameter, c*particleDiameter);
-        m_particles.push_back(particle);
+        initialParticle.position += glm::vec3(a*particleDiameter, b*particleDiameter, c*particleDiameter);
+        m_particles.push_back(initialParticle);
         if(a < xMax)
         {
             a++;
@@ -60,5 +59,15 @@ void FluidSPHSimulation::setFluidAndParticles()
             }
         }
     }
-        
+    // gęstość cząstki
+    for (auto& particle : m_particles)
+    {
+        for(auto& otherParticle : m_particles)
+        {
+            //if(&particle != &otherParticle) massa cząstki lokalnej wpływa na jej lokalną gęstość (ale nie siły)
+            particle.density += otherParticle.mass * CubicSplineKernel(DIMENSION_3, m_kernelRadius, glm::distance(particle.position, otherParticle.position));
+        }
+        // ciśnienie cząstki
+        particle.pressure = m_fluid.soundSpeed*m_fluid.soundSpeed*(particle.density-m_fluid.fluidDensity); // uproszczone równanie z założeniami
+    }
 }
