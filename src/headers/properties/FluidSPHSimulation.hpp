@@ -89,11 +89,3 @@ private:
 
 
 
-class FluidParticleManager
-{
-    public:
-    private:
-    std::vector<FluidParticle> m_fluidParticles;
-    float kernelRadius;
-    GLuint m_SSBO;
-}; 
