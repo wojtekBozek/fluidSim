@@ -71,3 +71,18 @@ void FluidSPHSimulation::setFluidAndParticles()
         particle.pressure = m_fluid.soundSpeed*m_fluid.soundSpeed*(particle.density-m_fluid.fluidDensity); // uproszczone równanie z założeniami
     }
 }
+
+const Fluid &FluidSPHSimulation::getFluid() const
+{
+    return m_fluid;
+}
+
+const uint32_t &FluidSPHSimulation::getNumOfParticles() const
+{
+    return m_numOfParticles;
+}
+
+const std::vector<FluidParticle> &FluidSPHSimulation::getParticles() const
+{
+    return m_particles;
+}

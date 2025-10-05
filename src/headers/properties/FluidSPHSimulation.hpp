@@ -78,6 +78,11 @@ public:
     FluidSPHSimulation(std::unique_ptr<ShaderProgram> computeShader, Domain simulationDomain, Fluid fluid, uint32_t numOfParticles);
 
     void setFluidAndParticles();
+    const Fluid& getFluid() const;
+    //const Domain& getInitialDomain() const;
+    //const Domain& getSimulationDomain() const;
+    const uint32_t& getNumOfParticles() const;
+    const std::vector<FluidParticle>& getParticles() const;
 private:
     std::unique_ptr<ShaderProgram> m_computeShader;
     Domain m_simulationDomain, m_initialDomain;
