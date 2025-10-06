@@ -8,9 +8,9 @@
 #include <math.h>
 struct Particle
 {
-    glm::vec3 position;
-    glm::vec3 velocity;
-    glm::vec3 acceleration;
+    glm::vec4 position;
+    glm::vec4 velocity;
+    glm::vec4 acceleration;
 };
 
 struct FluidParticle : Particle
@@ -18,6 +18,7 @@ struct FluidParticle : Particle
     float pressure;
     float density;
     float mass;
+    float pad0;
 };
 
 
@@ -83,13 +84,15 @@ public:
     //const Domain& getSimulationDomain() const;
     const uint32_t& getNumOfParticles() const;
     const std::vector<FluidParticle>& getParticles() const;
+    float getParticleRadius(){return particleRadius;}
 private:
     std::unique_ptr<ShaderProgram> m_computeShader;
     Domain m_simulationDomain, m_initialDomain;
     Fluid m_fluid;
     std::vector<FluidParticle> m_particles;
-    uint32_t m_numOfParticles;
-    float m_kernelRadius;
+    uint32_t m_numOfParticles = 100;
+    float m_kernelRadius = 1.0f;
+    float particleRadius = 0.0f;
 };
 
 

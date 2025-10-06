@@ -145,6 +145,9 @@ namespace rendering{
 			updateCameraVectors();
 		}
 		~PerspectiveCamera() {}
+		void setWindowHeight(float height){windowHeight = height;}
+		float getWindowHeight() const {return windowHeight;}
+		float getFOV() const {return fov;}
 	private:
 		glm::vec3 position, front, camera_up, right_dir;
 		glm::vec3 original_position, world_up;
@@ -152,6 +155,7 @@ namespace rendering{
 		float fov, aspect_ratio, near_plane, far_plane;
 		float yaw, pitch;
 		float movement_speed = 2.5f;
+		float windowHeight;
 
 		void makeViewMatrix()
 		{

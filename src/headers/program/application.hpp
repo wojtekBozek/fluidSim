@@ -11,6 +11,7 @@
 #include "camera3D.hpp"
 #include "positionedLight.hpp"
 #include "particleRenderer.hpp"
+#include "FluidRenderer.hpp"
 class Application
 {
 public:
@@ -39,8 +40,10 @@ private:
     std::vector<std::shared_ptr<BaseRenderer>> renderers;
     std::shared_ptr<MeshRenderer> meshRenderer;
     std::shared_ptr<ParticleRenderer> particleRenderer;
+    std::shared_ptr<SPHSimulationRenderer> sphRenderer;
     std::shared_ptr<ShaderProgram> shaderProgram;
     std::shared_ptr<ShaderProgram> particleShaderProgram;
+    std::shared_ptr<ShaderProgram> sphShaderProgram;
     std::shared_ptr<ShaderProgram> particleComputeShaderProgram;
     std::shared_ptr<ObjectMenager> objectsMenager;
     std::shared_ptr<ProgramState> programState;

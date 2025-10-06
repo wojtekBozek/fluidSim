@@ -1,5 +1,5 @@
 // fragment.glsl
-#version 330 core
+#version 430 core
 out vec4 FragColor;
 uniform vec3 color;
 uniform float softness; // how soft the edge is, 0.0–1.0 range
