@@ -1,28 +1,36 @@
 #version 430
 
-layout(std430, binding = 0) buffer PosBuffer {
-    vec4 positions[];
+struct FluidParticle{
+    vec4 position;
+    vec4 velocity;
+    vec4 acceleration;
+    float pressure;
+    float density;
+    float mass;
+    float pad0;
 };
 
-layout(location = 0) in vec2 quadVertex; // unit quad corner
+layout(std430, binding = 0) buffer PosBuffer {
+    FluidParticle particles[];
+};
 
-out vec4 vertColor;
 
-uniform mat4 viewProj;  
-uniform mat4 viewMatrix;
-uniform vec2 halfSize = vec2(0.01, 0.01);
+uniform mat4 view;
+uniform mat4 proj;
+uniform float viewportHeight;
+uniform float fovy;
+uniform float particleRadius;
 
 void main() {
     uint particleID = gl_InstanceID;
-    vec3 worldPos = positions[particleID].xyz;
+    vec4 pos = particles[particleID].position;
 
-    vec3 camRight = normalize(inverse(viewMatrix)[0].xyz);
-    vec3 camUp = normalize(inverse(viewMatrix)[1].xyz);
-
-    vec3 offset = (quadVertex.x * halfSize.x) * camRight +
-                  (quadVertex.y * halfSize.y) * camUp;
-    vec4 pos = vec4(worldPos + offset, 1.0);
-
-    gl_Position = viewProj * pos;
-    vertColor = vec4(1.0, 0.3, 0.3, 1.0); // fixed red-ish color
+    vec4 viewPos = view * pos;
+    float z_eye = -viewPos.z; // positive distance from camera
+    gl_PointSize = (particleRadius * viewportHeight) /
+                   (z_eye * tan(fovy * 0.5));
+    
+    gl_Position = proj * viewPos;
+    // clamp to reasonable range
+    gl_PointSize = clamp(gl_PointSize, 1.0, 200.0);
 }

@@ -14,9 +14,9 @@ void FluidSPHSimulation::setFluidAndParticles()
     FluidParticle initialParticle;
     initialParticle.mass = m_fluid.fluidDensity * m_fluid.volume /static_cast<float>(m_numOfParticles); // masa cząstki
     float domainVolume = m_initialDomain.size.x*m_initialDomain.size.y*m_initialDomain.size.z;
-    float particleDiameter = std::cbrt(domainVolume/m_numOfParticles);
-    float particleRadius = particleDiameter/2;
-    initialParticle.position = m_initialDomain.posittion + glm::vec3(particleDiameter/2.0f);
+    float particleDiameter = std::cbrt(domainVolume/static_cast<float>(m_numOfParticles));
+    particleRadius = particleDiameter/2.0f;
+    initialParticle.position = glm::vec4(m_initialDomain.posittion + glm::vec3(particleDiameter/2.0f), 1.0f);
     uint32_t xMax = std::floor(m_initialDomain.size.x/particleDiameter);
     uint32_t yMax = std::floor(m_initialDomain.size.y/particleDiameter);
     uint32_t zMax = std::floor(m_initialDomain.size.z/particleDiameter);
@@ -39,8 +39,9 @@ void FluidSPHSimulation::setFluidAndParticles()
     uint32_t a =0, b=0, c=0;
     for(int i=0; i<m_numOfParticles; ++i)
     {
-        initialParticle.position += glm::vec3(a*particleDiameter, b*particleDiameter, c*particleDiameter);
-        m_particles.push_back(initialParticle);
+        FluidParticle part = initialParticle;
+        part.position += glm::vec4(glm::vec3(a*particleDiameter, b*particleDiameter, c*particleDiameter),0.0f);
+        m_particles.push_back(part);
         if(a < xMax)
         {
             a++;
@@ -59,7 +60,7 @@ void FluidSPHSimulation::setFluidAndParticles()
             }
         }
     }
-    // gęstość cząstki
+    // gęstość cząstki i ciśnienie TODO: przenieść do initial shadera
     for (auto& particle : m_particles)
     {
         for(auto& otherParticle : m_particles)

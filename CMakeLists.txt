@@ -25,6 +25,7 @@ ${CMAKE_SOURCE_DIR}/src/src/program/mesh_loader.cpp
 ${CMAKE_SOURCE_DIR}/src/src/program/particleRenderer.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/properties/physics.cpp
 ${CMAKE_SOURCE_DIR}/src/src/properties/FluidSPHSimulation.cpp 
+${CMAKE_SOURCE_DIR}/src/src/properties/FluidRenderer.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/ui/mainWindow.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/ui/simulationUI.cpp
 ${CMAKE_SOURCE_DIR}/src/src/program/application.cpp

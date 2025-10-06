@@ -32,10 +32,10 @@ void MyApp::setupResources()
     camera = std::make_shared<rendering::PerspectiveCamera>(glm::vec3(0, 0, 5), glm::vec3(0, 1, 0),
         float(WIDTH)/float(HEIGHT), 0.1f, 100.0f, 45.0f);
     
-
     rendering::CameraHandler::setActiveCamera(camera);
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     rendering::CameraHandler::connectCallbacks(window);
+    camera->setWindowHeight(HEIGHT);
 
 
     shaderProgram->addShader(GL_VERTEX_SHADER, "shaders/location/vertex.shader");
@@ -48,6 +48,15 @@ void MyApp::setupResources()
     particleShaderProgram->addShader(GL_FRAGMENT_SHADER, "shaders/particleSolid/fragment.shader");
     particleComputeShaderProgram->addShader(GL_COMPUTE_SHADER, "shaders/particleSolid/compute.shader");
     
+    sphShaderProgram = std::make_shared<ShaderProgram>();
+    sphShaderProgram->addShader(GL_VERTEX_SHADER, "shaders/FluidSPH/vertex.shader");
+    sphShaderProgram->addShader(GL_FRAGMENT_SHADER, "shaders/FluidSPH/fragment.shader");
+    sphShaderProgram->linkProgram();
+    sphRenderer = std::make_shared<SPHSimulationRenderer>();
+    sphRenderer->setCamera(camera);
+    sphRenderer->setShaderProgram(sphShaderProgram);
+    sphRenderer->setupBackend();
+
     particleComputeShaderProgram->linkProgram();
     particleShaderProgram->linkProgram();
     particleRenderer= std::make_shared<ParticleRenderer>();
@@ -62,6 +71,9 @@ void MyApp::setupResources()
     {
         mesh->bind(layoutPos, layoutNormals);
     }
+
+
+
     light = std::make_shared<PositionedLight>();
     light->position = glm::vec3(-10.00f, 5.0f, 10.0f);
     light->ambient = glm::vec3(0.1f);
@@ -137,12 +149,13 @@ void MyApp::mainLoop()
         objectsMenager->rotate("cube", glm::vec3(0.0f, 0.0f, 1.0f),1.5);
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        for (const auto& renderer : renderers)
-        {
-          renderer->render();
-        }
+        //for (const auto& renderer : renderers)
+        //{
+        //  renderer->render();
+        //}
         //meshRenderer->render();
         //particleRenderer->render();
+        sphRenderer->render();
         glBindVertexArray(0);
         glUseProgram(0);
 
