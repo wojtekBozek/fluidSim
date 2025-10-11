@@ -6,26 +6,26 @@
 #include <memory>
 #define _USE_MATH_DEFINES
 #include <math.h>
-struct Particle
+struct alignas(16) Particle
 {
-    glm::vec4 position;
-    glm::vec4 velocity;
-    glm::vec4 acceleration;
+    glm::vec4 position = {0,0,0,0};
+    glm::vec4 velocity = {0,0,0,0};
+    glm::vec4 acceleration = {0,0,0,0};
 };
 
-struct FluidParticle : Particle
+struct alignas(16) FluidParticle : Particle
 {
-    float pressure;
-    float density;
-    float mass;
-    float pad0;
+    float pressure=0;
+    float density=0;
+    float mass=0;
+    float pad0=0;
 };
 
 
 /// @brief cell defined with a position of it's back, lower, left vertex and size right up and front
 struct Domain
 {
-    glm::vec3 posittion = {0,0,0};
+    glm::vec3 posittion = {-5,-5,-5};
     glm::vec3 size = {10,10,10}; // {m,m,m}
 };
 
@@ -87,10 +87,11 @@ public:
     float getParticleRadius(){return particleRadius;}
 private:
     std::unique_ptr<ShaderProgram> m_computeShader;
+    std::unique_ptr<ShaderProgram> m_computeInitShader;
     Domain m_simulationDomain, m_initialDomain;
     Fluid m_fluid;
     std::vector<FluidParticle> m_particles;
-    uint32_t m_numOfParticles = 100;
+    uint32_t m_numOfParticles = 1000000;
     float m_kernelRadius = 1.0f;
     float particleRadius = 0.0f;
 };

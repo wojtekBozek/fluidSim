@@ -30,7 +30,7 @@ void MyApp::setupResources()
     UIs.push_back(std::make_shared<MainWindow>(window, programState));
     UIs.push_back(std::make_shared<SimulationUI>(window, programState));
     camera = std::make_shared<rendering::PerspectiveCamera>(glm::vec3(0, 0, 5), glm::vec3(0, 1, 0),
-        float(WIDTH)/float(HEIGHT), 0.1f, 100.0f, 45.0f);
+        float(WIDTH)/float(HEIGHT), 0.1f, 100.0f, 60.0f);
     
     rendering::CameraHandler::setActiveCamera(camera);
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
@@ -81,8 +81,10 @@ void MyApp::setupResources()
     light->specular = glm::vec3(1.0f);
     currentFrame = static_cast<float>(glfwGetTime());
     meshRenderer = std::make_shared<MeshRenderer>(meshes, shaderProgram, light, camera);
-    renderers.push_back(particleRenderer);
-    renderers.push_back(meshRenderer);
+    //renderers.push_back(particleRenderer);
+    //renderers.push_back(meshRenderer);
+    renderers.push_back(sphRenderer);
+    objectsMenager->move("cube", glm::vec3(0.0f, 1.0f, 0.0f),2.5);
     setup::setupImGui(window); // needs to be called last, after creating window and opengl context
 }
 
@@ -146,16 +148,13 @@ void MyApp::mainLoop()
         rendering::CameraHandler::setCurrentSpeed(currentFrame - lastFrame);
         lastFrame = currentFrame;
         
-        objectsMenager->rotate("cube", glm::vec3(0.0f, 0.0f, 1.0f),1.5);
+        //objectsMenager->rotate("cube", glm::vec3(0.0f, 0.0f, 1.0f),1.5);
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        //for (const auto& renderer : renderers)
-        //{
-        //  renderer->render();
-        //}
-        //meshRenderer->render();
-        //particleRenderer->render();
-        sphRenderer->render();
+        for (const auto& renderer : renderers)
+        {
+          renderer->render();
+        }
         glBindVertexArray(0);
         glUseProgram(0);
 

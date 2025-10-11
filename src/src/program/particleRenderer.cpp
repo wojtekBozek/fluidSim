@@ -35,6 +35,8 @@ void ParticleRenderer::setupBackend()
 
 void ParticleRenderer::render()
 {
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBuf);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, velBuf);
     computeShaderProgram->useProgram();
     glDispatchCompute(particlesNumber/1000, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
