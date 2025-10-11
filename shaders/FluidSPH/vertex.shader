@@ -22,15 +22,19 @@ uniform float fovy;
 uniform float particleRadius;
 
 void main() {
+    
     uint particleID = gl_InstanceID;
-    vec4 pos = particles[particleID].position;
+    vec4 pos = particles[particleID].position; //particles[particleID].position;
 
     vec4 viewPos = view * pos;
     float z_eye = -viewPos.z; // positive distance from camera
-    gl_PointSize = (particleRadius * viewportHeight) /
-                   (z_eye * tan(fovy * 0.5));
     
-    gl_Position = proj * viewPos;
+    gl_Position = proj *viewPos;
+    gl_PointSize = particleRadius * viewportHeight / (z_eye * tan(fovy/2.0));
+    //gl_Position = proj * view * pos;
+    //gl_PointSize = 10.0;
+    //gl_PointSize = (particleRadius*2/z_eye) * (viewportHeight/
+    //               (z_eye * tan(fovy)));
     // clamp to reasonable range
-    gl_PointSize = clamp(gl_PointSize, 1.0, 200.0);
+    //gl_PointSize = clamp(pixelSize, 1.0, 200.0);
 }

@@ -1,4 +1,6 @@
 #pragma once
+//#define _USE_MATH_DEFINES
+//#include <math.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <iostream>
@@ -163,7 +165,7 @@ namespace rendering{
 		}
 		void makeProjectionMatrix() 
 		{
-			projection = glm::perspective(fov, aspect_ratio, near_plane, far_plane);
+			projection = glm::perspective(fov*3.1415f/180.0f, aspect_ratio, near_plane, far_plane);
 		}
 
 		void updateCameraVectors()

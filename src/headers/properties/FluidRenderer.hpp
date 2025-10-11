@@ -17,6 +17,8 @@ class SPHSimulationRenderer : public BaseRenderer
         camera = cam;
     }
     private:
+    
+    std::unique_ptr<ShaderProgram> m_computeShader;
     std::shared_ptr<ShaderProgram> shaderProgram;
     std::shared_ptr<rendering::PerspectiveCamera> camera;
     FluidSPHSimulation simulation;
