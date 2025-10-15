@@ -14,7 +14,7 @@ layout(std430, binding = 0) buffer PosBuffer {
     FluidParticle particles[];
 };
 
-
+uniform uint numOfParticles;
 uniform mat4 view;
 uniform mat4 proj;
 uniform float viewportHeight;
@@ -23,7 +23,8 @@ uniform float particleRadius;
 
 void main() {
     
-    uint particleID = gl_InstanceID;
+    uint particleID = gl_InstanceID.x;
+    if(particleID >= numOfParticles) return;
     vec4 pos = particles[particleID].position; //particles[particleID].position;
 
     vec4 viewPos = view * pos;

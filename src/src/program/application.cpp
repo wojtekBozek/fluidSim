@@ -29,7 +29,7 @@ void MyApp::setupResources()
     programState = std::make_shared<ProgramState>(ProgramState::MAIN_MENU);
     UIs.push_back(std::make_shared<MainWindow>(window, programState));
     UIs.push_back(std::make_shared<SimulationUI>(window, programState));
-    camera = std::make_shared<rendering::PerspectiveCamera>(glm::vec3(0, 0, 5), glm::vec3(0, 1, 0),
+    camera = std::make_shared<rendering::PerspectiveCamera>(glm::vec3(0, 2, 5), glm::vec3(0, 1, 0),
         float(WIDTH)/float(HEIGHT), 0.1f, 100.0f, 60.0f);
     
     rendering::CameraHandler::setActiveCamera(camera);
@@ -146,6 +146,7 @@ void MyApp::mainLoop()
         rendering::CameraHandler::processMovement(window);
         currentFrame = static_cast<float>(glfwGetTime());
         rendering::CameraHandler::setCurrentSpeed(currentFrame - lastFrame);
+        sphRenderer->setTimeStep(currentFrame-lastFrame);
         lastFrame = currentFrame;
         
         //objectsMenager->rotate("cube", glm::vec3(0.0f, 0.0f, 1.0f),1.5);
