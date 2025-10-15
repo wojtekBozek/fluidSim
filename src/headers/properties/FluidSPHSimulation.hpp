@@ -25,8 +25,8 @@ struct alignas(16) FluidParticle : Particle
 /// @brief cell defined with a position of it's back, lower, left vertex and size right up and front
 struct Domain
 {
-    glm::vec3 posittion = {-5,-5,-5};
-    glm::vec3 size = {10,10,10}; // {m,m,m}
+    glm::vec3 posittion = {-0.5,4.5,-0.5};
+    glm::vec3 size = {1,1,1}; // {m,m,m}
 };
 
 struct Fluid
@@ -34,13 +34,14 @@ struct Fluid
     float fluidDensity = 997; // kg
     float volume = 1000; // m^3
     float soundSpeed = 10.0f; // nazewnictwo luźno powiązane z prędkością dźwięku 
+    float pad0=0;
 };
 
 
 enum SimDim{
-    DIMENSION_1,
-    DIMENSION_2,
-    DIMENSION_3
+    DIMENSION_1 = 0u,
+    DIMENSION_2 = 1u,
+    DIMENSION_3 = 2u
 };
 
 inline float CubicSplineKernel(SimDim dimension, float kernelRadius, float distance)
@@ -75,24 +76,40 @@ inline float CubicSplineKernel(SimDim dimension, float kernelRadius, float dista
 class FluidSPHSimulation
 {
 public:
-    FluidSPHSimulation() = default;
-    FluidSPHSimulation(std::unique_ptr<ShaderProgram> computeShader, Domain simulationDomain, Fluid fluid, uint32_t numOfParticles);
+    FluidSPHSimulation()
+    {
+        m_pressureNdensityComputeShader = std::make_unique<ShaderProgram>();
+        m_pressureNdensityComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/densityNPressure.shader");
+        m_pressureNdensityComputeShader->linkProgram();
+        m_movementComputeShader = std::make_unique<ShaderProgram>();
+        m_movementComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/movement.shader");
+        m_movementComputeShader->linkProgram();
+        m_accelerationComputeShader = std::make_unique<ShaderProgram>();
+        m_accelerationComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/acceleration.shader");
+        m_accelerationComputeShader->linkProgram();
+    }
+    FluidSPHSimulation(std::unique_ptr<ShaderProgram> computePressureShader, std::unique_ptr<ShaderProgram> computeMovementShader, Domain simulationDomain, Fluid fluid, uint32_t numOfParticles);
 
     void setFluidAndParticles();
     const Fluid& getFluid() const;
     //const Domain& getInitialDomain() const;
     //const Domain& getSimulationDomain() const;
-    const uint32_t& getNumOfParticles() const;
+    uint32_t getNumOfParticles() const;
     const std::vector<FluidParticle>& getParticles() const;
     float getParticleRadius(){return particleRadius;}
+    void simulationStep(float timeStep);
+    GLuint getParticleBuffer() const {return partBuf;}
 private:
-    std::unique_ptr<ShaderProgram> m_computeShader;
-    std::unique_ptr<ShaderProgram> m_computeInitShader;
+    GLuint partBuf;
+    GLuint FluidBuf;
+    std::unique_ptr<ShaderProgram> m_movementComputeShader;
+    std::unique_ptr<ShaderProgram> m_accelerationComputeShader;
+    std::unique_ptr<ShaderProgram> m_pressureNdensityComputeShader;
     Domain m_simulationDomain, m_initialDomain;
     Fluid m_fluid;
     std::vector<FluidParticle> m_particles;
-    uint32_t m_numOfParticles = 1000000;
-    float m_kernelRadius = 1.0f;
+    uint32_t m_numOfParticles = 2500;
+    float m_kernelRadius = 0.5f;
     float particleRadius = 0.0f;
 };
 
