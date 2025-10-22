@@ -145,7 +145,7 @@ void MyApp::mainLoop()
 
         rendering::CameraHandler::processMovement(window);
         currentFrame = static_cast<float>(glfwGetTime());
-        rendering::CameraHandler::setCurrentSpeed(currentFrame - lastFrame);
+        rendering::CameraHandler::setCurrentSpeed(static_cast<float>(currentFrame - lastFrame));
         sphRenderer->setTimeStep(currentFrame-lastFrame);
         lastFrame = currentFrame;
         

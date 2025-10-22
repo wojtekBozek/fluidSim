@@ -53,7 +53,7 @@ private:
     std::shared_ptr<PositionedLight> light;
 
 
-    float currentFrame = 0.0f;
-    float lastFrame = 0.0f;
+    double currentFrame = 0.0f;
+    double lastFrame = 0.0f;
     GLFWwindow* window = nullptr;
 };
