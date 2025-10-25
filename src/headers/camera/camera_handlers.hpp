@@ -20,13 +20,27 @@ namespace rendering {
 			return ASC_ptr;
 		}
 
-		PerspectiveCamera& getCamera() const 
+		std::shared_ptr<Camera> getCamera() const 
 		{
-			return *camera_ptr.get();
+			return camera_ptr;
 		}
-		static void setActiveCamera(std::shared_ptr<PerspectiveCamera> camera) 
+		static void setActiveCamera(std::shared_ptr<Camera> camera) 
 		{
 			CameraHandler* handler = CameraHandler::getInstance();
+			handler->setCamera(camera);
+		}
+
+		static void changeCameraInPlace(std::shared_ptr<Camera> camera) 
+		{
+			CameraHandler* handler = CameraHandler::getInstance();
+			std::shared_ptr<Camera> oldCamera = handler->getCamera();
+			camera->setView(oldCamera->getView());
+			camera->setPitch(oldCamera->getPitch());
+			camera->setYaw(oldCamera->getYaw());
+			camera->setUpVector(oldCamera->getUpVector());
+			camera->setPosition(oldCamera->getPosition());
+			camera->setWindowHeight(oldCamera->getWindowHeight());
+			camera->updateCameraVectors();
 			handler->setCamera(camera);
 		}
 
@@ -118,7 +132,7 @@ namespace rendering {
 			}
 		}
 
-		void setCamera(std::shared_ptr<PerspectiveCamera> camera)
+		void setCamera(std::shared_ptr<Camera> camera)
 		{
 			camera_ptr = camera;
 		}
@@ -147,7 +161,7 @@ namespace rendering {
 		static void moveRight() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(RIGHT, handler->delta_time); }
 		static void moveLeft() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(LEFT, handler->delta_time); }
 		static void origin() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(ORIGINAL, handler->delta_time); }
-		std::shared_ptr<PerspectiveCamera> camera_ptr;
+		std::shared_ptr<Camera> camera_ptr;
 		float delta_time;
 		int key_up, key_down, key_left, key_right, key_origin, key_rotation_on;
 		int activation_type = GLFW_PRESS;;

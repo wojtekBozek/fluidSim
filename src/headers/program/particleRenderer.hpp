@@ -15,14 +15,14 @@ public:
     {
         computeShaderProgram = shader;
     }
-    void setCamera(std::shared_ptr<rendering::PerspectiveCamera> cam)
+    void setCamera(std::shared_ptr<rendering::Camera> cam)
     {
         camera = cam;
     }
 private:
     std::shared_ptr<ShaderProgram> shaderProgram;
     std::shared_ptr<ShaderProgram> computeShaderProgram;
-    std::shared_ptr<rendering::PerspectiveCamera> camera;
+    std::shared_ptr<rendering::Camera> camera;
     GLuint particlesNumber;
 
     std::vector<GLfloat> initPos;

@@ -32,11 +32,17 @@ void MyApp::setupResources()
     camera = std::make_shared<rendering::PerspectiveCamera>(glm::vec3(0, 2, 5), glm::vec3(0, 1, 0),
         float(WIDTH)/float(HEIGHT), 0.1f, 100.0f, 60.0f);
     
-    rendering::CameraHandler::setActiveCamera(camera);
+    camera->setWindowHeight(HEIGHT);
+    camera2 = std::make_shared<rendering::OrthographicCamera>(glm::vec3(0, 2, 5), glm::vec3(0, 1, 0),
+    -5.1315f, 5.1315f,     // left, right
+    -2.8867f, 2.8867f,     // bottom, top
+     0.1f, 100.0f
+    );
+    camera2->setWindowHeight(HEIGHT);
+
+    rendering::CameraHandler::setActiveCamera(camera2);
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     rendering::CameraHandler::connectCallbacks(window);
-    camera->setWindowHeight(HEIGHT);
-
 
     shaderProgram->addShader(GL_VERTEX_SHADER, "shaders/location/vertex.shader");
     shaderProgram->addShader(GL_FRAGMENT_SHADER, "shaders/location/fragment.shader");
@@ -53,7 +59,7 @@ void MyApp::setupResources()
     sphShaderProgram->addShader(GL_FRAGMENT_SHADER, "shaders/FluidSPH/fragment.shader");
     sphShaderProgram->linkProgram();
     sphRenderer = std::make_shared<SPHSimulationRenderer>();
-    sphRenderer->setCamera(camera);
+    sphRenderer->setCamera(camera2);
     sphRenderer->setShaderProgram(sphShaderProgram);
     sphRenderer->setupBackend();
 
@@ -80,7 +86,7 @@ void MyApp::setupResources()
     light->diffuse = glm::vec3(0.8f);
     light->specular = glm::vec3(1.0f);
     currentFrame = static_cast<float>(glfwGetTime());
-    meshRenderer = std::make_shared<MeshRenderer>(meshes, shaderProgram, light, camera);
+    meshRenderer = std::make_shared<MeshRenderer>(meshes, shaderProgram, light, camera2);
     //renderers.push_back(particleRenderer);
     //renderers.push_back(meshRenderer);
     renderers.push_back(sphRenderer);

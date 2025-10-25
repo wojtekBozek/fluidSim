@@ -12,7 +12,7 @@ class SPHSimulationRenderer : public BaseRenderer
     {
         shaderProgram = shader;
     }
-    void setCamera(std::shared_ptr<rendering::PerspectiveCamera> cam)
+    void setCamera(std::shared_ptr<rendering::Camera> cam)
     {
         camera = cam;
     }
@@ -21,7 +21,7 @@ class SPHSimulationRenderer : public BaseRenderer
     float m_timeStep;
     std::unique_ptr<ShaderProgram> m_computeShader;
     std::shared_ptr<ShaderProgram> shaderProgram;
-    std::shared_ptr<rendering::PerspectiveCamera> camera;
+    std::shared_ptr<rendering::Camera> camera;
     FluidSPHSimulation simulation;
     GLuint posBuf;
     GLuint quadVAO = 0;

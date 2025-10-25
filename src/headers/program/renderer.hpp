@@ -20,7 +20,7 @@ public:
     MeshRenderer(const std::vector<std::shared_ptr<Mesh>>& meshes_,
                  const std::shared_ptr<ShaderProgram>& shaderProgram_,
                  const std::shared_ptr<PositionedLight>& light_,
-                 const std::shared_ptr<rendering::PerspectiveCamera>& camera_)
+                 const std::shared_ptr<rendering::Camera>& camera_)
         : meshes(meshes_), shaderProgram(shaderProgram_), light(light_), camera(camera_) {}   
     void render() override
     {
@@ -34,7 +34,7 @@ public:
         shaderProgram->setVec3("light.ambient", light->ambient);
         shaderProgram->setVec3("light.diffuse", light->diffuse);
         shaderProgram->setVec3("light.specular", light->specular);
-        shaderProgram->setVec3("viewPos", camera->getViewPosition());
+        shaderProgram->setVec3("viewPos", camera->getPosition());
         shaderProgram->setMat4("view", camera->getView());
         shaderProgram->setMat4("projection", camera->getProjection());
         // Per-mesh
@@ -80,5 +80,5 @@ private:
     std::vector<std::shared_ptr<Mesh>> meshes;
     std::shared_ptr<ShaderProgram> shaderProgram;
     std::shared_ptr<PositionedLight> light;
-    std::shared_ptr<rendering::PerspectiveCamera> camera;
+    std::shared_ptr<rendering::Camera> camera;
 };
