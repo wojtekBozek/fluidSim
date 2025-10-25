@@ -2,7 +2,7 @@
 
 using namespace rendering;
 
-glm::mat4 rendering::PerspectiveCamera::calculateMVP(glm::mat4 model)
+glm::mat4 rendering::Camera::calculateMVP(glm::mat4 model)
 {
 	return projection*view*model;
 }

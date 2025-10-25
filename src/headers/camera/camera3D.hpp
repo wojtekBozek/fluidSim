@@ -25,29 +25,51 @@ namespace rendering{
 		const float ZOOM = 45.0f;
 	}
 
-	class camera {
-	public:
-		virtual glm::mat4 calculateMVP(glm::mat4 model) = 0;
-		virtual void setView(glm::vec3 view) = 0;
-		virtual glm::vec3 getViewPosition() const = 0;
-		virtual glm::mat4 getProjection() const = 0;
-		virtual glm::mat4 getView() const = 0;
+	enum CameraType
+	{
+		perspective,
+		orthographic
 	};
-	
-	class PerspectiveCamera : camera {
+	class Camera {
 	public:
+		virtual CameraType getCameraType() const = 0;
+		glm::mat4 calculateMVP(glm::mat4 model);
+		void setView(glm::mat4 view_) {view=view_;}
+		glm::vec3 getPosition() const { return position; }
+		glm::mat4 getProjection() const { return projection; }
+		glm::mat4 getView() const { return view; }
 
-		glm::vec3 getRightVector() const { return right_dir; }
+		glm::vec3 getRightVector() const { return right_dir;}
 		glm::vec3 getUpVector() const { return camera_up; }
-		glm::mat4 calculateMVP(glm::mat4 model) override;
-		virtual void setView(glm::vec3 view) override {};
-		virtual glm::vec3 getViewPosition() const override { return position; };
-		virtual glm::mat4 getProjection() const override { return projection; };
-		virtual glm::mat4 getView() const override { return view; };
-		void setLocation(glm::vec3 location) {};
-		void setUpVector(glm::vec3 up) {};
-		void setRightVector(glm::vec3 right) {};
-		void setMovementSpeed(float value);
+
+		float getYaw() const {return yaw;}
+		float getPitch() const {return pitch;}
+
+		void setYaw(float yaw_) {yaw = yaw_;}
+		void setPitch(float pitch_) {pitch = pitch_;}
+
+		void setPosition(glm::vec3 location_) {position=location_;}
+		void setUpVector(glm::vec3 up_) {camera_up=up_;};
+		void setRightVector(glm::vec3 right_) {right_dir=right_;}
+		void setMovementSpeed(float value_){movement_speed=value_;}
+
+		void makeViewMatrix()
+		{
+			view = glm::lookAt(position, position + front, camera_up);
+		}
+
+		void updateCameraVectors()
+		{
+			glm::vec3 front_;
+			front_.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+			front_.y = sin(glm::radians(pitch));
+			front_.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+			front = glm::normalize(front_);
+			right_dir = glm::normalize(glm::cross(front, world_up));
+			camera_up = glm::normalize(glm::cross(right_dir, front));
+			makeViewMatrix();
+		}
+
 		void returnToWorldView() {
 			position = original_position;
 			yaw = dCV::YAW;
@@ -92,24 +114,22 @@ namespace rendering{
 			}
 			updateCameraVectors();
 		}
-		/*
-		PerspectiveCamera(glm::vec3 position_, glm::vec3 up_, float aspect_ratio_, float near_plane_, float far_plane_, float fov_) 
-		{
-			original_position = position_;
-			position = position_;
-			world_up = up_;
-			yaw = dCV::YAW;
-			pitch = dCV::PITCH;
-			aspect_ratio = aspect_ratio_;
-			near_plane = near_plane_;
-			far_plane = far_plane_;
-			fov = fov_;
-			makeProjectionMatrix();
-			updateCameraVectors();
-		}*/
+
+		void setWindowHeight(float height){windowHeight = height;}
+		float getWindowHeight() const {return windowHeight;}
+	protected:
+		glm::vec3 position, front, camera_up, right_dir;
+		glm::vec3 original_position, world_up;
+		glm::mat4 view, projection;
+		float yaw, pitch;
+		float movement_speed = 2.5f;
+		float windowHeight;
+	};
+	
+	class PerspectiveCamera : public Camera {
+	public:
 		PerspectiveCamera(glm::vec3 position_, glm::vec3 up_,float aspect_ratio_ = 3.0f / 4.0f,
 			float near_plane_ = 0.1f, float far_plane_ = 100.0f, float fov_ = dCV::ZOOM, float yaw_ = dCV::YAW, float pitch_ = dCV::PITCH)
-			:front(glm::vec3(0.0, 0.0f, -1.0f))
 		{
 			original_position = position_;
 			position = position_;
@@ -131,53 +151,55 @@ namespace rendering{
 			updateCameraVectors();
 		}
 		PerspectiveCamera(const PerspectiveCamera& camera) :
-			original_position (camera.position),
-			position (camera.position),
-			world_up (camera.world_up),
-			yaw(camera.yaw),
-			pitch( camera.pitch),
-			aspect_ratio(camera.aspect_ratio),
-			near_plane( camera.near_plane),
-			far_plane (camera.far_plane),
-			fov(camera.fov),
-			front(camera.front),
-			right_dir(camera.right_dir)
+			PerspectiveCamera(camera.position,camera.world_up,camera.aspect_ratio,
+			camera.near_plane,camera.far_plane,camera.fov,camera.yaw,camera.pitch)
 		{
-			makeProjectionMatrix();
-			updateCameraVectors();
 		}
 		~PerspectiveCamera() {}
-		void setWindowHeight(float height){windowHeight = height;}
-		float getWindowHeight() const {return windowHeight;}
+		CameraType getCameraType() const override {return CameraType::perspective;}
 		float getFOV() const {return fov;}
 	private:
-		glm::vec3 position, front, camera_up, right_dir;
-		glm::vec3 original_position, world_up;
-		glm::mat4 view, projection;
 		float fov, aspect_ratio, near_plane, far_plane;
-		float yaw, pitch;
-		float movement_speed = 2.5f;
-		float windowHeight;
 
-		void makeViewMatrix()
-		{
-			view = glm::lookAt(position, position + front, camera_up);
-		}
+		
 		void makeProjectionMatrix() 
 		{
 			projection = glm::perspective(fov*3.1415f/180.0f, aspect_ratio, near_plane, far_plane);
 		}
 
-		void updateCameraVectors()
+		
+	};
+
+	class OrthographicCamera : public Camera
+	{
+		public:
+		OrthographicCamera(float l, float r, float b, float t, float n, float f)
+        : left(l), right_(r), bottom(b), top(t), near_plane(n), far_plane(f) 
 		{
-			glm::vec3 front_;
-			front_.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-			front_.y = sin(glm::radians(pitch));
-			front_.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-			front = glm::normalize(front_);
-			right_dir = glm::normalize(glm::cross(front, world_up));
-			camera_up = glm::normalize(glm::cross(right_dir, front));
-			makeViewMatrix();
-		}
+    	}
+
+		OrthographicCamera(glm::vec3 position_, glm::vec3 up_, float l, float r, float b, float t, float n, float f,float yaw_ = dCV::YAW, float pitch_ = dCV::PITCH)
+        : OrthographicCamera(l,r,b,t,n,f) 
+		{
+			original_position = position_;
+			position = position_;
+			world_up = up_;
+			yaw = yaw_;
+			pitch = pitch_;
+        	updateProjection();
+        	makeViewMatrix();
+    	}
+
+		CameraType getCameraType() const override {return CameraType::orthographic;}
+		
+		float getBottom() const {return bottom;}
+		float getTop() const {return top;}
+		
+		private:
+		float left, right_, bottom, top, near_plane, far_plane;
+		void updateProjection() 
+		{
+        	projection = glm::ortho(left, right_, bottom, top, near_plane, far_plane);
+    	}
 	};
 }
