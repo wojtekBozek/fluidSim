@@ -29,7 +29,8 @@ ${CMAKE_SOURCE_DIR}/src/src/properties/FluidRenderer.cpp
 ${CMAKE_SOURCE_DIR}/src/src/ui/mainWindow.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/ui/simulationUI.cpp
 ${CMAKE_SOURCE_DIR}/src/src/program/application.cpp
-)
+${CMAKE_SOURCE_DIR}/src/src/camera/perspectiveCamera.cpp 
+${CMAKE_SOURCE_DIR}/src/src/camera/orthographicCamera.cpp)
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
 ${CMAKE_SOURCE_DIR}/src/headers/camera/

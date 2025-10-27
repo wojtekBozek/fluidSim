@@ -39,7 +39,7 @@ void main() {
     }
     else
     {  
-        gl_PointSize = particleRadius * viewportHeight / (top-bottom);
+        gl_PointSize = 2*particleRadius * viewportHeight / (top-bottom);
     }
     //gl_Position = proj * view * pos;
     //gl_PointSize = 10.0;
