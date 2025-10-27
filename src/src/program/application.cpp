@@ -4,6 +4,9 @@
 #include "camera_handlers.hpp"
 #include "keyboard.hpp"
 
+#include "perspectiveCamera.hpp"
+#include "orthographicCamera.hpp"
+
 constexpr GLint WIDTH = 1200, HEIGHT = 900;
 constexpr int layoutPos = 0;
 constexpr int layoutNormals = 1;
@@ -29,18 +32,20 @@ void MyApp::setupResources()
     programState = std::make_shared<ProgramState>(ProgramState::MAIN_MENU);
     UIs.push_back(std::make_shared<MainWindow>(window, programState));
     UIs.push_back(std::make_shared<SimulationUI>(window, programState));
-    camera = std::make_shared<rendering::PerspectiveCamera>(glm::vec3(0, 2, 5), glm::vec3(0, 1, 0),
-        float(WIDTH)/float(HEIGHT), 0.1f, 100.0f, 60.0f);
     
+    camera = std::make_shared<rendering::PerspectiveCamera>(glm::vec3(0, 2, 5), glm::vec3(0, 1, 0),
+        float(WIDTH) / float(HEIGHT), 0.1f, 100.0f, window, 60.0f);
     camera->setWindowHeight(HEIGHT);
+    glfwSetWindowUserPointer(window, this);
+    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     camera2 = std::make_shared<rendering::OrthographicCamera>(glm::vec3(0, 2, 5), glm::vec3(0, 1, 0),
     -5.1315f, 5.1315f,     // left, right
     -2.8867f, 2.8867f,     // bottom, top
-     0.1f, 100.0f
+     0.1f, 100.0f, window
     );
     camera2->setWindowHeight(HEIGHT);
 
-    rendering::CameraHandler::setActiveCamera(camera2);
+    rendering::CameraHandler::setActiveCamera(camera);
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     rendering::CameraHandler::connectCallbacks(window);
 
@@ -59,7 +64,7 @@ void MyApp::setupResources()
     sphShaderProgram->addShader(GL_FRAGMENT_SHADER, "shaders/FluidSPH/fragment.shader");
     sphShaderProgram->linkProgram();
     sphRenderer = std::make_shared<SPHSimulationRenderer>();
-    sphRenderer->setCamera(camera2);
+    sphRenderer->setCamera(camera);
     sphRenderer->setShaderProgram(sphShaderProgram);
     sphRenderer->setupBackend();
 
@@ -116,9 +121,10 @@ void MyApp::initialize()
 
     int  bufferWidth, bufferHeight;
     glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
-
-    // Set context for GLEW to use
     glfwMakeContextCurrent(window);
+
+    
+    // Set context for GLEW to use
 
     //Allow modern extension feature;
     glewExperimental = GL_TRUE;
@@ -144,9 +150,6 @@ void MyApp::mainLoop()
     while(!glfwWindowShouldClose(window))
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
-        
-
-
         glfwPollEvents();
 
         rendering::CameraHandler::processMovement(window);
@@ -154,7 +157,7 @@ void MyApp::mainLoop()
         rendering::CameraHandler::setCurrentSpeed(static_cast<float>(currentFrame - lastFrame));
         sphRenderer->setTimeStep(currentFrame-lastFrame);
         lastFrame = currentFrame;
-        
+        camera->updateWindowProperties();
         //objectsMenager->rotate("cube", glm::vec3(0.0f, 0.0f, 1.0f),1.5);
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);

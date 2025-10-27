@@ -52,6 +52,7 @@ namespace rendering {
 			ProcessInput(window, handler->key_down, GLFW_PRESS, CameraHandler::moveDown);
 			ProcessInput(window, handler->key_left, GLFW_PRESS, CameraHandler::moveLeft);
 			ProcessInput(window, handler->key_right, GLFW_PRESS, CameraHandler::moveRight);
+			ProcessInput(window, handler->key_origin, GLFW_PRESS, CameraHandler::origin);
 		}
 		static void setCurrentSpeed(float value) 
 		{
@@ -69,12 +70,13 @@ namespace rendering {
 			CameraHandler* handler = CameraHandler::getInstance();
 			glfwSetWindowUserPointer(window, handler);
 			glfwSetCursorPosCallback(window, CameraHandler::mouseCallback);
+			glfwSetScrollCallback(window, CameraHandler::scrollCallback);
 			glfwSetKeyCallback(window, CameraHandler::KeyboardCallback);
 		}
 		static void SetMouseCallbacks(GLFWwindow* window)
 		{
 			glfwSetCursorPosCallback(window, CameraHandler::mouseCallback);
-			//glfwSetScrollCallback(window, scroll_callback);
+			glfwSetScrollCallback(window, CameraHandler::scrollCallback);
 		}
 
 		static void setKeyboardCallback(GLFWwindow* window)
@@ -106,7 +108,7 @@ namespace rendering {
 		static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 		{
 			CameraHandler* handler = CameraHandler::getInstance();
-			//handler->camera_ptr->processRotation(static_cast<float>(yoffset));
+			handler->camera_ptr->processScrollback(static_cast<float>(yoffset));
 		}
 		static void CallbackKEY(GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
@@ -150,6 +152,7 @@ namespace rendering {
 			key_up = GLFW_KEY_W;
 			key_left = GLFW_KEY_A;
 			key_right = GLFW_KEY_D;
+			key_origin = GLFW_KEY_O;
 			key_rotation_on = GLFW_KEY_TAB;
 			delta_time = 0.0f;
 			mouse_sensitivity = 0.1f;

@@ -72,7 +72,7 @@ public:
     {
         light = light_;
     }
-    void setCamera(const std::shared_ptr<rendering::PerspectiveCamera>& camera_)
+    void setCamera(const std::shared_ptr<rendering::Camera>& camera_)
     {
         camera = camera_;
     }

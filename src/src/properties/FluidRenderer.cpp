@@ -1,6 +1,9 @@
 #include "FluidRenderer.hpp"
-
 #include <glm/gtc/type_ptr.hpp>
+
+#include "perspectiveCamera.hpp"
+#include "orthographicCamera.hpp"
+
 void SPHSimulationRenderer::render()
 {
     simulation.simulationStep(m_timeStep);
@@ -9,7 +12,9 @@ void SPHSimulationRenderer::render()
     glm::mat4 projMatrix = camera->getProjection();
     shaderProgram->setMat4("view", viewMatrix);
     shaderProgram->setMat4("proj", projMatrix);
-    shaderProgram->setFloat("viewportHeight", camera->getWindowHeight());
+    int height, width;
+    glfwGetFramebufferSize(camera->getWindow(), &width, &height);
+    shaderProgram->setFloat("viewportHeight", height);
     shaderProgram->setUint("numOfParticles", simulation.getNumOfParticles());
     if(camera->getCameraType() == rendering::CameraType::perspective)
     {
