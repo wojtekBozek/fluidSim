@@ -18,7 +18,7 @@ namespace rendering
 
 		void processScrollback(float yOffset) override
 		{
-			float zoomFactor = 1.0f + yOffset;
+			float zoomFactor = 1.0f + yOffset/100.0f;
 			left *= zoomFactor;
 			right_ *= zoomFactor;
 			bottom *= zoomFactor;

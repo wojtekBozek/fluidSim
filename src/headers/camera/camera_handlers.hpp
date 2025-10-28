@@ -44,7 +44,13 @@ namespace rendering {
 			handler->setCamera(camera);
 		}
 
-		
+		static void resizeCallback(GLFWwindow* window, int width, int height)
+		{
+			CameraHandler* handler = CameraHandler::getInstance();
+			glViewport(0, 0, width, height);
+			handler->getCamera()->updateWindowProperties();
+		}
+
 		static void processMovement(GLFWwindow* window) 
 		{
 			CameraHandler* handler = CameraHandler::getInstance();
@@ -72,6 +78,7 @@ namespace rendering {
 			glfwSetCursorPosCallback(window, CameraHandler::mouseCallback);
 			glfwSetScrollCallback(window, CameraHandler::scrollCallback);
 			glfwSetKeyCallback(window, CameraHandler::KeyboardCallback);
+			glfwSetFramebufferSizeCallback(window, CameraHandler::resizeCallback);
 		}
 		static void SetMouseCallbacks(GLFWwindow* window)
 		{
