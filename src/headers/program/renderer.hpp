@@ -9,7 +9,7 @@
 class BaseRenderer
 {
 public:
-    virtual void render() = 0;
+    virtual void render(std::shared_ptr<rendering::Camera> camera) = 0;
     virtual ~BaseRenderer() = default;
 };
 
@@ -21,11 +21,11 @@ public:
                  const std::shared_ptr<ShaderProgram>& shaderProgram_,
                  const std::shared_ptr<PositionedLight>& light_,
                  const std::shared_ptr<rendering::Camera>& camera_)
-        : meshes(meshes_), shaderProgram(shaderProgram_), light(light_), camera(camera_) {}   
-    void render() override
+        : meshes(meshes_), shaderProgram(shaderProgram_), light(light_){}   
+    void render(std::shared_ptr<rendering::Camera> camera) override
     {
         if(shaderProgram == nullptr || light == nullptr || camera == nullptr) {
-            throw std::runtime_error("ShaderProgram, Light, or Camera not set in MeshRenderer");
+            throw std::runtime_error("ShaderProgram, Light, or Camera not set");
         }
         shaderProgram->useProgram();
 
@@ -72,13 +72,8 @@ public:
     {
         light = light_;
     }
-    void setCamera(const std::shared_ptr<rendering::Camera>& camera_)
-    {
-        camera = camera_;
-    }
 private:
     std::vector<std::shared_ptr<Mesh>> meshes;
     std::shared_ptr<ShaderProgram> shaderProgram;
     std::shared_ptr<PositionedLight> light;
-    std::shared_ptr<rendering::Camera> camera;
 };

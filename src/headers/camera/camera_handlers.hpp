@@ -24,10 +24,31 @@ namespace rendering {
 		{
 			return camera_ptr;
 		}
-		static void setActiveCamera(std::shared_ptr<Camera> camera) 
+
+		static void addCamera(std::shared_ptr<Camera> camera)
 		{
 			CameraHandler* handler = CameraHandler::getInstance();
-			handler->setCamera(camera);
+			if(camera)
+				handler->cameras.push_back(camera);
+		}
+		static void addActiveCamera(std::shared_ptr<Camera> camera) 
+		{
+			CameraHandler* handler = CameraHandler::getInstance();
+			if (camera)
+			{
+				handler->setCamera(camera);
+				handler->addCamera(camera);
+			}
+		}
+
+		static void setActiveCamera(int id)
+		{
+			CameraHandler* handler = CameraHandler::getInstance();
+			if (id < handler->cameras.size())
+			{
+				auto camera = handler->cameras.at(id);
+				handler->changeCameraInPlace(camera);
+			}
 		}
 
 		static void changeCameraInPlace(std::shared_ptr<Camera> camera) 
@@ -40,6 +61,7 @@ namespace rendering {
 			camera->setUpVector(oldCamera->getUpVector());
 			camera->setPosition(oldCamera->getPosition());
 			camera->setWindowHeight(oldCamera->getWindowHeight());
+			camera->updateWindowProperties();
 			camera->updateCameraVectors();
 			handler->setCamera(camera);
 		}
@@ -58,7 +80,9 @@ namespace rendering {
 			ProcessInput(window, handler->key_down, GLFW_PRESS, CameraHandler::moveDown);
 			ProcessInput(window, handler->key_left, GLFW_PRESS, CameraHandler::moveLeft);
 			ProcessInput(window, handler->key_right, GLFW_PRESS, CameraHandler::moveRight);
-			ProcessInput(window, handler->key_origin, GLFW_PRESS, CameraHandler::origin);
+			ProcessInput(window, handler->key_origin, GLFW_PRESS, CameraHandler::origin); 
+			ProcessInput(window, handler->key_camera1, GLFW_PRESS, CameraHandler::setActiveCamera, 0);
+			ProcessInput(window, handler->key_camera2, GLFW_PRESS, CameraHandler::setActiveCamera, 1);
 		}
 		static void setCurrentSpeed(float value) 
 		{
@@ -109,13 +133,15 @@ namespace rendering {
 			handler->last_x = xpos;
 			handler->last_y = ypos;
 			if (handler->rotation_on) {
-				handler->camera_ptr->processRotation(xoffset * handler->mouse_sensitivity, -yoffset * handler->mouse_sensitivity);
+				if(handler->camera_ptr)
+					handler->camera_ptr->processRotation(xoffset * handler->mouse_sensitivity, -yoffset * handler->mouse_sensitivity);
 			}
 		}
 		static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 		{
 			CameraHandler* handler = CameraHandler::getInstance();
-			handler->camera_ptr->processScrollback(static_cast<float>(yoffset));
+			if(handler->camera_ptr)
+				handler->camera_ptr->processScrollback(static_cast<float>(yoffset));
 		}
 		static void CallbackKEY(GLFWwindow* window, int key, int scancode, int action, int mods)
 		{
@@ -161,6 +187,9 @@ namespace rendering {
 			key_right = GLFW_KEY_D;
 			key_origin = GLFW_KEY_O;
 			key_rotation_on = GLFW_KEY_TAB;
+			key_camera1 = GLFW_KEY_1;
+			key_camera2 = GLFW_KEY_2;
+
 			delta_time = 0.0f;
 			mouse_sensitivity = 0.1f;
 			first_mouse = true;
@@ -172,9 +201,11 @@ namespace rendering {
 		static void moveLeft() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(LEFT, handler->delta_time); }
 		static void origin() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(ORIGINAL, handler->delta_time); }
 		std::shared_ptr<Camera> camera_ptr;
+		std::vector<std::shared_ptr<Camera>> cameras;
 		float delta_time;
 		int key_up, key_down, key_left, key_right, key_origin, key_rotation_on;
-		int activation_type = GLFW_PRESS;;
+		int key_camera1, key_camera2;
+		int activation_type = GLFW_PRESS;
 		float mouse_sensitivity;
 		float last_x = 0.0f, last_y = 0.0f;
 		bool first_mouse, rotation_on;

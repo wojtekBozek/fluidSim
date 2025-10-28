@@ -33,7 +33,7 @@ void ParticleRenderer::setupBackend()
     glBindVertexArray(0);
 }
 
-void ParticleRenderer::render()
+void ParticleRenderer::render(std::shared_ptr<rendering::Camera> camera)
 {
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, posBuf);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, velBuf);

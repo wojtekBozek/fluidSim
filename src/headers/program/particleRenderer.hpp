@@ -5,7 +5,7 @@ class ParticleRenderer : public BaseRenderer
 public:
     ParticleRenderer() = default;
     void setupBackend();
-    void render() override;
+    void render(std::shared_ptr<rendering::Camera> camera) override;
     void generateParticles(GLuint number, float minCoord, float maxCoord);
     void setShaderProgram(std::shared_ptr<ShaderProgram> shader)
     {
@@ -15,14 +15,9 @@ public:
     {
         computeShaderProgram = shader;
     }
-    void setCamera(std::shared_ptr<rendering::Camera> cam)
-    {
-        camera = cam;
-    }
 private:
     std::shared_ptr<ShaderProgram> shaderProgram;
     std::shared_ptr<ShaderProgram> computeShaderProgram;
-    std::shared_ptr<rendering::Camera> camera;
     GLuint particlesNumber;
 
     std::vector<GLfloat> initPos;
