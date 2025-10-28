@@ -76,8 +76,10 @@ namespace rendering {
 		static void processMovement(GLFWwindow* window) 
 		{
 			CameraHandler* handler = CameraHandler::getInstance();
-			ProcessInput(window, handler->key_up, GLFW_PRESS, CameraHandler::moveUp);
-			ProcessInput(window, handler->key_down, GLFW_PRESS, CameraHandler::moveDown);
+			ProcessInput(window, handler->key_forward, GLFW_PRESS, CameraHandler::moveForward);
+			ProcessInput(window, handler->key_backward, GLFW_PRESS, CameraHandler::moveBackward);
+			ProcessInput(window, handler->key_vertical_up, GLFW_PRESS, CameraHandler::moveVerticallyUp);
+			ProcessInput(window, handler->key_vertical_down, GLFW_PRESS, CameraHandler::moveVerticallyDown);
 			ProcessInput(window, handler->key_left, GLFW_PRESS, CameraHandler::moveLeft);
 			ProcessInput(window, handler->key_right, GLFW_PRESS, CameraHandler::moveRight);
 			ProcessInput(window, handler->key_origin, GLFW_PRESS, CameraHandler::origin); 
@@ -180,30 +182,33 @@ namespace rendering {
 				return glm::mat4(1.0f); 
 		}
 		CameraHandler() {
-			camera_ptr = nullptr;
-			key_down = GLFW_KEY_S;
-			key_up = GLFW_KEY_W;
+			camera_ptr = nullptr; 
+			key_backward = GLFW_KEY_S;
+			key_forward = GLFW_KEY_W;
 			key_left = GLFW_KEY_A;
 			key_right = GLFW_KEY_D;
 			key_origin = GLFW_KEY_O;
+			key_vertical_down = GLFW_KEY_PAGE_DOWN;
+			key_vertical_up = GLFW_KEY_PAGE_UP;
 			key_rotation_on = GLFW_KEY_TAB;
 			key_camera1 = GLFW_KEY_1;
 			key_camera2 = GLFW_KEY_2;
-
 			delta_time = 0.0f;
 			mouse_sensitivity = 0.1f;
 			first_mouse = true;
 			rotation_on = true;
 		}
-		static void moveUp() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(FORWARD, handler->delta_time); }
-		static void moveDown() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(BACKWARD, handler->delta_time); }
+		static void moveForward() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(FORWARD, handler->delta_time); }
+		static void moveBackward() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(BACKWARD, handler->delta_time); }
+		static void moveVerticallyUp() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(VERTICAL_UP, handler->delta_time); }
+		static void moveVerticallyDown() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(VERTICAL_DOWN, handler->delta_time); }
 		static void moveRight() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(RIGHT, handler->delta_time); }
 		static void moveLeft() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(LEFT, handler->delta_time); }
 		static void origin() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(ORIGINAL, handler->delta_time); }
 		std::shared_ptr<Camera> camera_ptr;
 		std::vector<std::shared_ptr<Camera>> cameras;
 		float delta_time;
-		int key_up, key_down, key_left, key_right, key_origin, key_rotation_on;
+		int key_forward, key_backward, key_left, key_right, key_origin, key_rotation_on, key_vertical_up, key_vertical_down;
 		int key_camera1, key_camera2;
 		int activation_type = GLFW_PRESS;
 		float mouse_sensitivity;

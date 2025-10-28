@@ -12,7 +12,9 @@ namespace rendering{
 		BACKWARD,
 		LEFT,
 		RIGHT,
-		ORIGINAL
+		ORIGINAL,
+		VERTICAL_UP,
+		VERTICAL_DOWN
 	};
 
 	namespace dCV

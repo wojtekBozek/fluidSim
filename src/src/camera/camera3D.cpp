@@ -62,6 +62,14 @@ void rendering::Camera::processMovement(Camera_Movement direction, float DeltaTi
 	{
 		position += right_dir * velocity;
 	}
+	if (direction == VERTICAL_UP)
+	{
+		position += camera_up * velocity;
+	}
+	if (direction == VERTICAL_DOWN)
+	{
+		position -= camera_up * velocity;
+	}
 	if (direction == ORIGINAL)
 	{
 		returnToWorldView();
