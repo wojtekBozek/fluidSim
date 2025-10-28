@@ -35,14 +35,6 @@ private:
     void cleanup();
     void setupResources();
 
-    static void framebuffer_size_callback(GLFWwindow* window, int width, int height)
-    {
-        MyApp* self = static_cast<MyApp*>(glfwGetWindowUserPointer(window));
-        if (!self) return;
-
-        glViewport(0, 0, width, height);
-    }
-
     std::vector<std::shared_ptr<BaseRenderer>> renderers;
     std::shared_ptr<MeshRenderer> meshRenderer;
     std::shared_ptr<ParticleRenderer> particleRenderer;

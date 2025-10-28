@@ -36,8 +36,6 @@ void MyApp::setupResources()
     camera = std::make_shared<rendering::PerspectiveCamera>(glm::vec3(0, 2, 5), glm::vec3(0, 1, 0),
         float(WIDTH) / float(HEIGHT), 0.1f, 100.0f, window, 60.0f);
     camera->setWindowHeight(HEIGHT);
-    glfwSetWindowUserPointer(window, this);
-    glfwSetFramebufferSizeCallback(window, framebuffer_size_callback);
     camera2 = std::make_shared<rendering::OrthographicCamera>(glm::vec3(0, 2, 5), glm::vec3(0, 1, 0),
     -5.1315f, 5.1315f,     // left, right
     -2.8867f, 2.8867f,     // bottom, top
@@ -45,7 +43,7 @@ void MyApp::setupResources()
     );
     camera2->setWindowHeight(HEIGHT);
 
-    rendering::CameraHandler::setActiveCamera(camera);
+    rendering::CameraHandler::setActiveCamera(camera2);
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     rendering::CameraHandler::connectCallbacks(window);
 
@@ -64,7 +62,7 @@ void MyApp::setupResources()
     sphShaderProgram->addShader(GL_FRAGMENT_SHADER, "shaders/FluidSPH/fragment.shader");
     sphShaderProgram->linkProgram();
     sphRenderer = std::make_shared<SPHSimulationRenderer>();
-    sphRenderer->setCamera(camera);
+    sphRenderer->setCamera(camera2);
     sphRenderer->setShaderProgram(sphShaderProgram);
     sphRenderer->setupBackend();
 
@@ -157,7 +155,6 @@ void MyApp::mainLoop()
         rendering::CameraHandler::setCurrentSpeed(static_cast<float>(currentFrame - lastFrame));
         sphRenderer->setTimeStep(currentFrame-lastFrame);
         lastFrame = currentFrame;
-        camera->updateWindowProperties();
         //objectsMenager->rotate("cube", glm::vec3(0.0f, 0.0f, 1.0f),1.5);
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
