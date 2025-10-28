@@ -43,7 +43,8 @@ void MyApp::setupResources()
     );
     camera2->setWindowHeight(HEIGHT);
 
-    rendering::CameraHandler::setActiveCamera(camera2);
+    rendering::CameraHandler::addCamera(camera);
+    rendering::CameraHandler::addActiveCamera(camera2);
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     rendering::CameraHandler::connectCallbacks(window);
 
@@ -62,7 +63,6 @@ void MyApp::setupResources()
     sphShaderProgram->addShader(GL_FRAGMENT_SHADER, "shaders/FluidSPH/fragment.shader");
     sphShaderProgram->linkProgram();
     sphRenderer = std::make_shared<SPHSimulationRenderer>();
-    sphRenderer->setCamera(camera2);
     sphRenderer->setShaderProgram(sphShaderProgram);
     sphRenderer->setupBackend();
 
@@ -73,7 +73,6 @@ void MyApp::setupResources()
     particleRenderer->setComputeShaderProgram(particleComputeShaderProgram); 
     particleRenderer->generateParticles(1000000, -1.0f, 1.0f);
     particleRenderer->setupBackend();
-    particleRenderer->setCamera(camera);    
     SceneLoader<SceneLoaderObj>::loadScene("obj/scene1/", 
                             *objectsMenager, meshes);
     for (auto& mesh : meshes)
@@ -160,7 +159,7 @@ void MyApp::mainLoop()
         glClear(GL_COLOR_BUFFER_BIT);
         for (const auto& renderer : renderers)
         {
-          renderer->render();
+          renderer->render(rendering::CameraHandler::getInstance()->getCamera());
         }
         glBindVertexArray(0);
         glUseProgram(0);

@@ -4,7 +4,7 @@
 #include "perspectiveCamera.hpp"
 #include "orthographicCamera.hpp"
 
-void SPHSimulationRenderer::render()
+void SPHSimulationRenderer::render(std::shared_ptr<rendering::Camera> camera)
 {
     simulation.simulationStep(m_timeStep);
     shaderProgram->useProgram();
