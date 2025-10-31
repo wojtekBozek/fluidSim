@@ -45,8 +45,22 @@ const uint DIMENSION_1 = 0u;
 const uint DIMENSION_2 = 1u;
 const uint DIMENSION_3 = 2u;
 
-float CubicSplineKernel(uint dimension, float kernelRadius, float distance);
-vec3 KernelGradient(uint dimension, float kernelRadius, vec3 distanceVector);
+float getAlfa(float kernelRadius, uint dimension)
+{
+    float alfa;
+
+    switch (dimension)
+    {
+        case DIMENSION_1: alfa = 1.0/kernelRadius;break;
+        case DIMENSION_2: alfa = 15.0/(7.0*PI*kernelRadius*kernelRadius);break;
+        case DIMENSION_3: alfa = 3.0/(2.0*PI*pow(kernelRadius,3));break;
+        default: alfa = 3.0/(2.0*PI*pow(kernelRadius,3));break;
+    }
+    return alfa;
+}
+
+float CubicSplineKernel(float kernelRadius, float distance, float alfa);
+vec3 KernelGradient(float kernel, vec3 distanceVector);
 vec3 applyDomainForces(vec3 position, FluidParticle particle);
 float PressureByDensity2(FluidParticle part);
 vec3 reflectFromSurface(vec3 velVector, vec3 normalVector, float energyReflected); // istnieje reflect w GLSL, można skorzystać, jeśli nie będzie potrzeby utraty energi przy zderzeniu
@@ -54,19 +68,26 @@ void main()
 {
     uint fluidParticle_id = gl_GlobalInvocationID.x;
     if(fluidParticle_id >= numOfParticles) return;
-
+    float alfa = getAlfa(sphKernelRadius, DIMENSION);
     FluidParticle particle= particles[fluidParticle_id];
     vec3 temp = vec3(0.0,0.0,0.0);
     float localPBD2 = PressureByDensity2(particle);
+    float kernel = 0.0;
     for (uint i=0; i< numOfParticles; i++)
     {
-        vec3 kernelGradient = KernelGradient(DIMENSION, sphKernelRadius, particle.position.xyz - particles[i].position.xyz);
-        temp += particles[i].mass*(localPBD2+PressureByDensity2(particles[i]))*kernelGradient;
+        if(distance(particle.position.xyz,particles[i].position.xyz) <= 2*sphKernelRadius)
+        {
+            kernel = CubicSplineKernel(sphKernelRadius, distance(particle.position.xyz, particles[i].position.xyz), alfa);
+            particle.density += particles[i].mass * kernel;
+            vec3 kernelGradient = KernelGradient(kernel, particle.position.xyz - particles[i].position.xyz);
+            temp += particles[i].mass*(localPBD2+PressureByDensity2(particles[i]))*kernelGradient;
+        }
     }
+    particle.pressure = fluid.soundSpeed*fluid.soundSpeed*(particle.density-fluid.fluidDensity);
     particle.acceleration.xyz = externalAccelerations + applyDomainForces(particle.position.xyz, particle); //-temp - where temp is from fluid dynamic, for now left from equation
     //particle.velocity.xyz += particle.acceleration.xyz*timeStep;
     //particle.position.xyz += particle.velocity.xyz*timeStep;
-    //particles[fluidParticle_id].acceleration.xyz = particle.acceleration.xyz;
+    particles[fluidParticle_id].acceleration.xyz = particle.acceleration.xyz;
     //particles[fluidParticle_id].position.xyz = particles[fluidParticle_id].position.xyz + vec3(1.0, 1.0, 1.0);
 } 
 
@@ -75,18 +96,8 @@ float PressureByDensity2(FluidParticle part)
     return part.pressure/(part.density*part.density);
 }
 
-float CubicSplineKernel(uint dimension, float kernelRadius, float distance)
+float CubicSplineKernel(float kernelRadius, float distance, float alfa)
 {
-    float alfa;
-
-    switch (dimension)
-    {
-        case DIMENSION_1: alfa = 1.0/kernelRadius;
-        case DIMENSION_2: alfa = 15.0/(7.0*PI*kernelRadius*kernelRadius);
-        case DIMENSION_3: alfa = 3.0/(2.0*PI*(kernelRadius*kernelRadius*kernelRadius));
-        default: alfa = 3.0/(2.0*PI*(kernelRadius*kernelRadius*kernelRadius));
-    }
-
     float q = distance/kernelRadius;
     float retVal = 0.0;
 
@@ -101,9 +112,9 @@ float CubicSplineKernel(uint dimension, float kernelRadius, float distance)
     return alfa*retVal;
 }
 
-vec3 KernelGradient(uint dimension, float kernelRadius, vec3 distanceVector)
+vec3 KernelGradient(float kernel, vec3 distanceVector)
 {
-    return CubicSplineKernel(DIMENSION, kernelRadius, length(distanceVector)) * normalize(distanceVector);
+    return kernel * normalize(distanceVector);
 }
 
 

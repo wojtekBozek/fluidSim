@@ -60,7 +60,6 @@ namespace rendering {
 			camera->setYaw(oldCamera->getYaw());
 			camera->setUpVector(oldCamera->getUpVector());
 			camera->setPosition(oldCamera->getPosition());
-			camera->setWindowHeight(oldCamera->getWindowHeight());
 			camera->updateWindowProperties();
 			camera->updateCameraVectors();
 			handler->setCamera(camera);

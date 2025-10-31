@@ -33,18 +33,14 @@ void MyApp::setupResources()
     UIs.push_back(std::make_shared<MainWindow>(window, programState));
     UIs.push_back(std::make_shared<SimulationUI>(window, programState));
     
-    camera = std::make_shared<rendering::PerspectiveCamera>(glm::vec3(0, 2, 5), glm::vec3(0, 1, 0),
-        float(WIDTH) / float(HEIGHT), 0.1f, 100.0f, window, 60.0f);
-    camera->setWindowHeight(HEIGHT);
-    camera2 = std::make_shared<rendering::OrthographicCamera>(glm::vec3(0, 2, 5), glm::vec3(0, 1, 0),
+
+    rendering::CameraHandler::addActiveCamera(std::make_shared<rendering::PerspectiveCamera>(glm::vec3(0, 2, 5), glm::vec3(0, 1, 0),
+        float(WIDTH) / float(HEIGHT), 0.1f, 100.0f, window, 60.0f));
+    rendering::CameraHandler::addCamera(std::make_shared<rendering::OrthographicCamera>(glm::vec3(0, 2, 5), glm::vec3(0, 1, 0),
     -5.1315f, 5.1315f,     // left, right
     -2.8867f, 2.8867f,     // bottom, top
      0.1f, 100.0f, window
-    );
-    camera2->setWindowHeight(HEIGHT);
-
-    rendering::CameraHandler::addCamera(camera);
-    rendering::CameraHandler::addActiveCamera(camera2);
+    ));
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     rendering::CameraHandler::connectCallbacks(window);
 
@@ -88,7 +84,7 @@ void MyApp::setupResources()
     light->diffuse = glm::vec3(0.8f);
     light->specular = glm::vec3(1.0f);
     currentFrame = static_cast<float>(glfwGetTime());
-    meshRenderer = std::make_shared<MeshRenderer>(meshes, shaderProgram, light, camera2);
+    meshRenderer = std::make_shared<MeshRenderer>(meshes, shaderProgram, light);
     //renderers.push_back(particleRenderer);
     //renderers.push_back(meshRenderer);
     renderers.push_back(sphRenderer);
@@ -144,31 +140,41 @@ void MyApp::initialize()
 
 void MyApp::mainLoop()
 {
+    lastFrame = glfwGetTime();
+    double now = glfwGetTime();
+    double now1 = glfwGetTime();
+    double now2 = glfwGetTime();
     while(!glfwWindowShouldClose(window))
     {
+
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
         glfwPollEvents();
 
+        
         rendering::CameraHandler::processMovement(window);
-        currentFrame = static_cast<float>(glfwGetTime());
+        currentFrame = glfwGetTime();
         rendering::CameraHandler::setCurrentSpeed(static_cast<float>(currentFrame - lastFrame));
-        sphRenderer->setTimeStep(currentFrame-lastFrame);
+        sphRenderer->setTimeStep(0.001f);
         lastFrame = currentFrame;
         //objectsMenager->rotate("cube", glm::vec3(0.0f, 0.0f, 1.0f),1.5);
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
+        now1 = glfwGetTime();
+        
         for (const auto& renderer : renderers)
         {
           renderer->render(rendering::CameraHandler::getInstance()->getCamera());
         }
+        
         glBindVertexArray(0);
         glUseProgram(0);
-
+        
         ProcessInput(window, GLFW_KEY_ESCAPE, GLFW_PRESS, closeWindow, this->window, GLFW_TRUE);
         for(const auto& ui : UIs)
         {
             ui->showUI();
         }
+
         glfwSwapBuffers(window);
     }
 }

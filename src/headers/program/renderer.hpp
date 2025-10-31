@@ -19,8 +19,7 @@ public:
     MeshRenderer() = default;
     MeshRenderer(const std::vector<std::shared_ptr<Mesh>>& meshes_,
                  const std::shared_ptr<ShaderProgram>& shaderProgram_,
-                 const std::shared_ptr<PositionedLight>& light_,
-                 const std::shared_ptr<rendering::Camera>& camera_)
+                 const std::shared_ptr<PositionedLight>& light_)
         : meshes(meshes_), shaderProgram(shaderProgram_), light(light_){}   
     void render(std::shared_ptr<rendering::Camera> camera) override
     {
