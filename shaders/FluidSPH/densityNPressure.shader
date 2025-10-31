@@ -31,29 +31,15 @@ uniform uint numOfParticles;
 uniform float sphKernelRadius;
 uniform uint DIMENSION;
 
-float CubicSplineKernel(uint dimension, float kernelRadius, float distance);
+float CubicSplineKernel(float kernelRadius, float distance, float alfa);
 
 const uint DIMENSION_1 = 0u;
 const uint DIMENSION_2 = 1u;
 const uint DIMENSION_3 = 2u;
 
 const float PI = 3.14159265359;
-void main()
-{
-    uint fluidParticle_id = gl_GlobalInvocationID.x;
-    if(fluidParticle_id >= numOfParticles) return;
-//
-    FluidParticle particle = particles[fluidParticle_id];
-    particle.density=0.0;
-    for (uint i=0; i < numOfParticles; i++)
-    {
-        particle.density += particles[i].mass * CubicSplineKernel(DIMENSION, sphKernelRadius, distance(particle.position.xyz, particles[i].position.xyz));       
-    }
-    particle.pressure = fluid.soundSpeed*fluid.soundSpeed*(particle.density-fluid.fluidDensity);
-    particles[fluidParticle_id] = particle;
-}
 
-float CubicSplineKernel(uint dimension, float kernelRadius, float distance)
+float getAlfa(float kernelRadius, uint dimension)
 {
     float alfa;
 
@@ -64,7 +50,28 @@ float CubicSplineKernel(uint dimension, float kernelRadius, float distance)
         case DIMENSION_3: alfa = 3.0/(2.0*PI*pow(kernelRadius,3));break;
         default: alfa = 3.0/(2.0*PI*pow(kernelRadius,3));break;
     }
+    return alfa;
+}
 
+void main()
+{
+    uint fluidParticle_id = gl_GlobalInvocationID.x;
+    if(fluidParticle_id >= numOfParticles) return;
+
+    float alfa = getAlfa(sphKernelRadius, DIMENSION);
+    FluidParticle particle = particles[fluidParticle_id];
+    particle.density=0.0;
+    for (uint i=0; i < numOfParticles; i++)
+    {
+        if(distance(particle.position.xyz, particles[i].position.xyz) <= 2*sphKernelRadius)
+            particle.density += particles[i].mass * CubicSplineKernel(sphKernelRadius, distance(particle.position.xyz, particles[i].position.xyz), alfa);       
+    }
+    particle.pressure = fluid.soundSpeed*fluid.soundSpeed*(particle.density-fluid.fluidDensity);
+    particles[fluidParticle_id] = particle;
+}
+
+float CubicSplineKernel(float kernelRadius, float distance, float alfa)
+{
     float q = distance/kernelRadius;
     float retVal = 0.0;
 

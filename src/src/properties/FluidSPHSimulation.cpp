@@ -58,15 +58,6 @@ void FluidSPHSimulation::setFluidAndParticles()
     glGenBuffers(1, &FluidBuf);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, FluidBuf);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, &m_fluid, GL_DYNAMIC_DRAW);
-    
-    //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, partBuf);
-    //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, FluidBuf);
-    //m_pressureNdensityComputeShader->useProgram();
-    //m_pressureNdensityComputeShader->setUint("numOfParticles", m_numOfParticles);
-    //m_pressureNdensityComputeShader->setFloat("sphKernelRadius", m_kernelRadius);
-    //m_pressureNdensityComputeShader->setUint("DIMENSION", DIMENSION_3);
-    //glDispatchCompute((m_numOfParticles + 999) / 1000, 1, 1);
-    //glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
 const Fluid &FluidSPHSimulation::getFluid() const
@@ -86,24 +77,28 @@ const std::vector<FluidParticle> &FluidSPHSimulation::getParticles() const
 
 void FluidSPHSimulation::simulationStep(float timeStep)
 {
-    //std::cout << "step [" << timeStep << "] - FrameRate: ["<< 1.0/timeStep << "]\n";
+    GLuint query;
+    glGenQueries(1, &query);
+
+    glBeginQuery(GL_TIME_ELAPSED, query);
+
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, partBuf);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, FluidBuf);
-    m_pressureNdensityComputeShader->useProgram();
-    m_pressureNdensityComputeShader->setUint("numOfParticles", m_numOfParticles);
-    m_pressureNdensityComputeShader->setFloat("sphKernelRadius", m_kernelRadius);
-    m_pressureNdensityComputeShader->setUint("DIMENSION", SimDim::DIMENSION_2);
-    glDispatchCompute((m_numOfParticles + 999) / 1000, 1, 1);
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+    //m_pressureNdensityComputeShader->useProgram();
+    //m_pressureNdensityComputeShader->setUint("numOfParticles", m_numOfParticles);
+    //m_pressureNdensityComputeShader->setFloat("sphKernelRadius", particleRadius);
+    //m_pressureNdensityComputeShader->setUint("DIMENSION", SimDim::DIMENSION_2);
+    //glDispatchCompute((m_numOfParticles + 999) / 1000, 1, 1);
+    //glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
     m_accelerationComputeShader->useProgram();
     m_accelerationComputeShader->setUint("numOfParticles", m_numOfParticles);
-    m_accelerationComputeShader->setFloat("sphKernelRadius", m_kernelRadius);
+    m_accelerationComputeShader->setFloat("sphKernelRadius", 0.005f);
     m_accelerationComputeShader->setUint("DIMENSION", SimDim::DIMENSION_2);
     m_accelerationComputeShader->setVec3("externalAccelerations", {0.0f,-9.8f,0.0f});
-    m_accelerationComputeShader->setVec3("domainRefPos", {-1,-6,-1});
-    m_accelerationComputeShader->setVec3("domainDimennsions", {5,500,5});
-    m_accelerationComputeShader->setFloat("boundaryMaxDist", 2*m_kernelRadius);
+    m_accelerationComputeShader->setVec3("domainRefPos", {-10,-6,-10});
+    m_accelerationComputeShader->setVec3("domainDimennsions", {50,500,50});
+    m_accelerationComputeShader->setFloat("boundaryMaxDist", 2* particleRadius);
     m_accelerationComputeShader->setUint("toonerP", 2);
     m_accelerationComputeShader->setFloat("stiffnessK", 100);    
     glDispatchCompute((m_numOfParticles + 999) / 1000, 1, 1);
@@ -115,4 +110,9 @@ void FluidSPHSimulation::simulationStep(float timeStep)
     glDispatchCompute((m_numOfParticles + 999) / 1000, 1, 1);
 
     glMemoryBarrier(GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
+    glEndQuery(GL_TIME_ELAPSED);
+
+    GLuint64 elapsedTime = 0;
+    glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsedTime);
+    std::cout << "Compute time (ns): " << elapsedTime << std::endl;
 }

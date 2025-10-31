@@ -46,8 +46,6 @@ private:
     std::shared_ptr<ObjectMenager> objectsMenager;
     std::shared_ptr<ProgramState> programState;
     std::vector<std::shared_ptr<BaseUI>> UIs;
-    std::shared_ptr<rendering::Camera> camera;
-    std::shared_ptr<rendering::Camera> camera2;
     std::vector<std::shared_ptr<Mesh>> meshes;
     std::shared_ptr<PositionedLight> light;
     std::unordered_map<std::string, std::shared_ptr<rendering::Camera>> cameras;

@@ -109,7 +109,7 @@ private:
     Fluid m_fluid;
     std::vector<FluidParticle> m_particles;
     uint32_t m_numOfParticles = 2500;
-    float m_kernelRadius = 0.5f;
+    float m_kernelRadius = 0.1f;
     float particleRadius = 0.0f;
 };
 
