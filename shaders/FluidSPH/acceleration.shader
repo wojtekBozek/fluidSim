@@ -78,13 +78,11 @@ void main()
         if(distance(particle.position.xyz,particles[i].position.xyz) <= 2*sphKernelRadius)
         {
             kernel = CubicSplineKernel(sphKernelRadius, distance(particle.position.xyz, particles[i].position.xyz), alfa);
-            particle.density += particles[i].mass * kernel;
             vec3 kernelGradient = KernelGradient(kernel, particle.position.xyz - particles[i].position.xyz);
             temp += particles[i].mass*(localPBD2+PressureByDensity2(particles[i]))*kernelGradient;
         }
     }
-    particle.pressure = fluid.soundSpeed*fluid.soundSpeed*(particle.density-fluid.fluidDensity);
-    particle.acceleration.xyz = externalAccelerations + applyDomainForces(particle.position.xyz, particle); //-temp - where temp is from fluid dynamic, for now left from equation
+    particle.acceleration.xyz = externalAccelerations-temp;//-temp; //externalAccelerations + applyDomainForces(particle.position.xyz, particle)// - where temp is from fluid dynamic, for now left from equation
     //particle.velocity.xyz += particle.acceleration.xyz*timeStep;
     //particle.position.xyz += particle.velocity.xyz*timeStep;
     particles[fluidParticle_id].acceleration.xyz = particle.acceleration.xyz;
@@ -114,7 +112,9 @@ float CubicSplineKernel(float kernelRadius, float distance, float alfa)
 
 vec3 KernelGradient(float kernel, vec3 distanceVector)
 {
-    return kernel * normalize(distanceVector);
+    float len = length(distanceVector);
+    if(len < 0.0001) return vec3(0.0); // avoid divide-by-zero
+    return kernel * distanceVector / len;
 }
 
 

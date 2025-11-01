@@ -15,8 +15,8 @@ struct Fluid
 {
     float fluidDensity; // kg
     float volume; // m^3
-    float soundSpeed;// nazewnictwo luźno powiązane z prędkością dźwięku 
-    float pad0;
+    float stiffnesK;// nazewnictwo luźno powiązane z prędkością dźwięku 
+    float stiffnesY;
 };
 
 layout(std430, binding = 0) buffer PartBuffer {
@@ -66,8 +66,9 @@ void main()
         if(distance(particle.position.xyz, particles[i].position.xyz) <= 2*sphKernelRadius)
             particle.density += particles[i].mass * CubicSplineKernel(sphKernelRadius, distance(particle.position.xyz, particles[i].position.xyz), alfa);       
     }
-    particle.pressure = fluid.soundSpeed*fluid.soundSpeed*(particle.density-fluid.fluidDensity);
-    particles[fluidParticle_id] = particle;
+    particle.pressure = (fluid.stiffnesK*fluid.fluidDensity)/fluid.stiffnesY*(pow((particle.density/fluid.fluidDensity),fluid.stiffnesY)-1.0);// -;
+    particles[fluidParticle_id].pressure = particle.pressure;
+    particles[fluidParticle_id].density = particle.density;
 }
 
 float CubicSplineKernel(float kernelRadius, float distance, float alfa)
