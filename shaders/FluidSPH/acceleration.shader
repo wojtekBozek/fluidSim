@@ -52,10 +52,16 @@ float getAlfa(float kernelRadius, uint dimension)
 
     switch (dimension)
     {
-        case DIMENSION_1: alfa = 1.0/kernelRadius;break;
-        case DIMENSION_2: alfa = 15.0/(7.0*PI*kernelRadius*kernelRadius);break;
-        case DIMENSION_3: alfa = 3.0/(2.0*PI*pow(kernelRadius,3));break;
-        default: alfa = 3.0/(2.0*PI*pow(kernelRadius,3));break;
+         case DIMENSION_1:
+            alfa = 2.0 / (3.0 * kernelRadius);
+            break;
+        case DIMENSION_2:
+            alfa = 10.0 / (7.0 * PI * kernelRadius * kernelRadius);
+            break;
+        case DIMENSION_3:
+        default:
+            alfa = 1.0 / (PI * pow(kernelRadius, 3.0));
+            break;
     }
     return alfa;
 }
@@ -85,7 +91,7 @@ void main()
             particle.velocity.xyz += epsilon*particles[i].mass/particles[i].density*(particles[i].velocity.xyz-particle.velocity.xyz)*kernel;
         }
     }
-    particle.acceleration.xyz = externalAccelerations - temp;// + applyDomainForces(particle.position.xyz, particle);
+    particle.acceleration.xyz = externalAccelerations - temp + applyDomainForces(particle.position.xyz, particle);
     particles[fluidParticle_id].acceleration.xyz = particle.acceleration.xyz;
     particles[fluidParticle_id].velocity.xyz = particle.velocity.xyz;
 } 
