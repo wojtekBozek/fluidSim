@@ -32,9 +32,9 @@ struct Domain
 struct Fluid
 {
     float fluidDensity = 997.0f; // kg
-    float volume = 1.0f; // m^3
-    float stiffnesK = 35000; // nazewnictwo luźno powiązane z prędkością dźwięku 
-    float stiffnesY=7;
+    float volume = 10.0f; // m^3
+    float stiffnesK = 35000.0f; // nazewnictwo luźno powiązane z prędkością dźwięku 
+    float stiffnesY=7.0f;
 };
 
 

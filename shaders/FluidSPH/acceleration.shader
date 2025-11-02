@@ -39,6 +39,7 @@ uniform float boundaryMaxDist;
 uniform uint toonerP;
 uniform float stiffnessK = 100.0;//n/m
 
+uniform float epsilon;
 
 const float PI = 3.14159265359;
 const uint DIMENSION_1 = 0u;
@@ -60,10 +61,11 @@ float getAlfa(float kernelRadius, uint dimension)
 }
 
 float CubicSplineKernel(float kernelRadius, float distance, float alfa);
-vec3 KernelGradient(float kernel, vec3 distanceVector);
+vec3 KernelGradient(float kernel, vec3 distanceVector, float alfa);
 vec3 applyDomainForces(vec3 position, FluidParticle particle);
 float PressureByDensity2(FluidParticle part);
-vec3 reflectFromSurface(vec3 velVector, vec3 normalVector, float energyReflected); // istnieje reflect w GLSL, można skorzystać, jeśli nie będzie potrzeby utraty energi przy zderzeniu
+
+
 void main()
 {
     uint fluidParticle_id = gl_GlobalInvocationID.x;
@@ -78,15 +80,14 @@ void main()
         if(distance(particle.position.xyz,particles[i].position.xyz) <= 2*sphKernelRadius)
         {
             kernel = CubicSplineKernel(sphKernelRadius, distance(particle.position.xyz, particles[i].position.xyz), alfa);
-            vec3 kernelGradient = KernelGradient(kernel, particle.position.xyz - particles[i].position.xyz);
+            vec3 kernelGradient = KernelGradient(sphKernelRadius, particle.position.xyz - particles[i].position.xyz, alfa);
             temp += particles[i].mass*(localPBD2+PressureByDensity2(particles[i]))*kernelGradient;
+            particle.velocity.xyz += epsilon*particles[i].mass/particles[i].density*(particles[i].velocity.xyz-particle.velocity.xyz)*kernel;
         }
     }
-    particle.acceleration.xyz = externalAccelerations-temp;//-temp; //externalAccelerations + applyDomainForces(particle.position.xyz, particle)// - where temp is from fluid dynamic, for now left from equation
-    //particle.velocity.xyz += particle.acceleration.xyz*timeStep;
-    //particle.position.xyz += particle.velocity.xyz*timeStep;
+    particle.acceleration.xyz = externalAccelerations - temp;// + applyDomainForces(particle.position.xyz, particle);
     particles[fluidParticle_id].acceleration.xyz = particle.acceleration.xyz;
-    //particles[fluidParticle_id].position.xyz = particles[fluidParticle_id].position.xyz + vec3(1.0, 1.0, 1.0);
+    particles[fluidParticle_id].velocity.xyz = particle.velocity.xyz;
 } 
 
 float PressureByDensity2(FluidParticle part)
@@ -99,28 +100,32 @@ float CubicSplineKernel(float kernelRadius, float distance, float alfa)
     float q = distance/kernelRadius;
     float retVal = 0.0;
 
-    if (q >= 0.0 && q <1.0)
+    if (q >= 0.0 && q < 1.0)
     {
         retVal = 1.5 - q*q + 0.5*(q*q*q);
     }
-    else if(q >= 1.0 && q<2.0)
+    else if(q >= 1.0 && q < 2.0)
     {
-        retVal = (1.0/6.0)*((2-q)*(2-q)*(2-q));
-    } // else 0, obsłużone z defaultu
+        retVal = (1.0/6.0)*((2.0-q)*(2.0-q)*(2.0-q));
+    }
     return alfa*retVal;
 }
 
-vec3 KernelGradient(float kernel, vec3 distanceVector)
+vec3 KernelGradient(float kernelRadius, vec3 distanceVector, float alfa)
 {
-    float len = length(distanceVector);
-    if(len < 0.0001) return vec3(0.0); // avoid divide-by-zero
-    return kernel * distanceVector / len;
-}
+    float r = length(distanceVector);
+    if (r < 0.0001) return vec3(0.0);
 
+    float q = r / kernelRadius;
+    float grad_q = 0.0;
 
-vec3 reflectFromSurface(vec3 velVector, vec3 normalVector, float energyReflected)
-{
-    return velVector - (1+energyReflected)*(dot(velVector, normalVector))*normalize(normalVector);
+    if (q >= 0.0 && q < 1.0)
+        grad_q = (-3.0*q + 2.25*q*q);
+    else if (q >= 1.0 && q < 2.0)
+        grad_q = -0.75 * pow(2.0 - q, 2.0);
+
+    float gradW = alfa * grad_q / kernelRadius;
+    return gradW * (distanceVector / r);
 }
 
 float WallForce(float dist,float mass)
@@ -143,7 +148,7 @@ vec3 applyDomainForces(vec3 position, FluidParticle particle)
     float up = domainRefPos.y + domainDimennsions.y;
     vec3 upNormal = vec3(0.0,-1.0,0.0);
     float down = domainRefPos.y;
-    vec3 downNormal = vec3(0.0,-1.0,0.0);
+    vec3 downNormal = vec3(0.0,1.0,0.0);
     float right = domainRefPos.x + domainDimennsions.x;
     vec3 rightNormal = vec3(-1.0,0.0,0.0);
     float left = domainRefPos.x;
