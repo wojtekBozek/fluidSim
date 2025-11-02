@@ -31,9 +31,9 @@ struct Domain
 
 struct Fluid
 {
-    float fluidDensity = 997.0f; // kg
+    float fluidDensity = 997; // kg
     float volume = 10.0f; // m^3
-    float stiffnesK = 35000.0f; // nazewnictwo luźno powiązane z prędkością dźwięku 
+    float stiffnesK = 35.0f; // nazewnictwo luźno powiązane z prędkością dźwięku 
     float stiffnesY=7.0f;
 };
 
@@ -108,7 +108,7 @@ private:
     Domain m_simulationDomain, m_initialDomain;
     Fluid m_fluid;
     std::vector<FluidParticle> m_particles;
-    uint32_t m_numOfParticles = 2500;
+    uint32_t m_numOfParticles = 25000;
     float m_kernelRadius = 0.1f;
     float particleRadius = 0.0f;
 };

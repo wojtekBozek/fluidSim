@@ -45,10 +45,16 @@ float getAlfa(float kernelRadius, uint dimension)
 
     switch (dimension)
     {
-        case DIMENSION_1: alfa = 1.0/kernelRadius;break;
-        case DIMENSION_2: alfa = 15.0/(7.0*PI*kernelRadius*kernelRadius);break;
-        case DIMENSION_3: alfa = 3.0/(2.0*PI*pow(kernelRadius,3));break;
-        default: alfa = 3.0/(2.0*PI*pow(kernelRadius,3));break;
+         case DIMENSION_1:
+            alfa = 2.0 / (3.0 * kernelRadius);
+            break;
+        case DIMENSION_2:
+            alfa = 10.0 / (7.0 * PI * kernelRadius * kernelRadius);
+            break;
+        case DIMENSION_3:
+        default:
+            alfa = 1.0 / (PI * pow(kernelRadius, 3.0));
+            break;
     }
     return alfa;
 }
