@@ -154,7 +154,7 @@ void MyApp::mainLoop()
         rendering::CameraHandler::processMovement(window);
         currentFrame = glfwGetTime();
         rendering::CameraHandler::setCurrentSpeed(static_cast<float>(currentFrame - lastFrame));
-        sphRenderer->setTimeStep(0.0001f);
+        sphRenderer->setTimeStep(0.001f);
         lastFrame = currentFrame;
         //objectsMenager->rotate("cube", glm::vec3(0.0f, 0.0f, 1.0f),1.5);
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);

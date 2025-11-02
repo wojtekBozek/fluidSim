@@ -28,8 +28,8 @@ layout(std430, binding = 1) buffer FluidBuffer {
 };
 
 uniform uint numOfParticles;
-uniform float sphKernelRadius;
 uniform uint DIMENSION;
+uniform float sphKernelRadius;
 
 float CubicSplineKernel(float kernelRadius, float distance, float alfa);
 
@@ -64,7 +64,9 @@ void main()
     for (uint i=0; i < numOfParticles; i++)
     {
         if(distance(particle.position.xyz, particles[i].position.xyz) <= 2*sphKernelRadius)
+        {
             particle.density += particles[i].mass * CubicSplineKernel(sphKernelRadius, distance(particle.position.xyz, particles[i].position.xyz), alfa);       
+        }
     }
     particle.pressure = (fluid.stiffnesK*fluid.fluidDensity)/fluid.stiffnesY*(pow((particle.density/fluid.fluidDensity),fluid.stiffnesY)-1.0);// -;
     particles[fluidParticle_id].pressure = particle.pressure;
@@ -76,13 +78,13 @@ float CubicSplineKernel(float kernelRadius, float distance, float alfa)
     float q = distance/kernelRadius;
     float retVal = 0.0;
 
-    if (q >= 0.0 && q <1.0)
+    if (q >= 0.0 && q < 1.0)
     {
-        retVal = 1.5 - q*q + 0.5*pow(q,3);
+        retVal = 1.5 - q*q + 0.5*(q*q*q);
     }
-    else if(q >= 1.0 && q<2.0)
+    else if(q >= 1.0 && q < 2.0)
     {
-        retVal = (1.0/6.0)*pow((2.0-q),3);
-    } // else 0, obsłużone z defaultu
+        retVal = (1.0/6.0)*((2.0-q)*(2.0-q)*(2.0-q));
+    }
     return alfa*retVal;
 }
