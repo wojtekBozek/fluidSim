@@ -69,8 +69,8 @@ void MyApp::setupResources()
     particleRenderer->setComputeShaderProgram(particleComputeShaderProgram); 
     particleRenderer->generateParticles(1000000, -1.0f, 1.0f);
     particleRenderer->setupBackend();
-    SceneLoader<SceneLoaderObj>::loadScene("obj/scene1/", 
-                            *objectsMenager, meshes);
+    //SceneLoader<SceneLoaderObj>::loadScene("obj/scene1/", 
+    //                        *objectsMenager, meshes);
     for (auto& mesh : meshes)
     {
         mesh->bind(layoutPos, layoutNormals);

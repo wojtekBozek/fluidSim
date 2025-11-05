@@ -25,8 +25,8 @@ struct alignas(16) FluidParticle : Particle
 /// @brief cell defined with a position of it's back, lower, left vertex and size right up and front
 struct Domain
 {
-    glm::vec3 posittion = {-2.5,-0.5,0.0};
-    glm::vec3 size = {5,5,1}; // {m,m,m}
+    glm::vec3 posittion = {-10,-7,-10.0};
+    glm::vec3 size = {20,50,20}; // {m,m,m}
 };
 
 struct Fluid
@@ -34,7 +34,7 @@ struct Fluid
     float fluidDensity = 997; // kg
     float volume = 10.0f; // m^3
     float stiffnesK = 35.0f; // nazewnictwo luźno powiązane z prędkością dźwięku 
-    float stiffnesY=7.0f;
+    float stiffnesY=5.0f;
 };
 
 
@@ -121,9 +121,9 @@ private:
     Domain m_simulationDomain, m_initialDomain;
     Fluid m_fluid;
     std::vector<FluidParticle> m_particles;
-    uint32_t m_numOfParticles = 25600;
-    float m_kernelRadius = 0.1f;
-    float particleRadius = 0.0f;
+    uint32_t m_numOfParticles = 0;
+    float m_kernelRadius = 0.5f;
+    float particleRadius = 0.05f;
 };
 
 
