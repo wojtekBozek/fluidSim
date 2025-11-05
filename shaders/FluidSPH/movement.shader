@@ -1,5 +1,5 @@
 #version 430
-layout(local_size_x = 1000) in;
+layout(local_size_x = 256) in;
 struct FluidParticle{
     vec4 position;
     vec4 velocity;

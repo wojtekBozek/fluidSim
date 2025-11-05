@@ -78,14 +78,20 @@ class FluidSPHSimulation
 public:
     FluidSPHSimulation()
     {
+        m_resetHashTableComputeShader = std::make_unique<ShaderProgram>();
+        m_resetHashTableComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/resetingHash.shader");
+        m_resetHashTableComputeShader->linkProgram();
+        m_initHashTableComputeShader = std::make_unique<ShaderProgram>();
+        m_initHashTableComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/hashingFunction.shader");
+        m_initHashTableComputeShader->linkProgram();
         m_pressureNdensityComputeShader = std::make_unique<ShaderProgram>();
-        m_pressureNdensityComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/densityNPressure.shader");
+        m_pressureNdensityComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/densityNpressureHashed.shader");
         m_pressureNdensityComputeShader->linkProgram();
         m_movementComputeShader = std::make_unique<ShaderProgram>();
         m_movementComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/movement.shader");
         m_movementComputeShader->linkProgram();
         m_accelerationComputeShader = std::make_unique<ShaderProgram>();
-        m_accelerationComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/acceleration.shader");
+        m_accelerationComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/accelerationHashed.shader");
         m_accelerationComputeShader->linkProgram();
     }
     FluidSPHSimulation(std::unique_ptr<ShaderProgram> computePressureShader, std::unique_ptr<ShaderProgram> computeMovementShader, Domain simulationDomain, Fluid fluid, uint32_t numOfParticles);
@@ -102,13 +108,20 @@ public:
 private:
     GLuint partBuf;
     GLuint FluidBuf;
+    GLuint hashBuf;
+    GLuint nextNodeBuf;
+
+    std::vector<GLint> hashValues;
+    std::vector<GLint> nextNodes;
+    std::unique_ptr<ShaderProgram> m_initHashTableComputeShader;
+    std::unique_ptr<ShaderProgram> m_resetHashTableComputeShader;
     std::unique_ptr<ShaderProgram> m_movementComputeShader;
     std::unique_ptr<ShaderProgram> m_accelerationComputeShader;
     std::unique_ptr<ShaderProgram> m_pressureNdensityComputeShader;
     Domain m_simulationDomain, m_initialDomain;
     Fluid m_fluid;
     std::vector<FluidParticle> m_particles;
-    uint32_t m_numOfParticles = 25000;
+    uint32_t m_numOfParticles = 25600;
     float m_kernelRadius = 0.1f;
     float particleRadius = 0.0f;
 };
