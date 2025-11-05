@@ -27,9 +27,27 @@ layout(std430, binding = 1) buffer FluidBuffer {
     Fluid fluid;
 };
 
+layout(std430, binding = 2) buffer HashHeadBuffer {
+    int hashHead[];
+};
+
+layout(std430, binding = 3) buffer NextNodeBuffer {
+    int nextNode[];
+};
+
+
+uint hash(ivec3 cell) {
+    const uint p1 = 73856093u;
+    const uint p2 = 19349663u;
+    const uint p3 = 83492791u;
+    return (cell.x * p1 ^ cell.y * p2 ^ cell.z * p3);
+}
+
 uniform uint numOfParticles;
 uniform uint DIMENSION;
+uniform uint tableSize;
 uniform float sphKernelRadius;
+uniform float cellSize;
 
 float CubicSplineKernel(float kernelRadius, float distance, float alfa);
 
@@ -66,14 +84,50 @@ void main()
 
     float alfa = getAlfa(sphKernelRadius, DIMENSION);
     FluidParticle particle = particles[fluidParticle_id];
+    vec3 position = particle.position.xyz;
+    ivec3 cellPosition = ivec3(floor(position/cellSize));
+
+    uint ourHashValue = hash(cellPosition) % tableSize;
+
     particle.density=0.0;
-    for (uint i=0; i < numOfParticles; i++)
+    ivec3 theirCellPosition = cellPosition;
+    uint theirHashValue = ourHashValue;
+    
+    for (int dx=-1; dx <=1; dx++)
     {
-        if(distance(particle.position.xyz, particles[i].position.xyz) <= 2*sphKernelRadius)
+        for (int dy=-1; dy <= 1; dy++)
         {
-            particle.density += particles[i].mass * CubicSplineKernel(sphKernelRadius, distance(particle.position.xyz, particles[i].position.xyz), alfa);       
+            //for(int dz = -1; dz <=1; dz++)  
+            //{
+                theirCellPosition = cellPosition + ivec3(dx, dy, 0);
+                theirHashValue = hash(theirCellPosition) % tableSize;
+
+                if(hashHead[theirHashValue] != -1)
+                {
+                    int currentParticle = hashHead[theirHashValue];
+                    do 
+                    {
+                        if(distance(particle.position.xyz, particles[currentParticle].position.xyz) <= 2*sphKernelRadius)
+                        {
+                            particle.density += particles[currentParticle].mass * CubicSplineKernel(sphKernelRadius, distance(particle.position.xyz, particles[currentParticle].position.xyz), alfa);       
+                        }
+                        if(nextNode[currentParticle]!=-1)
+                        {
+                            currentParticle = nextNode[currentParticle];
+                        }
+                    }while(nextNode[currentParticle] != -1);
+                }
+            //}      
         }
     }
+
+    //for (uint i=0; i < numOfParticles; i++)
+    //{
+    //    if(distance(particle.position.xyz, particles[i].position.xyz) <= 2*sphKernelRadius)
+    //    {
+    //        particle.density += particles[i].mass * CubicSplineKernel(sphKernelRadius, distance(particle.position.xyz, particles[i].position.xyz), alfa);       
+    //    }
+    //}
     particle.pressure = (fluid.stiffnesK*fluid.fluidDensity)/fluid.stiffnesY*(pow((particle.density/fluid.fluidDensity),fluid.stiffnesY)-1.0);// -;
     particles[fluidParticle_id].pressure = particle.pressure;
     particles[fluidParticle_id].density = particle.density;
