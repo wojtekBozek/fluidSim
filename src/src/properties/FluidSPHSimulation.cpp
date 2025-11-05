@@ -11,11 +11,16 @@ FluidSPHSimulation::FluidSPHSimulation(std::unique_ptr<ShaderProgram> computePre
 
 void FluidSPHSimulation::setFluidAndParticles()
 {
+    m_initialDomain.posittion = glm::vec3(-1.0, -5.0, -particleRadius);
+    m_kernelRadius = 5*particleRadius;
+    m_initialDomain.size = glm::vec3(10.0, 10.0, 2*particleRadius);
+    m_fluid.fluidDensity *= particleRadius;
+    m_fluid.volume = m_initialDomain.size.x * m_initialDomain.size.y;// *m_initialDomain.size.z;
     FluidParticle initialParticle;
+    float particleDiameter = particleRadius *2.0f;
+    m_numOfParticles = m_fluid.volume / (std::pow(particleRadius, 2)*M_PI);
     initialParticle.mass = (m_fluid.fluidDensity * m_fluid.volume) /static_cast<float>(m_numOfParticles); // masa cząstki
-    float domainVolume = m_initialDomain.size.x*m_initialDomain.size.y;// 2d*m_initialDomain.size.z;
-    float particleDiameter = std::sqrtf(domainVolume/static_cast<float>(m_numOfParticles));
-    particleRadius = particleDiameter/2.0f;
+    std::cout << "Num of particles: " << m_numOfParticles << "\n";
     std::cout << particleRadius << ", " << initialParticle.mass << " - particle radius, mass\n";
     initialParticle.position = glm::vec4(m_initialDomain.posittion + glm::vec3(particleRadius), 1.0f);
     initialParticle.velocity = glm::vec4(glm::vec3(0.0f), 1.0f);
@@ -102,7 +107,7 @@ void FluidSPHSimulation::simulationStep(float timeStep)
     m_resetHashTableComputeShader->useProgram();
     m_resetHashTableComputeShader->setUint("numOfParticles", m_numOfParticles);
     m_resetHashTableComputeShader->setUint("tableSize", m_numOfParticles);
-    m_initHashTableComputeShader->setFloat("cellSize", 2.0 * 7.5 * particleRadius);
+    m_initHashTableComputeShader->setFloat("cellSize", 2.0 * m_kernelRadius);
     glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
@@ -113,7 +118,7 @@ void FluidSPHSimulation::simulationStep(float timeStep)
     m_initHashTableComputeShader->useProgram();
     m_initHashTableComputeShader->setUint("numOfParticles", m_numOfParticles);
     m_initHashTableComputeShader->setUint("tableSize", m_numOfParticles);
-    m_initHashTableComputeShader->setFloat("cellSize", 2.0*7.5 * particleRadius);
+    m_initHashTableComputeShader->setFloat("cellSize", 2.0* m_kernelRadius);
     glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
@@ -123,23 +128,23 @@ void FluidSPHSimulation::simulationStep(float timeStep)
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, nextNodeBuf);
     m_pressureNdensityComputeShader->useProgram();
     m_pressureNdensityComputeShader->setUint("numOfParticles", m_numOfParticles);
-    m_pressureNdensityComputeShader->setFloat("sphKernelRadius", 7.5 * particleRadius);
+    m_pressureNdensityComputeShader->setFloat("sphKernelRadius", m_kernelRadius);
     m_pressureNdensityComputeShader->setUint("tableSize", m_numOfParticles);
-    m_pressureNdensityComputeShader->setFloat("cellSize", 2.0 * 7.5 * particleRadius);
+    m_pressureNdensityComputeShader->setFloat("cellSize", 2.0 * m_kernelRadius);
     m_pressureNdensityComputeShader->setUint("DIMENSION", SimDim::DIMENSION_2);
     glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
     m_accelerationComputeShader->useProgram();
     m_accelerationComputeShader->setUint("numOfParticles", m_numOfParticles);
-    m_accelerationComputeShader->setFloat("sphKernelRadius", 7.5 * particleRadius);
+    m_accelerationComputeShader->setFloat("sphKernelRadius", m_kernelRadius);
     m_accelerationComputeShader->setUint("DIMENSION", SimDim::DIMENSION_2);
     m_accelerationComputeShader->setVec3("externalAccelerations", { 0.0f,-9.8f,0.0f });
-    m_accelerationComputeShader->setVec3("domainRefPos", { -5,-2,-1 });
-    m_accelerationComputeShader->setVec3("domainDimennsions", { 10,10,2 });
-    m_accelerationComputeShader->setFloat("boundaryMaxDist", 15 * particleRadius);
+    m_accelerationComputeShader->setVec3("domainRefPos", m_simulationDomain.posittion);
+    m_accelerationComputeShader->setVec3("domainDimennsions", m_simulationDomain.size);
+    m_accelerationComputeShader->setFloat("boundaryMaxDist", 2.0 * m_kernelRadius);
     m_accelerationComputeShader->setUint("tableSize", m_numOfParticles);
-    m_accelerationComputeShader->setFloat("cellSize", 2.0 * 7.5 * particleRadius);
+    m_accelerationComputeShader->setFloat("cellSize", 2.0 * m_kernelRadius);
     m_accelerationComputeShader->setUint("toonerP", 7);
     m_accelerationComputeShader->setFloat("stiffnessK", 35000);
     m_accelerationComputeShader->setFloat("epsilon", 0.05f);
