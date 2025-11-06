@@ -33,8 +33,8 @@ struct Fluid
 {
     float fluidDensity = 997; // kg
     float volume = 10.0f; // m^3
-    float stiffnesK = 35.0f; // nazewnictwo luźno powiązane z prędkością dźwięku 
-    float stiffnesY=5.0f;
+    float stiffnesK = 3.50f; // nazewnictwo luźno powiązane z prędkością dźwięku 
+    float stiffnesY= 3.0f;
 };
 
 
@@ -122,8 +122,8 @@ private:
     Fluid m_fluid;
     std::vector<FluidParticle> m_particles;
     uint32_t m_numOfParticles = 0;
-    float m_kernelRadius = 0.5f;
-    float particleRadius = 0.05f;
+    float m_kernelRadius = 0.02f;
+    float particleRadius = 0.02f;
 };
 
 
