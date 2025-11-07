@@ -162,21 +162,25 @@ float CubicSplineKernel(float kernelRadius, float distance, float alfa)
     float q = distance/kernelRadius;
     float retVal = 0.0;
 
+    //if (q >= 0.0 && q < 1.0)
+    //{
+    //    retVal = 1.5 - q*q + 0.5*(q*q*q);
+    //}
+    //else if(q >= 1.0 && q < 2.0)
+    //{
+    //    retVal = (1.0/6.0)*((2.0-q)*(2.0-q)*(2.0-q));
+    //}
     if (q >= 0.0 && q < 1.0)
-    {
-        retVal = 1.5 - q*q + 0.5*(q*q*q);
-    }
-    else if(q >= 1.0 && q < 2.0)
-    {
-        retVal = (1.0/6.0)*((2.0-q)*(2.0-q)*(2.0-q));
-    }
+        retVal = 1.0 - 1.5*q*q + 0.75*q*q*q;
+    else if (q >= 1.0 && q < 2.0)
+        retVal = 0.25 * pow(2.0 - q, 3.0);
     return alfa*retVal;
 }
 
 vec3 KernelGradient(float kernelRadius, vec3 distanceVector, float alfa)
 {
     float r = length(distanceVector);
-    if (r < 0.0001) return vec3(0.0);
+    if (r < 0.00001) return vec3(0.0);
 
     float q = r / kernelRadius;
     float grad_q = 0.0;

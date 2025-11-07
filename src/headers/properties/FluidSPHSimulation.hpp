@@ -25,7 +25,7 @@ struct alignas(16) FluidParticle : Particle
 /// @brief cell defined with a position of it's back, lower, left vertex and size right up and front
 struct Domain
 {
-    glm::vec3 posittion = {-10,-7,-10.0};
+    glm::vec3 posittion = {-5,-5,-10.0};
     glm::vec3 size = {20,50,20}; // {m,m,m}
 };
 
