@@ -11,7 +11,7 @@ FluidSPHSimulation::FluidSPHSimulation(std::unique_ptr<ShaderProgram> computePre
 
 void FluidSPHSimulation::setFluidAndParticles()
 {
-    m_initialDomain.posittion = glm::vec3(-1.0, -5.0, -particleRadius);
+    m_initialDomain.posittion = glm::vec3(-5.0+4*particleRadius, -5.0+4*particleRadius, -particleRadius);
     m_kernelRadius = 5*particleRadius;
     m_initialDomain.size = glm::vec3(10.0, 10.0, 2*particleRadius);
     m_fluid.fluidDensity *= particleRadius;
