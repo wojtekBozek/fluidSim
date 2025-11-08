@@ -97,7 +97,7 @@ private:
     uint32_t m_numOfParticles = 0;
     float particleRadius = 0.05f;
     float kernelCof = 3.5;
-    float boundCof = 2;
+    float boundCof = 1.0;
     float m_kernelRadius = 0.2f;
 };
 
