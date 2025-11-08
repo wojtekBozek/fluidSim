@@ -93,13 +93,17 @@ void main()
     ivec3 theirCellPosition = cellPosition;
     uint theirHashValue = ourHashValue;
     
+
+    int dzMin = (DIMENSION == DIMENSION_2) ? 0 : -1;
+    int dzMax = (DIMENSION == DIMENSION_2) ? 0 : 1;
+
     for (int dx=-1; dx <=1; dx++)
     {
         for (int dy=-1; dy <= 1; dy++)
         {
-            //for(int dz = -1; dz <=1; dz++)  
-            //{
-                theirCellPosition = cellPosition + ivec3(dx, dy, 0);
+            for(int dz = dzMin; dz <=dzMax; dz++)  
+            {
+                theirCellPosition = cellPosition + ivec3(dx, dy, dz);
                 theirHashValue = hash(theirCellPosition) % tableSize;
 
                 if(hashHead[theirHashValue] != -1)
@@ -117,17 +121,9 @@ void main()
                         }
                     }while(nextNode[currentParticle] != -1);
                 }
-            //}      
+            }     
         }
     }
-
-    //for (uint i=0; i < numOfParticles; i++)
-    //{
-    //    if(distance(particle.position.xyz, particles[i].position.xyz) <= 2*sphKernelRadius)
-    //    {
-    //        particle.density += particles[i].mass * CubicSplineKernel(sphKernelRadius, distance(particle.position.xyz, particles[i].position.xyz), alfa);       
-    //    }
-    //}
     particle.pressure = (fluid.stiffnesK*fluid.fluidDensity)/fluid.stiffnesY*(pow((particle.density/fluid.fluidDensity),fluid.stiffnesY)-1.0);// -;
     particles[fluidParticle_id].pressure = particle.pressure;
     particles[fluidParticle_id].density = particle.density;
@@ -137,15 +133,6 @@ float CubicSplineKernel(float kernelRadius, float distance, float alfa)
 {
     float q = distance/kernelRadius;
     float retVal = 0.0;
-
-    //if (q >= 0.0 && q < 1.0)
-    //{
-    //    retVal = 1.5 - q*q + 0.5*(q*q*q);
-    //}
-    //else if(q >= 1.0 && q < 2.0)
-    //{
-    //    retVal = (1.0/6.0)*((2.0-q)*(2.0-q)*(2.0-q));
-    //}
     if (q >= 0.0 && q < 1.0)
         retVal = 1.0 - 1.5*q*q + 0.75*q*q*q;
     else if (q >= 1.0 && q < 2.0)
