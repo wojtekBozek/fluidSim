@@ -16,6 +16,9 @@ void FluidSPHSimulation::setFluidAndParticles()
         m_initialDomain.posittion = glm::vec3(-2.5 + 4 * particleRadius, 0.0 + 4 * particleRadius, -1.0 + 0.4 * particleRadius);
 
         m_initialDomain.size = glm::vec3(5.0, 5.0, 2.5);
+        m_simulationDomain.posittion = glm::vec3(-5.0, -2.5, -5.0);
+
+        m_simulationDomain.size = glm::vec3(10.0, 10.0, 10.0);
         m_fluid.volume = m_initialDomain.size.x * m_initialDomain.size.y * m_initialDomain.size.z;
         m_numOfParticles = m_fluid.volume / (1.33 * std::pow(particleRadius, 3) * M_PI);
     }
@@ -127,7 +130,6 @@ void FluidSPHSimulation::simulationStep(float timeStep)
     m_resetHashTableComputeShader->useProgram();
     m_resetHashTableComputeShader->setUint("numOfParticles", m_numOfParticles);
     m_resetHashTableComputeShader->setUint("tableSize", m_numOfParticles);
-    m_initHashTableComputeShader->setFloat("cellSize", 2.0 * m_kernelRadius);
     glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
