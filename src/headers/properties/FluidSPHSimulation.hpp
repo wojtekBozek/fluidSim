@@ -33,7 +33,7 @@ struct Fluid
 {
     float fluidDensity = 1000; // kg
     float volume = 10.0f; // m^3
-    float stiffnesK = 3.5f; // nazewnictwo luźno powiązane z prędkością dźwięku 
+    float stiffnesK = 3.5f;  
     float stiffnesY= 5.0f;
 };
 
@@ -73,19 +73,19 @@ public:
     //const Domain& getSimulationDomain() const;
     uint32_t getNumOfParticles() const;
     const std::vector<FluidParticle>& getParticles() const;
-    float getParticleRadius(){return particleRadius;}
+    float getParticleRadius(){return m_particleRadius;}
     void simulationStep(float timeStep);
-    GLuint getParticleBuffer() const {return partBuf;}
+    GLuint getParticleBuffer() const {return m_partBuf;}
 private:
-    GLuint partBuf;
-    GLuint FluidBuf;
-    GLuint hashBuf;
-    GLuint nextNodeBuf;
+    GLuint m_partBuf;
+    GLuint m_fluidBuf;
+    GLuint m_hashBuf;
+    GLuint m_nextNodeBuf;
 
-    GLuint dimension = SimDim::DIMENSION_3;
+    GLuint m_dimension = SimDim::DIMENSION_3;
 
-    std::vector<GLint> hashValues;
-    std::vector<GLint> nextNodes;
+    std::vector<GLint> m_hashValues;
+    std::vector<GLint> m_nextNodes;
     std::unique_ptr<ShaderProgram> m_initHashTableComputeShader;
     std::unique_ptr<ShaderProgram> m_resetHashTableComputeShader;
     std::unique_ptr<ShaderProgram> m_movementComputeShader;
@@ -96,9 +96,9 @@ private:
     std::vector<FluidParticle> m_particles;
     uint32_t m_numOfParticles = 0;
     float m_timeStep = 0.001f;
-    float particleRadius = 0.05f;
-    float kernelCof = 3.5;
-    float boundCof = 1.0;
+    float m_particleRadius = 0.05f;
+    float m_kernelCof = 3.5;
+    float m_boundCof = 1.0;
     float m_kernelRadius = 0.2f;
 };
 
