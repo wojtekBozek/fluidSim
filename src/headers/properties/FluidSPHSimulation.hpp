@@ -78,7 +78,7 @@ public:
     const Fluid& getFluid() const{ return m_fluid; }
     void setFluidDensity(float density) { m_fluid.fluidDensity = density; }
     void setFluidStiffnessKCoefficient(float k) { m_fluid.stiffnesK = k; }
-    void setFluidStiffnesYCoefficient(float y) { m_fluid.stiffnesY = y; }
+    void setFluidStiffnessYCoefficient(float y) { m_fluid.stiffnesY = y; }
 
     uint32_t getNumOfParticles() const { return m_numOfParticles; }
 
@@ -96,14 +96,18 @@ public:
 
     const Domain& getSimulationDomain() const { return m_simulationDomain; }
     void setSimuilationDomainSize(glm::vec3 sizeVec) { m_simulationDomain.size = sizeVec; }
-    void setSimulationsDomainPOsition(glm::vec3 position) { m_simulationDomain.posittion = position; }
+    void setSimulationsDomainPosition(glm::vec3 position) { m_simulationDomain.posittion = position; }
 
     const Domain& getFluidDomain() const { return m_initialDomain; }
     void setFluidDomainSize(glm::vec3 sizeVec) { m_initialDomain.size = sizeVec; }
-    void setFluidDomainPOsition(glm::vec3 position) { m_initialDomain.posittion = position; }
+    void setFluidDomainPosition(glm::vec3 position) { m_initialDomain.posittion = position; }
 
     GLuint64 getComputeTiome() const { return m_computeTime; }
     GLuint getParticleBuffer() const {return m_partBuf;}
+
+    GLuint getSimulationDimension() const { return m_dimension; }
+    void  setSimulationDimension(float dimension) { m_dimension = dimension; }
+
 private:
     GLuint m_partBuf;
     GLuint m_fluidBuf;

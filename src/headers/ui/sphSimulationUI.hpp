@@ -39,4 +39,11 @@ private:
 
 	void returnToMenuButton();
 	std::shared_ptr<FluidSPHSimulation> refSimulation;
+
+	struct UiValues
+	{
+		float k, y, timeStep, density, kernelRadius, visualRadius;
+		glm::vec3 simDomainSize, simDomainPos, fluidInitSize, fluidInitPos;
+		SimDim dimension;
+	}uiValues;
 };
