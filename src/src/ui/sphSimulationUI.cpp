@@ -4,11 +4,11 @@ void SPHsimulationUI::showUI()
 {
 }
 
-void SPHsimulationUI::fluidStiffKcoeffSlider()
+void SPHsimulationUI::fluidStiffKcoeffTextInput()
 {
 }
 
-void SPHsimulationUI::fluidStiffYcoeffSlider()
+void SPHsimulationUI::fluidStiffYcoeffTextInput()
 {
 }
 

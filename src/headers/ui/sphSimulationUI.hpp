@@ -16,8 +16,8 @@ private:
 		pauseSim,
 		restartSim
 	};
-	void fluidStiffKcoeffSlider();
-	void fluidStiffYcoeffSlider();
+	void fluidStiffKcoeffTextInput();
+	void fluidStiffYcoeffTextInput();
 	void fluidDensityTextInput();
 	void dimensionComboBox();
 	void fluidVolumeTextInputs();
