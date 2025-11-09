@@ -64,17 +64,45 @@ public:
         m_accelerationComputeShader = std::make_unique<ShaderProgram>();
         m_accelerationComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/accelerationHashed.shader");
         m_accelerationComputeShader->linkProgram();
+
+        setInitialState();
     }
     FluidSPHSimulation(std::unique_ptr<ShaderProgram> computePressureShader, std::unique_ptr<ShaderProgram> computeMovementShader, Domain simulationDomain, Fluid fluid, uint32_t numOfParticles);
 
+    void setInitialState();
+
     void setFluidAndParticles();
-    const Fluid& getFluid() const;
-    //const Domain& getInitialDomain() const;
-    //const Domain& getSimulationDomain() const;
-    uint32_t getNumOfParticles() const;
-    const std::vector<FluidParticle>& getParticles() const;
-    float getParticleRadius(){return m_particleRadius;}
+    void setMemoryLayout();
+    void deleteMemoryLayout() {};
+
+    const Fluid& getFluid() const{ return m_fluid; }
+    void setFluidDensity(float density) { m_fluid.fluidDensity = density; }
+    void setFluidStiffnessKCoefficient(float k) { m_fluid.stiffnesK = k; }
+    void setFluidStiffnesYCoefficient(float y) { m_fluid.stiffnesY = y; }
+
+    uint32_t getNumOfParticles() const { return m_numOfParticles; }
+
+    const std::vector<FluidParticle>& getParticles() const { return m_particles; }
+
+    float getParticleRadius() const {return m_particleRadius;}
+    void setParticleRadius(float radius) { m_particleRadius = radius; }
+
+    float getKernelRadius() const { return m_kernelRadius; }
+    void setKernelRadius(float radius) { m_kernelRadius = radius; }
+
     void simulationStep(float timeStep);
+    float getSimulationStep() const { return m_timeStep; }
+    float setSimulationStep(float timeStep) { m_timeStep = timeStep; }
+
+    const Domain& getSimulationDomain() const { return m_simulationDomain; }
+    void setSimuilationDomainSize(glm::vec3 sizeVec) { m_simulationDomain.size = sizeVec; }
+    void setSimulationsDomainPOsition(glm::vec3 position) { m_simulationDomain.posittion = position; }
+
+    const Domain& getFluidDomain() const { return m_initialDomain; }
+    void setFluidDomainSize(glm::vec3 sizeVec) { m_initialDomain.size = sizeVec; }
+    void setFluidDomainPOsition(glm::vec3 position) { m_initialDomain.posittion = position; }
+
+    GLuint64 getComputeTiome() const { return m_computeTime; }
     GLuint getParticleBuffer() const {return m_partBuf;}
 private:
     GLuint m_partBuf;
@@ -100,6 +128,7 @@ private:
     float m_kernelCof = 3.5;
     float m_boundCof = 1.0;
     float m_kernelRadius = 0.2f;
+    GLuint64 m_computeTime = 0;
 };
 
 

@@ -5,13 +5,12 @@ FluidSPHSimulation::FluidSPHSimulation(std::unique_ptr<ShaderProgram> computePre
 {
     m_simulationDomain = simulationDomain;
     m_fluid = fluid;
-    m_numOfParticles = numOfParticles;
-    m_particles.reserve(numOfParticles);
+    setInitialState();
 }
 
-void FluidSPHSimulation::setFluidAndParticles()
+void FluidSPHSimulation::setInitialState()
 {
-    if (m_dimension == SimDim::DIMENSION_3) 
+    if (m_dimension == SimDim::DIMENSION_3)
     {
         m_initialDomain.posittion = glm::vec3(-2.5 + 4 * m_particleRadius, 0.0 + 4 * m_particleRadius, -1.0 + 0.4 * m_particleRadius);
 
@@ -27,13 +26,15 @@ void FluidSPHSimulation::setFluidAndParticles()
         m_initialDomain.posittion = glm::vec3(-10.0 + 4 * m_particleRadius, 0.0 + 4 * m_particleRadius, -m_particleRadius);
 
         m_initialDomain.size = glm::vec3(20.0, 10.0, 2 * m_particleRadius);
-
         m_fluid.fluidDensity *= m_particleRadius;
         m_fluid.volume = m_initialDomain.size.x * m_initialDomain.size.y;// *m_initialDomain.size.z;
         m_numOfParticles = m_fluid.volume / (std::pow(m_particleRadius, 2) * M_PI);
     }
+    m_kernelRadius = m_kernelCof * m_particleRadius;
+}
 
-    m_kernelRadius = m_kernelCof *m_particleRadius;
+void FluidSPHSimulation::setFluidAndParticles()
+{    
     FluidParticle initialParticle;
     float particleDiameter = m_particleRadius *2.0f;
     initialParticle.mass = (m_fluid.fluidDensity * m_fluid.volume) /static_cast<float>(m_numOfParticles); // masa cząstki
@@ -79,11 +80,16 @@ void FluidSPHSimulation::setFluidAndParticles()
             }
         }
     }
+    setMemoryLayout();
+}
+
+void FluidSPHSimulation::setMemoryLayout()
+{
     GLuint bufsize = m_numOfParticles * sizeof(FluidParticle);
     glGenBuffers(1, &m_partBuf);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_partBuf);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, m_particles.data(), GL_DYNAMIC_DRAW);
-    
+
     bufsize = sizeof(Fluid);
     glGenBuffers(1, &m_fluidBuf);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_fluidBuf);
@@ -126,7 +132,7 @@ void FluidSPHSimulation::setFluidAndParticles()
     m_accelerationComputeShader->setVec3("externalAccelerations", { 0.0f,-9.8f,0.0f });
     m_accelerationComputeShader->setVec3("domainRefPos", m_simulationDomain.posittion);
     m_accelerationComputeShader->setVec3("domainDimennsions", m_simulationDomain.size);
-    m_accelerationComputeShader->setFloat("boundaryMaxDist", m_boundCof* m_kernelRadius);
+    m_accelerationComputeShader->setFloat("boundaryMaxDist", m_boundCof * m_kernelRadius);
     m_accelerationComputeShader->setUint("tableSize", m_numOfParticles);
     m_accelerationComputeShader->setFloat("cellSize", 2.0 * m_kernelRadius);
     m_accelerationComputeShader->setUint("toonerP", 7);
@@ -137,21 +143,6 @@ void FluidSPHSimulation::setFluidAndParticles()
     m_movementComputeShader->useProgram();
     m_movementComputeShader->setFloat("timeStep", m_timeStep);
     m_movementComputeShader->setUint("numOfParticles", m_numOfParticles);
-}
-
-const Fluid &FluidSPHSimulation::getFluid() const
-{
-    return m_fluid;
-}
-
-uint32_t FluidSPHSimulation::getNumOfParticles() const
-{
-    return m_numOfParticles;
-}
-
-const std::vector<FluidParticle> &FluidSPHSimulation::getParticles() const
-{
-    return m_particles;
 }
 
 void FluidSPHSimulation::simulationStep(float timeStep)
@@ -194,7 +185,6 @@ void FluidSPHSimulation::simulationStep(float timeStep)
     glMemoryBarrier(GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
     glEndQuery(GL_TIME_ELAPSED);
 
-    GLuint64 elapsedTime = 0;
-    glGetQueryObjectui64v(query, GL_QUERY_RESULT, &elapsedTime);
-    std::cout << "Compute time (ns): " << elapsedTime << std::endl;
+    glGetQueryObjectui64v(query, GL_QUERY_RESULT, &m_computeTime);
+    std::cout << "Compute time (ns): " << m_computeTime << std::endl;
 }
