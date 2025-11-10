@@ -1,12 +1,14 @@
 #pragma once
 #include "baseUI.hpp"
 #include "FluidSPHSimulation.hpp"
+#include "SPHContextState.hpp"
 
 
 class SPHsimulationUI : public BaseUI
 {
 public:
 	SPHsimulationUI() = default;
+	SPHsimulationUI(std::shared_ptr<FluidSPHSimulation> simulation, std::shared_ptr<ContextState> context) { refSimulation = simulation; simulationContext = context; }
 	void showUI() override;
 private:
 	enum SimulationState
@@ -39,7 +41,7 @@ private:
 
 	void returnToMenuButton();
 	std::shared_ptr<FluidSPHSimulation> refSimulation;
-
+	std::shared_ptr<ContextState> simulationContext;
 	struct UiValues
 	{
 		float k, y, timeStep, density, kernelRadius, visualRadius;

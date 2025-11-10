@@ -6,7 +6,7 @@
 
 void SPHSimulationRenderer::render(std::shared_ptr<rendering::Camera> camera)
 {
-    simulation.simulationStep(m_timeStep);
+    //simulation.simulationStep(m_timeStep);
     shaderProgram->useProgram();
     glm::mat4 viewMatrix = camera->getView();
     glm::mat4 projMatrix = camera->getProjection();
@@ -15,7 +15,7 @@ void SPHSimulationRenderer::render(std::shared_ptr<rendering::Camera> camera)
     int height, width;
     glfwGetFramebufferSize(camera->getWindow(), &width, &height);
     shaderProgram->setFloat("viewportHeight", height);
-    shaderProgram->setUint("numOfParticles", simulation.getNumOfParticles());
+    shaderProgram->setUint("numOfParticles", simulation->getNumOfParticles());
     if(camera->getCameraType() == rendering::CameraType::perspective)
     {
         shaderProgram->setBool("perspectiveProjection", true);
@@ -28,16 +28,15 @@ void SPHSimulationRenderer::render(std::shared_ptr<rendering::Camera> camera)
         shaderProgram->setFloat("bottom", static_cast<rendering::OrthographicCamera*>(camera.get())->getBottom());
     }
     shaderProgram->setVec3("color", glm::vec3(0.0, 0.3, 0.8));
-    shaderProgram->setFloat("particleRadius", simulation.getParticleRadius());
+    shaderProgram->setFloat("particleRadius", simulation->getParticleRadius());
     glBindVertexArray(quadVAO);
-    glDrawArraysInstanced(GL_POINTS, 0, 1, simulation.getNumOfParticles());
+    glDrawArraysInstanced(GL_POINTS, 0, 1, simulation->getNumOfParticles());
     glBindVertexArray(0);
 }
 
 void SPHSimulationRenderer::setupBackend()
 {
-    simulation.setFluidAndParticles();
-
+    //simulation->setFluidAndParticles();
     glGenVertexArrays(1, &quadVAO);
     glBindVertexArray(quadVAO);
     glEnable(GL_PROGRAM_POINT_SIZE);
