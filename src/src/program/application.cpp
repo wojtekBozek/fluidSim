@@ -87,6 +87,9 @@ void MyApp::setupResources()
     meshRenderer = std::make_shared<MeshRenderer>(meshes, shaderProgram, light);
     //renderers.push_back(particleRenderer);
     //renderers.push_back(meshRenderer);
+
+    activeContext = std::make_shared<SPHSimulationContext>();
+    activeContext->initContext();
     renderers.push_back(sphRenderer);
     objectsMenager->move("cube", glm::vec3(0.0f, 1.0f, 0.0f),2.5);
     setup::setupImGui(window); // needs to be called last, after creating window and opengl context
@@ -141,39 +144,38 @@ void MyApp::initialize()
 void MyApp::mainLoop()
 {
     lastFrame = glfwGetTime();
-    double now = glfwGetTime();
-    double now1 = glfwGetTime();
-    double now2 = glfwGetTime();
+    //double now = glfwGetTime();
+    //double now1 = glfwGetTime();
+    //double now2 = glfwGetTime();
     while(!glfwWindowShouldClose(window))
     {
-
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);  
         glfwPollEvents();
-
         
         rendering::CameraHandler::processMovement(window);
         currentFrame = glfwGetTime();
         rendering::CameraHandler::setCurrentSpeed(static_cast<float>(currentFrame - lastFrame));
-        sphRenderer->setTimeStep(0.001f);
+        //sphRenderer->setTimeStep(0.001f);
         lastFrame = currentFrame;
         //objectsMenager->rotate("cube", glm::vec3(0.0f, 0.0f, 1.0f),1.5);
         glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
         glClear(GL_COLOR_BUFFER_BIT);
-        now1 = glfwGetTime();
-        
-        for (const auto& renderer : renderers)
-        {
-          renderer->render(rendering::CameraHandler::getInstance()->getCamera());
-        }
+        //now1 = glfwGetTime();
+        activeContext->processContext(rendering::CameraHandler::getInstance()->getCamera());
+        //for (const auto& renderer : renderers)
+        //{
+        //  renderer->render(rendering::CameraHandler::getInstance()->getCamera());
+        //}
         
         glBindVertexArray(0);
         glUseProgram(0);
         
         ProcessInput(window, GLFW_KEY_ESCAPE, GLFW_PRESS, closeWindow, this->window, GLFW_TRUE);
-        for(const auto& ui : UIs)
-        {
-            ui->showUI();
-        }
+        activeContext->showUI();
+        //for(const auto& ui : UIs)
+        //{
+        //    ui->showUI();
+        //}
 
         glfwSwapBuffers(window);
     }

@@ -7,6 +7,35 @@
 
 void SPHsimulationUI::showUI()
 {
+	ImGui_ImplOpenGL3_NewFrame();
+	ImGui_ImplGlfw_NewFrame();
+	ImGui::NewFrame();
+	ImGui::Begin("SPH-Simulation");
+	fluidStiffKcoeffTextInput();
+	fluidStiffYcoeffTextInput();
+	fluidDensityTextInput();
+	dimensionComboBox();
+	fluidVolumeTextInputs();
+	fluidPositionTextInputs();
+	simulationVolumeTextInputs();
+	simulationPositionTextInputs();
+	sphKernelRadiusSizeInput();
+	visualRadiusSizeInput();
+
+	numOfParticlesTextInfo();
+	volumeTextInfo();
+	nsComputationTextInfo();
+	frameRateTextInfo();
+
+	startSimulationButton();
+	restartSimulationButton();
+	stopSimulationButton();
+	pauseSimulationButton();
+
+	returnToMenuButton();
+	ImGui::End();
+	ImGui::Render();
+	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
 
 void SPHsimulationUI::fluidStiffKcoeffTextInput()
@@ -36,7 +65,7 @@ void SPHsimulationUI::fluidStiffYcoeffTextInput()
 void SPHsimulationUI::fluidDensityTextInput()
 {
 	float PrevValue = refSimulation->getFluid().fluidDensity;
-	uiValues.y = PrevValue;
+	uiValues.density = PrevValue;
 	ImGui::InputFloat("Density", &uiValues.density, 0.0f, 10000000.0f, "%.0001f");
 
 	if (uiValues.density != PrevValue)
@@ -54,10 +83,10 @@ void SPHsimulationUI::fluidVolumeTextInputs()
 {
 	glm::vec3 PrevValue = refSimulation->getFluidDomain().size;
 	uiValues.fluidInitSize = PrevValue;
-	ImGui::InputFloat("SimDomainSizeX", &uiValues.fluidInitSize.x, 0.0f, 10000000.0f, "%.0001f");
-	ImGui::InputFloat("SimDomainSizeY", &uiValues.fluidInitSize.y, 0.0f, 10000000.0f, "%.0001f");
+	ImGui::InputFloat("SimFluidSizeX", &uiValues.fluidInitSize.x, 0.0f, 10000000.0f, "%.0001f");
+	ImGui::InputFloat("SimFluidSizeY", &uiValues.fluidInitSize.y, 0.0f, 10000000.0f, "%.0001f");
 	if(refSimulation->getSimulationDimension() == SimDim::DIMENSION_3)
-		ImGui::InputFloat("SimDomainSizeZ", &uiValues.fluidInitSize.z, 0.0f, 10000000.0f, "%.0001f");
+		ImGui::InputFloat("SimFluidSizeZ", &uiValues.fluidInitSize.z, 0.0f, 10000000.0f, "%.0001f");
 
 	if (uiValues.fluidInitSize != PrevValue)
 	{
@@ -135,22 +164,33 @@ void SPHsimulationUI::visualRadiusSizeInput()
 
 void SPHsimulationUI::numOfParticlesTextInfo()
 {
+	ImGui::Value("NumOfParticles", refSimulation->getNumOfParticles());
 }
 
 void SPHsimulationUI::volumeTextInfo()
 {
+	ImGui::Value("FluidVolume", refSimulation->getFluid().volume, "%.001f");
 }
 
 void SPHsimulationUI::nsComputationTextInfo()
 {
+	ImGui::Value("ComputeTime [ns]", refSimulation->getComputeTime(), "%.001f");
 }
 
 void SPHsimulationUI::frameRateTextInfo()
 {
+	float fr = 1.0f / (static_cast<float>(refSimulation->getComputeTime())/1000000000.0f);
+
+	ImGui::Value("FrameRate", fr, "%.001f");
 }
 
 void SPHsimulationUI::startSimulationButton()
 {
+	if (ImGui::Button("StartSimulation"))
+	{
+		refSimulation->setMemoryLayout();
+		*simulationContext = ContextState::RUNNING;
+	}
 }
 
 void SPHsimulationUI::restartSimulationButton()

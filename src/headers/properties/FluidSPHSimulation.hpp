@@ -73,7 +73,7 @@ public:
 
     void setFluidAndParticles();
     void setMemoryLayout();
-    void deleteMemoryLayout() {};
+    void setParticleBufferData();
 
     const Fluid& getFluid() const{ return m_fluid; }
     void setFluidDensity(float density) { m_fluid.fluidDensity = density; }
@@ -102,7 +102,7 @@ public:
     void setFluidDomainSize(glm::vec3 sizeVec) { m_initialDomain.size = sizeVec; }
     void setFluidDomainPosition(glm::vec3 position) { m_initialDomain.posittion = position; }
 
-    GLuint64 getComputeTiome() const { return m_computeTime; }
+    GLuint64 getComputeTime() const { return m_computeTime; }
     GLuint getParticleBuffer() const {return m_partBuf;}
 
     GLuint getSimulationDimension() const { return m_dimension; }
@@ -132,6 +132,8 @@ private:
     float m_kernelCof = 3.5;
     float m_boundCof = 1.0;
     float m_kernelRadius = 0.2f;
+    bool m_partBUfferCreated = false;
+    GLuint m_particleBufferSize = 0;
     GLuint64 m_computeTime = 0;
 };
 

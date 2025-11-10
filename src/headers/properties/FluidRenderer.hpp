@@ -12,12 +12,13 @@ class SPHSimulationRenderer : public BaseRenderer
     {
         shaderProgram = shader;
     }
+    void setSimulation(std::shared_ptr<FluidSPHSimulation> sim) { simulation = sim; }
     void setTimeStep(float timeStep){m_timeStep = timeStep;}
     private:
     float m_timeStep;
     std::unique_ptr<ShaderProgram> m_computeShader;
     std::shared_ptr<ShaderProgram> shaderProgram;
-    FluidSPHSimulation simulation;
+    std::shared_ptr<FluidSPHSimulation> simulation;
     GLuint posBuf;
     GLuint quadVAO = 0;
     GLuint quadVBO = 0; 

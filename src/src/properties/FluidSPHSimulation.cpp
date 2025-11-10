@@ -80,17 +80,13 @@ void FluidSPHSimulation::setFluidAndParticles()
             }
         }
     }
-    setMemoryLayout();
 }
 
 void FluidSPHSimulation::setMemoryLayout()
 {
-    GLuint bufsize = m_numOfParticles * sizeof(FluidParticle);
-    glGenBuffers(1, &m_partBuf);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_partBuf);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, m_particles.data(), GL_DYNAMIC_DRAW);
-
-    bufsize = sizeof(Fluid);
+    
+    setParticleBufferData();
+    GLuint bufsize = sizeof(Fluid);
     glGenBuffers(1, &m_fluidBuf);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_fluidBuf);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, &m_fluid, GL_DYNAMIC_DRAW);
@@ -143,6 +139,25 @@ void FluidSPHSimulation::setMemoryLayout()
     m_movementComputeShader->useProgram();
     m_movementComputeShader->setFloat("timeStep", m_timeStep);
     m_movementComputeShader->setUint("numOfParticles", m_numOfParticles);
+}
+
+void FluidSPHSimulation::setParticleBufferData()
+{
+    if (!m_partBUfferCreated)
+    {
+        glGenBuffers(1, &m_partBuf);
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_partBuf);
+        m_partBUfferCreated = true;
+    }
+    GLuint bufsize = m_numOfParticles * sizeof(FluidParticle);
+    if (bufsize != m_particleBufferSize)
+    {
+        std::cout << "Creating particle Buffer\n";
+        m_particleBufferSize = bufsize;
+        glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, m_particles.data(), GL_DYNAMIC_DRAW);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_partBuf);
+        glMemoryBarrier(GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
+    }
 }
 
 void FluidSPHSimulation::simulationStep(float timeStep)

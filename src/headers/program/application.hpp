@@ -12,6 +12,8 @@
 #include "positionedLight.hpp"
 #include "particleRenderer.hpp"
 #include "FluidRenderer.hpp"
+#include "context.hpp"
+
 class Application
 {
 public:
@@ -49,6 +51,8 @@ private:
     std::vector<std::shared_ptr<Mesh>> meshes;
     std::shared_ptr<PositionedLight> light;
     std::unordered_map<std::string, std::shared_ptr<rendering::Camera>> cameras;
+
+    std::shared_ptr<AbstractContext> activeContext;
 
     double currentFrame = 0.0f;
     double lastFrame = 0.0f;
