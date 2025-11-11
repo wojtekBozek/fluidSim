@@ -23,9 +23,12 @@ void FluidSPHSimulation::setInitialState()
     }
     else if (m_dimension == SimDim::DIMENSION_2)
     {
-        m_initialDomain.posittion = glm::vec3(-10.0 + 4 * m_particleRadius, 0.0 + 4 * m_particleRadius, -m_particleRadius);
+        m_initialDomain.posittion = glm::vec3(-10.0, 0.0, 0.0);
 
         m_initialDomain.size = glm::vec3(20.0, 10.0, 2 * m_particleRadius);
+        m_simulationDomain.posittion = glm::vec3(-50.0, -2.5, 0.0);
+
+        m_simulationDomain.size = glm::vec3(100.0, 10.0, 0.0);
         m_fluid.fluidDensity *= m_particleRadius;
         m_fluid.volume = m_initialDomain.size.x * m_initialDomain.size.y;// *m_initialDomain.size.z;
         m_numOfParticles = m_fluid.volume / (std::pow(m_particleRadius, 2) * M_PI);
@@ -46,8 +49,16 @@ void FluidSPHSimulation::setFluidAndParticles()
     uint32_t xMax = std::ceil(m_initialDomain.size.x/particleDiameter);
     uint32_t yMax = std::ceil(m_initialDomain.size.y/particleDiameter)-1;
     uint32_t zMax = 0;
+
+    uint32_t boundaryXmax = m_simulationDomain.size.x/particleDiameter;
+    uint32_t boundaryYmax = m_simulationDomain.size.y / particleDiameter;
+    uint32_t boundaryZmax = m_simulationDomain.size.z / particleDiameter;
+    uint32_t numOfBoundaryParticles = 2*boundaryXmax + 2*boundaryYmax;
     if (m_dimension == SimDim::DIMENSION_3)
-       zMax = std::ceil(m_initialDomain.size.z/particleDiameter)-1;
+    {
+        zMax = std::ceil(m_initialDomain.size.z / particleDiameter) - 1;
+        numOfBoundaryParticles += 2 * boundaryZmax;
+    }
     
     uint32_t a=0;
     uint32_t b=0;
@@ -80,11 +91,78 @@ void FluidSPHSimulation::setFluidAndParticles()
             }
         }
     }
+    std::vector<FluidParticle> boundaryParticles;
+
+
+    boundaryParticles.reserve(numOfBoundaryParticles);
+    initialParticle.position = glm::vec4(m_simulationDomain.posittion, 1.0f);
+    if (SimDim::DIMENSION_2 == m_dimension)
+    {
+        for (int i = 0; i <= boundaryXmax; i++)
+        {
+            for (int j = 0; j <= boundaryYmax; j++)
+            {
+                if (i == 0 || i == boundaryXmax || j == 0 || j == boundaryYmax)
+                {
+                    initialParticle.position += glm::vec4(i * particleDiameter, j * particleDiameter, 0.0, 0.0);
+                    boundaryParticles.push_back(initialParticle);
+                }
+            }
+        }
+    } 
+    else if (SimDim::DIMENSION_3 == m_dimension)
+    {
+        for (int i = 0; i <= boundaryXmax; i++)
+        {
+            for (int j = 0; j <= boundaryYmax; j++)
+            {
+                for (int z = 0; z <= boundaryZmax; z++)
+                    if (i == 0 || i == boundaryXmax || j == 0 || j == boundaryYmax || z == 0 || z == boundaryZmax)
+                    {
+                        initialParticle.position += glm::vec4(i * particleDiameter, j * particleDiameter, z * particleDiameter, 0.0);
+                        boundaryParticles.push_back(initialParticle);
+                    }
+            }
+        }
+    }
+    GLuint ssbo;
+    glGenBuffers(1, &ssbo);
+    GLuint bufsize = boundaryParticles.size() * sizeof(FluidParticle);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, boundaryParticles.data(), GL_DYNAMIC_COPY);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, ssbo);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    m_boundaryParticleMassComputeShader->useProgram();
+
+    m_resetHashTableComputeShader->setUint("numOfParticles", boundaryParticles.size());
+    m_pressureNdensityComputeShader->setFloat("sphKernelRadius", m_kernelRadius);
+    m_accelerationComputeShader->setUint("DIMENSION", m_dimension);
+    glDispatchCompute((boundaryParticles.size() + invocations - 1) / invocations, 1, 1);
+    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+    glFinish(); 
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, ssbo);
+    void* ptr = glMapBuffer(GL_SHADER_STORAGE_BUFFER, GL_READ_ONLY);
+
+    if (ptr)
+    {
+        // Example: if your SSBO holds an array of structs
+        FluidParticle* data = static_cast<FluidParticle*>(ptr);
+
+        // Now you can access data[i] safely
+        for (int i = 0; i < boundaryParticles.size(); ++i)
+        {
+            boundaryParticles[i] = data[i];
+        }
+
+        glUnmapBuffer(GL_SHADER_STORAGE_BUFFER);
+    }
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+    glDeleteBuffers(1, &ssbo);
 }
 
 void FluidSPHSimulation::setMemoryLayout()
 {
-    
     setParticleBufferData();
     GLuint bufsize = sizeof(Fluid);
     glGenBuffers(1, &m_fluidBuf);

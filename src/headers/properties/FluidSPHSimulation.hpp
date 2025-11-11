@@ -13,12 +13,18 @@ struct alignas(16) Particle
     glm::vec4 acceleration = {0,0,0,0};
 };
 
+enum particleType
+{
+    FLUID,
+    BOUNDARY
+};
+
 struct alignas(16) FluidParticle : Particle
 {
     float pressure=0;
     float density=0;
     float mass=0;
-    float pad0=0;
+    GLuint type = particleType::FLUID;
 };
 
 
@@ -64,6 +70,9 @@ public:
         m_accelerationComputeShader = std::make_unique<ShaderProgram>();
         m_accelerationComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/accelerationHashed.shader");
         m_accelerationComputeShader->linkProgram();
+        m_boundaryParticleMassComputeShader = std::make_unique<ShaderProgram>();
+        m_boundaryParticleMassComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/boundaryParticlesDensity.shader");
+        m_boundaryParticleMassComputeShader->linkProgram();
 
         setInitialState();
     }
@@ -136,9 +145,11 @@ private:
     std::unique_ptr<ShaderProgram> m_movementComputeShader;
     std::unique_ptr<ShaderProgram> m_accelerationComputeShader;
     std::unique_ptr<ShaderProgram> m_pressureNdensityComputeShader;
+    std::unique_ptr<ShaderProgram> m_boundaryParticleMassComputeShader;
     Domain m_simulationDomain, m_initialDomain;
     Fluid m_fluid;
     std::vector<FluidParticle> m_particles;
+    std::vector<FluidParticle> m_boundaryParticles;
     uint32_t m_numOfParticles = 0;
     float m_timeStep = 0.001f;
     float m_particleRadius = 0.05f;
