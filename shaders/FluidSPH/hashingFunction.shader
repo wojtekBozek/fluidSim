@@ -8,7 +8,7 @@ struct FluidParticle{
     float pressure;
     float density;
     float mass;
-    float pad0;
+    uint type;
 };
 
 layout(std430, binding = 0) buffer PartBuffer {
