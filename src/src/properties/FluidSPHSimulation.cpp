@@ -220,7 +220,7 @@ void FluidSPHSimulation::setMemoryLayout()
     m_accelerationComputeShader->setUint("toonerP", 7);
     m_accelerationComputeShader->setFloat("stiffnessK", 35000);
     m_accelerationComputeShader->setFloat("epsilon", 0.05f);
-    m_accelerationComputeShader->setFloat("epsilonBoundary", 0.5f);
+    m_accelerationComputeShader->setFloat("epsilonBoundary", 0.01f);
 
 
     m_movementComputeShader->useProgram();

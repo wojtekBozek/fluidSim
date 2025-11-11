@@ -137,15 +137,17 @@ void main()
                         {
                             kernel = CubicSplineKernel(sphKernelRadius, dist, alfa);
                             kernelGradient = KernelGradient(sphKernelRadius, particle.position.xyz - otherParticle.position.xyz, alfa);
-                            if(otherParticle.type == 0)
+                            if(otherParticle.type == 0) // fluid
                             {
                                 temp += otherParticle.mass*(localPBD2+PressureByDensity2(otherParticle))*kernelGradient;
                                 particle.velocity.xyz += epsilon*otherParticle.mass/otherParticle.density*(otherParticle.velocity.xyz-particle.velocity.xyz)*kernel;  
                             }
-                            else
+                            else // boundary
                             {
-                                temp += otherParticle.mass*fluid.fluidDensity*(localPBD2)*kernelGradient;
-                                particle.velocity.xyz += epsilonBoundary*otherParticle.mass*otherParticle.mass*(otherParticle.velocity.xyz-particle.velocity.xyz)*kernel;
+                                temp += otherParticle.mass * 10 * localPBD2 * kernelGradient;
+
+                            // Much weaker coupling
+                                particle.velocity.xyz += epsilonBoundary * otherParticle.mass / fluid.fluidDensity *(otherParticle.velocity.xyz - particle.velocity.xyz) * kernel;
                             }
                         }
                         //if(nextNode[currentParticle]!=-1)
