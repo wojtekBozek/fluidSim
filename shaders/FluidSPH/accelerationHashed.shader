@@ -1,5 +1,5 @@
 #version 430
-layout(local_size_x = 256) in;
+layout(local_size_x = 512) in;
 struct FluidParticle{
     vec4 position;
     vec4 velocity;
@@ -109,7 +109,8 @@ void main()
     
     int dzMin = (DIMENSION == DIMENSION_2) ? 0 : -1;
     int dzMax = (DIMENSION == DIMENSION_2) ? 0 : 1;
-
+    float dist = 0.0;
+    vec3 kernelGradient = vec3(0.0, 0.0, 0.0);
     for (int dx=-1; dx <=1; dx++)
     {
         for (int dy=-1; dy <= 1; dy++)
@@ -119,29 +120,30 @@ void main()
                 theirCellPosition = cellPosition + ivec3(dx, dy, dz);
                 theirHashValue = hash(theirCellPosition) % tableSize;
 
-                if(hashHead[theirHashValue] != -1)
-                {
+                //if(hashHead[theirHashValue] != -1)
+                //{
                     int currentParticle = hashHead[theirHashValue];
-                    do 
+                    while(currentParticle != -1)
                     {
-                        if(distance(particle.position.xyz, particles[currentParticle].position.xyz) <= 2*sphKernelRadius)
+                        dist = distance(particle.position.xyz, particles[currentParticle].position.xyz);
+                        if(dist <= 2*sphKernelRadius)
                         {
-                            kernel = CubicSplineKernel(sphKernelRadius, distance(particle.position.xyz, particles[currentParticle].position.xyz), alfa);
-                            vec3 kernelGradient = KernelGradient(sphKernelRadius, particle.position.xyz - particles[currentParticle].position.xyz, alfa);
+                            kernel = CubicSplineKernel(sphKernelRadius, dist, alfa);
+                            kernelGradient = KernelGradient(sphKernelRadius, particle.position.xyz - particles[currentParticle].position.xyz, alfa);
                             temp += particles[currentParticle].mass*(localPBD2+PressureByDensity2(particles[currentParticle]))*kernelGradient;
                             particle.velocity.xyz += epsilon*particles[currentParticle].mass/particles[currentParticle].density*(particles[currentParticle].velocity.xyz-particle.velocity.xyz)*kernel;       
                         }
-                        if(nextNode[currentParticle]!=-1)
-                        {
+                        //if(nextNode[currentParticle]!=-1)
+                        //{
                             currentParticle = nextNode[currentParticle];
-                        }
-                    }while(nextNode[currentParticle] != -1);
-                }
+                        //}
+                    }
+                //}
             }      
         }
     }
     
-    particle.acceleration.xyz = externalAccelerations - temp + applyDomainForces(particle.position.xyz, particle);
+    particle.acceleration.xyz = externalAccelerations - temp;// + applyDomainForces(particle.position.xyz, particle);
     particles[fluidParticle_id].acceleration.xyz = particle.acceleration.xyz;
     particles[fluidParticle_id].velocity.xyz = particle.velocity.xyz;
 } 

@@ -88,10 +88,10 @@ void SPHsimulationUI::fluidVolumeTextInputs()
 	if(refSimulation->getSimulationDimension() == SimDim::DIMENSION_3)
 		ImGui::InputFloat("SimFluidSizeZ", &uiValues.fluidInitSize.z, 0.0f, 10000000.0f, "%.0001f");
 
-	if (uiValues.fluidInitSize != PrevValue)
-	{
+	//if (uiValues.fluidInitSize != PrevValue)
+	//{
 		refSimulation->setFluidDomainSize(uiValues.fluidInitSize);
-	}
+	//}
 }
 
 void SPHsimulationUI::fluidPositionTextInputs()
@@ -103,10 +103,10 @@ void SPHsimulationUI::fluidPositionTextInputs()
 	if (refSimulation->getSimulationDimension() == SimDim::DIMENSION_3)
 		ImGui::InputFloat("fluidInitPosZ", &uiValues.fluidInitPos.z, -10000000.0f, 10000000.0f, "%.0001f");
 
-	if (uiValues.fluidInitPos != PrevValue)
-	{
-		refSimulation->setFluidDomainSize(uiValues.fluidInitPos);
-	}
+	//if (uiValues.fluidInitPos != PrevValue)
+	//{
+		refSimulation->setFluidDomainPosition(uiValues.fluidInitPos);
+	//}
 }
 
 void SPHsimulationUI::simulationVolumeTextInputs()
@@ -118,10 +118,10 @@ void SPHsimulationUI::simulationVolumeTextInputs()
 	if (refSimulation->getSimulationDimension() == SimDim::DIMENSION_3)
 		ImGui::InputFloat("SimDomainSizeZ", &uiValues.simDomainSize.z, 0.0f, 10000000.0f, "%.0001f");
 
-	if (uiValues.simDomainSize != PrevValue)
-	{
+	//if (uiValues.simDomainSize != PrevValue)
+	//{
 		refSimulation->setSimuilationDomainSize(uiValues.simDomainSize);
-	}
+	//}
 }
 
 void SPHsimulationUI::simulationPositionTextInputs()
@@ -132,10 +132,10 @@ void SPHsimulationUI::simulationPositionTextInputs()
 	ImGui::InputFloat("simDomainPosY", &uiValues.simDomainPos.y, -10000000.0f, 10000000.0f, "%.0001f");
 	if (refSimulation->getSimulationDimension() == SimDim::DIMENSION_3)
 		ImGui::InputFloat("simDomainPosZ", &uiValues.simDomainPos.z, -10000000.0f, 10000000.0f, "%.0001f");
-	if (uiValues.simDomainPos != PrevValue)
-	{
+	//if (uiValues.simDomainPos != PrevValue)
+	//{
 		refSimulation->setSimulationsDomainPosition(uiValues.simDomainPos);
-	}
+	//}
 }
 
 void SPHsimulationUI::sphKernelRadiusSizeInput()
@@ -195,6 +195,11 @@ void SPHsimulationUI::startSimulationButton()
 
 void SPHsimulationUI::restartSimulationButton()
 {
+	if (ImGui::Button("SetSimulation"))
+	{
+		refSimulation->setFluidAndParticles();		
+		refSimulation->setParticleBufferData();
+	}
 }
 
 void SPHsimulationUI::stopSimulationButton()

@@ -1,5 +1,5 @@
 #version 430
-layout(local_size_x = 256) in;
+layout(local_size_x = 512) in;
 
 struct FluidParticle{
     vec4 position;
@@ -96,7 +96,7 @@ void main()
 
     int dzMin = (DIMENSION == DIMENSION_2) ? 0 : -1;
     int dzMax = (DIMENSION == DIMENSION_2) ? 0 : 1;
-
+    float dist = 0.0;
     for (int dx=-1; dx <=1; dx++)
     {
         for (int dy=-1; dy <= 1; dy++)
@@ -106,21 +106,22 @@ void main()
                 theirCellPosition = cellPosition + ivec3(dx, dy, dz);
                 theirHashValue = hash(theirCellPosition) % tableSize;
 
-                if(hashHead[theirHashValue] != -1)
-                {
+                //if(hashHead[theirHashValue] != -1)
+                //{
                     int currentParticle = hashHead[theirHashValue];
-                    do 
+                    while(currentParticle != -1)
                     {
-                        if(distance(particle.position.xyz, particles[currentParticle].position.xyz) <= 2*sphKernelRadius)
+                        dist = distance(particle.position.xyz, particles[currentParticle].position.xyz);
+                        if(dist <= 2*sphKernelRadius)
                         {
-                            particle.density += particles[currentParticle].mass * CubicSplineKernel(sphKernelRadius, distance(particle.position.xyz, particles[currentParticle].position.xyz), alfa);       
+                            particle.density += particles[currentParticle].mass * CubicSplineKernel(sphKernelRadius, dist, alfa);       
                         }
-                        if(nextNode[currentParticle]!=-1)
-                        {
+                        //if(nextNode[currentParticle]!=-1)
+                        //{
                             currentParticle = nextNode[currentParticle];
-                        }
-                    }while(nextNode[currentParticle] != -1);
-                }
+                        //}
+                    }
+                //}
             }     
         }
     }

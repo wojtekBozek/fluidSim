@@ -170,7 +170,7 @@ void FluidSPHSimulation::simulationStep(float timeStep)
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_hashBuf);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_nextNodeBuf);
     m_resetHashTableComputeShader->useProgram();
-    glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
+    glDispatchCompute((m_numOfParticles + invocations-1) / invocations, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 
@@ -179,7 +179,7 @@ void FluidSPHSimulation::simulationStep(float timeStep)
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_nextNodeBuf);
     m_initHashTableComputeShader->useProgram();
     
-    glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
+    glDispatchCompute((m_numOfParticles + invocations - 1) / invocations, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_partBuf);
@@ -187,19 +187,18 @@ void FluidSPHSimulation::simulationStep(float timeStep)
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_hashBuf);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_nextNodeBuf);
     m_pressureNdensityComputeShader->useProgram();
-    glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
+    glDispatchCompute((m_numOfParticles + invocations - 1) / invocations, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
     m_accelerationComputeShader->useProgram();
-    glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
+    glDispatchCompute((m_numOfParticles + invocations - 1) / invocations, 1, 1);
     glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
     m_movementComputeShader->useProgram();
-    glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
+    glDispatchCompute((m_numOfParticles + invocations - 1) / invocations, 1, 1);
 
     glMemoryBarrier(GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
     glEndQuery(GL_TIME_ELAPSED);
 
     glGetQueryObjectui64v(query, GL_QUERY_RESULT, &m_computeTime);
-    std::cout << "Compute time (ns): " << m_computeTime << std::endl;
 }

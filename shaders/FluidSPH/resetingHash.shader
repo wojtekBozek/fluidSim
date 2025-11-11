@@ -1,5 +1,5 @@
 #version 430
-layout(local_size_x = 256) in;
+layout(local_size_x = 512) in;
 
 layout(std430, binding = 0) buffer HashHeadBuffer {
     int hashHead[];
