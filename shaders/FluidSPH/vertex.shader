@@ -23,6 +23,7 @@ uniform float top;
 uniform float bottom;
 uniform float particleRadius;
 uniform bool perspectiveProjection;
+
 void main() {
     
     uint particleID = gl_InstanceID.x;

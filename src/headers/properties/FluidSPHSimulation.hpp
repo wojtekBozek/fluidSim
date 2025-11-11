@@ -13,10 +13,10 @@ struct alignas(16) Particle
     glm::vec4 acceleration = {0,0,0,0};
 };
 
-enum particleType
+enum particleType : GLuint
 {
-    FLUID,
-    BOUNDARY
+    FLUID = 0,
+    BOUNDARY = 1 
 };
 
 struct alignas(16) FluidParticle : Particle
@@ -136,7 +136,7 @@ private:
     GLuint m_hashBuf;
     GLuint m_nextNodeBuf;
 
-    GLuint m_dimension = SimDim::DIMENSION_3;
+    GLuint m_dimension = SimDim::DIMENSION_2;
 
     std::vector<GLint> m_hashValues;
     std::vector<GLint> m_nextNodes;
@@ -153,7 +153,7 @@ private:
     uint32_t m_numOfParticles = 0;
     float m_timeStep = 0.001f;
     float m_particleRadius = 0.05f;
-    float m_kernelCof = 3.5;
+    float m_kernelCof = 2.5;
     float m_boundCof = 1.0;
     float m_kernelRadius = 0.2f;
     bool m_partBUfferCreated = false;

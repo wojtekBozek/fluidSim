@@ -56,6 +56,7 @@ uniform uint toonerP;
 uniform float stiffnessK = 100.0;//n/m
 
 uniform float epsilon;
+uniform float epsilonBoundary;
 uniform float cellSize;
 
 const float PI = 3.14159265359;
@@ -93,8 +94,13 @@ void main()
 {
     uint fluidParticle_id = gl_GlobalInvocationID.x;
     if(fluidParticle_id >= numOfParticles) return;
+    FluidParticle particle = particles[fluidParticle_id];
+    if(particle.type != 0)
+    {
+        return;
+    }
     float alfa = getAlfa(sphKernelRadius, DIMENSION);
-    FluidParticle particle= particles[fluidParticle_id];
+    FluidParticle otherParticle;
     vec3 temp = vec3(0.0,0.0,0.0);
     float localPBD2 = PressureByDensity2(particle);
     float kernel = 0.0;
@@ -125,13 +131,22 @@ void main()
                     int currentParticle = hashHead[theirHashValue];
                     while(currentParticle != -1)
                     {
-                        dist = distance(particle.position.xyz, particles[currentParticle].position.xyz);
+                        otherParticle = particles[currentParticle];
+                        dist = distance(particle.position.xyz, otherParticle.position.xyz);
                         if(dist <= 2*sphKernelRadius)
                         {
                             kernel = CubicSplineKernel(sphKernelRadius, dist, alfa);
-                            kernelGradient = KernelGradient(sphKernelRadius, particle.position.xyz - particles[currentParticle].position.xyz, alfa);
-                            temp += particles[currentParticle].mass*(localPBD2+PressureByDensity2(particles[currentParticle]))*kernelGradient;
-                            particle.velocity.xyz += epsilon*particles[currentParticle].mass/particles[currentParticle].density*(particles[currentParticle].velocity.xyz-particle.velocity.xyz)*kernel;       
+                            kernelGradient = KernelGradient(sphKernelRadius, particle.position.xyz - otherParticle.position.xyz, alfa);
+                            if(otherParticle.type == 0)
+                            {
+                                temp += otherParticle.mass*(localPBD2+PressureByDensity2(otherParticle))*kernelGradient;
+                                particle.velocity.xyz += epsilon*otherParticle.mass/otherParticle.density*(otherParticle.velocity.xyz-particle.velocity.xyz)*kernel;  
+                            }
+                            else
+                            {
+                                temp += otherParticle.mass*fluid.fluidDensity*(localPBD2)*kernelGradient;
+                                particle.velocity.xyz += epsilonBoundary*otherParticle.mass*otherParticle.mass*(otherParticle.velocity.xyz-particle.velocity.xyz)*kernel;
+                            }
                         }
                         //if(nextNode[currentParticle]!=-1)
                         //{
