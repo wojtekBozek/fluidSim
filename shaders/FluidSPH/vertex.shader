@@ -24,12 +24,14 @@ uniform float bottom;
 uniform float particleRadius;
 uniform bool perspectiveProjection;
 
+flat out uint isFluid;
+
 void main() {
     
     uint particleID = gl_InstanceID.x;
     if(particleID >= numOfParticles) return;
     vec4 pos = particles[particleID].position; //particles[particleID].position;
-    
+    isFluid = particles[particleID].type;
     vec4 viewPos = view * pos;
     gl_Position = proj *viewPos;
     if(perspectiveProjection)

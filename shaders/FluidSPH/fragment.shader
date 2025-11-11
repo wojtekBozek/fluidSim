@@ -3,7 +3,7 @@
 out vec4 FragColor;
 uniform vec3 color;
 //uniform float softness; // how soft the edge is, 0.0–1.0 range
-
+flat in uint isFluid;
 void main() {
     
     // gl_PointCoord gives the fragment’s coordinate in [0,1] range
@@ -19,7 +19,12 @@ void main() {
 //
     //// Final color
     if(dist+0.01 < 1.0)
-        FragColor = vec4(color, 1.0);
+    {
+        if(isFluid == 0)
+            FragColor = vec4(color, 1.0);
+        else
+            FragColor = vec4(0.5, 0.5, 0.5, 0.2);
+    }
     else
         FragColor = vec4(0.0,0.0,0.0,1.0);
 }

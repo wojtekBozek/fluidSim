@@ -40,4 +40,8 @@ void SPHSimulationRenderer::setupBackend()
     glGenVertexArrays(1, &quadVAO);
     glBindVertexArray(quadVAO);
     glEnable(GL_PROGRAM_POINT_SIZE);
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);  // Default: passes if incoming depth < stored depth
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
