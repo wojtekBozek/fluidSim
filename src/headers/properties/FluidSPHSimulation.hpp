@@ -114,12 +114,12 @@ public:
         if (m_dimension == SimDim::DIMENSION_3)
         {
             m_fluid.volume = m_initialDomain.size.x * m_initialDomain.size.y * m_initialDomain.size.z;
-            m_numOfParticles = m_fluid.volume / (1.33 * std::pow(m_particleRadius, 3) * M_PI);
+            //m_numOfParticles = m_fluid.volume / (1.33 * std::pow(m_particleRadius, 3) * M_PI);
         }
         else if (m_dimension == SimDim::DIMENSION_2)
         {
             m_fluid.volume = m_initialDomain.size.x * m_initialDomain.size.y;// *m_initialDomain.size.z;
-            m_numOfParticles = m_fluid.volume / (std::pow(m_particleRadius, 2) * M_PI);
+            //m_numOfParticles = m_fluid.volume / (std::pow(m_particleRadius, 2) * M_PI);
         }
     }
     void setFluidDomainPosition(glm::vec3 position) { m_initialDomain.posittion = position; }

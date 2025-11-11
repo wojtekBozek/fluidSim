@@ -164,7 +164,8 @@ void SPHsimulationUI::visualRadiusSizeInput()
 
 void SPHsimulationUI::numOfParticlesTextInfo()
 {
-	ImGui::Value("NumOfParticles", refSimulation->getNumOfParticles());
+	volatile uint32_t value = refSimulation->getNumOfParticles();
+	ImGui::Value("NumOfParticles", value);
 }
 
 void SPHsimulationUI::volumeTextInfo()

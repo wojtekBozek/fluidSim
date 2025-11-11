@@ -38,6 +38,7 @@ void FluidSPHSimulation::setInitialState()
 
 void FluidSPHSimulation::setFluidAndParticles()
 {    
+    m_particles.clear();
     FluidParticle initialParticle;
     float particleDiameter = m_particleRadius *2.0f;
     initialParticle.mass = (m_fluid.fluidDensity * m_fluid.volume) /static_cast<float>(m_numOfParticles); // masa cząstki
@@ -46,6 +47,7 @@ void FluidSPHSimulation::setFluidAndParticles()
     initialParticle.position = glm::vec4(m_initialDomain.posittion + glm::vec3(m_particleRadius), 1.0f);
     initialParticle.velocity = glm::vec4(glm::vec3(0.0f), 1.0f);
     initialParticle.acceleration = glm::vec4(glm::vec3(0.0f), 1.0f);
+    initialParticle.type = particleType::FLUID;
     uint32_t xMax = std::ceil(m_initialDomain.size.x/particleDiameter);
     uint32_t yMax = std::ceil(m_initialDomain.size.y/particleDiameter)-1;
     uint32_t zMax = 0;
@@ -63,7 +65,7 @@ void FluidSPHSimulation::setFluidAndParticles()
     uint32_t a=0;
     uint32_t b=0;
     uint32_t c=0;
-    m_particles.reserve(m_numOfParticles);
+    m_particles.reserve(m_numOfParticles + numOfBoundaryParticles);
     for(int i=0; i<m_numOfParticles; ++i)
     {
         FluidParticle part = initialParticle;
@@ -96,6 +98,7 @@ void FluidSPHSimulation::setFluidAndParticles()
 
     boundaryParticles.reserve(numOfBoundaryParticles);
     initialParticle.position = glm::vec4(m_simulationDomain.posittion, 1.0f);
+    initialParticle.type = particleType::BOUNDARY;
     if (SimDim::DIMENSION_2 == m_dimension)
     {
         for (int i = 0; i <= boundaryXmax; i++)
@@ -119,7 +122,7 @@ void FluidSPHSimulation::setFluidAndParticles()
                 for (int z = 0; z <= boundaryZmax; z++)
                     if (i == 0 || i == boundaryXmax || j == 0 || j == boundaryYmax || z == 0 || z == boundaryZmax)
                     {
-                        initialParticle.position += glm::vec4(i * particleDiameter, j * particleDiameter, z * particleDiameter, 0.0);
+                        initialParticle.position =  glm::vec4(m_simulationDomain.posittion + glm::vec3(i * particleDiameter, j * particleDiameter, z * particleDiameter), 1.0);
                         boundaryParticles.push_back(initialParticle);
                     }
             }
@@ -159,6 +162,9 @@ void FluidSPHSimulation::setFluidAndParticles()
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, 0);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
     glDeleteBuffers(1, &ssbo);
+    m_particles.insert(m_particles.end(), std::make_move_iterator(boundaryParticles.begin()), std::make_move_iterator(boundaryParticles.end()));
+    m_numOfParticles = m_particles.size();
+    std::cout << m_numOfParticles << "\n";
 }
 
 void FluidSPHSimulation::setMemoryLayout()
@@ -232,6 +238,7 @@ void FluidSPHSimulation::setParticleBufferData()
     {
         std::cout << "Creating particle Buffer\n";
         m_particleBufferSize = bufsize;
+        glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_partBuf);
         glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, m_particles.data(), GL_DYNAMIC_DRAW);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_partBuf);
         glMemoryBarrier(GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
