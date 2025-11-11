@@ -35,6 +35,9 @@ void main()
     if(fluidParticle_id >= numOfParticles) return;
 
     FluidParticle particle= particles[fluidParticle_id];
-    particles[fluidParticle_id].position.xyz += particle.velocity.xyz*timeStep;
-    particles[fluidParticle_id].velocity.xyz += particle.acceleration.xyz*timeStep;
+    if(particle.type == 0)
+    {
+        particles[fluidParticle_id].position.xyz += particle.velocity.xyz*timeStep;
+        particles[fluidParticle_id].velocity.xyz += particle.acceleration.xyz*timeStep;
+    }
 }

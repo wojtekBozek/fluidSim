@@ -19,6 +19,7 @@ layout(std430, binding = 0) buffer PartBuffer {
 uniform uint numOfParticles;
 uniform uint DIMENSION;
 uniform float sphKernelRadius;
+uniform float globalDensity;
 
 float CubicSplineKernel(float kernelRadius, float distance, float alfa);
 
@@ -53,8 +54,8 @@ void main()
     uint fluidParticle_id = gl_GlobalInvocationID.x;
     if(fluidParticle_id >= numOfParticles) return;
 
-    float alfa = getAlfa(sphKernelRadius, DIMENSION);
     FluidParticle particle = particles[fluidParticle_id];
+    float alfa = getAlfa(sphKernelRadius, DIMENSION);
     vec3 position = particle.position.xyz;
     float kernelSum = 0.0;
     float dist = 0.0;
@@ -66,7 +67,7 @@ void main()
            kernelSum += CubicSplineKernel(sphKernelRadius, dist, alfa);       
         }
     }
-    particle.mass = particle.density/kernelSum;
+    particle.mass = globalDensity/kernelSum;
     particles[fluidParticle_id].mass = particle.mass;
 }
 
