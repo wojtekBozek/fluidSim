@@ -99,7 +99,20 @@ public:
     void setSimulationsDomainPosition(glm::vec3 position) { m_simulationDomain.posittion = position; }
 
     const Domain& getFluidDomain() const { return m_initialDomain; }
-    void setFluidDomainSize(glm::vec3 sizeVec) { m_initialDomain.size = sizeVec; }
+    void setFluidDomainSize(glm::vec3 sizeVec) 
+    { 
+        m_initialDomain.size = sizeVec;
+        if (m_dimension == SimDim::DIMENSION_3)
+        {
+            m_fluid.volume = m_initialDomain.size.x * m_initialDomain.size.y * m_initialDomain.size.z;
+            m_numOfParticles = m_fluid.volume / (1.33 * std::pow(m_particleRadius, 3) * M_PI);
+        }
+        else if (m_dimension == SimDim::DIMENSION_2)
+        {
+            m_fluid.volume = m_initialDomain.size.x * m_initialDomain.size.y;// *m_initialDomain.size.z;
+            m_numOfParticles = m_fluid.volume / (std::pow(m_particleRadius, 2) * M_PI);
+        }
+    }
     void setFluidDomainPosition(glm::vec3 position) { m_initialDomain.posittion = position; }
 
     GLuint64 getComputeTime() const { return m_computeTime; }
@@ -135,6 +148,7 @@ private:
     bool m_partBUfferCreated = false;
     GLuint m_particleBufferSize = 0;
     GLuint64 m_computeTime = 0;
+    GLuint invocations = 512;
 };
 
 
