@@ -136,7 +136,7 @@ private:
     GLuint m_hashBuf;
     GLuint m_nextNodeBuf;
 
-    GLuint m_dimension = SimDim::DIMENSION_3;
+    GLuint m_dimension = SimDim::DIMENSION_2;
 
     std::vector<GLint> m_hashValues;
     std::vector<GLint> m_nextNodes;
