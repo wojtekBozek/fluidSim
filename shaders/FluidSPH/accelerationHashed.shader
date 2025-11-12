@@ -144,7 +144,7 @@ void main()
                             }
                             else // boundary
                             {
-                                temp += otherParticle.mass * 10 * localPBD2 * kernelGradient;
+                                temp += otherParticle.mass * particle.mass * localPBD2 * kernelGradient;
 
                             // Much weaker coupling
                                 particle.velocity.xyz += epsilonBoundary * otherParticle.mass / fluid.fluidDensity *(otherParticle.velocity.xyz - particle.velocity.xyz) * kernel;

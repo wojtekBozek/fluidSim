@@ -100,13 +100,15 @@ void FluidSPHSimulation::setFluidAndParticles()
     initialParticle.position = glm::vec4(m_simulationDomain.posittion, 1.0f);
     initialParticle.density = 1000.0/static_cast<float>(numOfBoundaryParticles);
     initialParticle.type = particleType::BOUNDARY;
+
+    int depth = 2;
     if (SimDim::DIMENSION_2 == m_dimension)
     {
         for (int i = 0; i <= boundaryXmax; i++)
         {
             for (int j = 0; j <= boundaryYmax; j++)
             {
-                if (i == 0 || i == boundaryXmax || j == 0 || j == boundaryYmax)
+                if (i <= depth || i >= boundaryXmax - depth || j <= depth || j >= boundaryYmax - depth)
                 {
                     initialParticle.position = glm::vec4(m_simulationDomain.posittion + glm::vec3(i * particleDiameter, j * particleDiameter, m_particleRadius), 1.0);
                     boundaryParticles.push_back(initialParticle);
@@ -121,7 +123,7 @@ void FluidSPHSimulation::setFluidAndParticles()
             for (int j = 0; j <= boundaryYmax; j++)
             {
                 for (int z = 0; z <= boundaryZmax; z++)
-                    if (i == 0 || i == boundaryXmax || j == 0 || j == boundaryYmax || z == 0 || z == boundaryZmax)
+                    if (i <= depth || i >= boundaryXmax - depth || j <= depth || j >= boundaryYmax - depth || z <= depth || z >= boundaryZmax- depth)
                     {
                         initialParticle.position =  glm::vec4(m_simulationDomain.posittion + glm::vec3(i * particleDiameter, j * particleDiameter, z * particleDiameter), 1.0);
                         boundaryParticles.push_back(initialParticle);
@@ -220,7 +222,7 @@ void FluidSPHSimulation::setMemoryLayout()
     m_accelerationComputeShader->setUint("toonerP", 7);
     m_accelerationComputeShader->setFloat("stiffnessK", 35000);
     m_accelerationComputeShader->setFloat("epsilon", 0.05f);
-    m_accelerationComputeShader->setFloat("epsilonBoundary", 0.01f);
+    m_accelerationComputeShader->setFloat("epsilonBoundary", 0.15f);
 
 
     m_movementComputeShader->useProgram();
