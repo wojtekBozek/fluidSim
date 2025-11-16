@@ -101,7 +101,7 @@ void FluidSPHSimulation::setFluidAndParticles()
     initialParticle.density = 1000.0/static_cast<float>(numOfBoundaryParticles);
     initialParticle.type = particleType::BOUNDARY;
 
-    int depth = 2;
+    int depth = 1;
     if (SimDim::DIMENSION_2 == m_dimension)
     {
         for (int i = 0; i <= boundaryXmax; i++)

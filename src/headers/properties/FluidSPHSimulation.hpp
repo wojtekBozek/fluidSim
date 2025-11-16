@@ -19,6 +19,13 @@ enum particleType : GLuint
     BOUNDARY = 1 
 };
 
+enum BoundaryConditions : GLuint
+{
+    SolidWall = 0,
+    ParticleWall = 1,
+    GhostParticles = 2
+};
+
 struct alignas(16) FluidParticle : Particle
 {
     float pressure=0;
@@ -136,7 +143,7 @@ private:
     GLuint m_hashBuf;
     GLuint m_nextNodeBuf;
 
-    GLuint m_dimension = SimDim::DIMENSION_2;
+    GLuint m_dimension = SimDim::DIMENSION_3;
 
     std::vector<GLint> m_hashValues;
     std::vector<GLint> m_nextNodes;
@@ -154,7 +161,7 @@ private:
     float m_timeStep = 0.001f;
     float m_particleRadius = 0.05f;
     float m_kernelCof = 2.5;
-    float m_boundCof = 1.0;
+    float m_boundCof = 2.0;
     float m_kernelRadius = 0.2f;
     bool m_partBUfferCreated = false;
     GLuint m_particleBufferSize = 0;
