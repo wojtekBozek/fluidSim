@@ -115,7 +115,7 @@ void main()
                     {
                         otherParticle = particles[currentParticle];
                         dist = distance(particle.position.xyz, otherParticle.position.xyz);
-                        if(dist <= 2*sphKernelRadius)
+                        if(dist <= 2*sphKernelRadius && otherParticle.type == 0)
                         {
                             particle.density += otherParticle.mass * CubicSplineKernel(sphKernelRadius, dist, alfa);       
                         }

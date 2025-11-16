@@ -142,12 +142,12 @@ void main()
                                 temp += otherParticle.mass*(localPBD2+PressureByDensity2(otherParticle))*kernelGradient;
                                 particle.velocity.xyz += epsilon*otherParticle.mass/otherParticle.density*(otherParticle.velocity.xyz-particle.velocity.xyz)*kernel;  
                             }
-                            else // boundary
-                            {
-                                temp += particle.mass * otherParticle.mass * fluid.fluidDensity * localPBD2 * kernelGradient;
-
-                                particle.velocity.xyz += epsilonBoundary * otherParticle.mass / fluid.fluidDensity *(otherParticle.velocity.xyz - particle.velocity.xyz) * kernel;
-                            }
+                            //else // boundary
+                            //{
+                            //    temp += particle.mass * otherParticle.mass * fluid.fluidDensity * localPBD2 * kernelGradient;
+//
+                            //    particle.velocity.xyz += epsilonBoundary * otherParticle.mass / fluid.fluidDensity *(otherParticle.velocity.xyz - particle.velocity.xyz) * kernel;
+                            //}
                         }
                         //if(nextNode[currentParticle]!=-1)
                         //{
@@ -159,7 +159,7 @@ void main()
         }
     }
     
-    particle.acceleration.xyz = externalAccelerations - temp;// + applyDomainForces(particle.position.xyz, particle);
+    particle.acceleration.xyz = externalAccelerations - temp + applyDomainForces(particle.position.xyz, particle);
     particles[fluidParticle_id].acceleration.xyz = particle.acceleration.xyz;
     particles[fluidParticle_id].velocity.xyz = particle.velocity.xyz;
 } 
