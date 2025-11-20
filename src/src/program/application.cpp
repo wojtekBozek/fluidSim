@@ -37,6 +37,7 @@ void MyApp::mainLoop()
         ProcessInput(window, GLFW_KEY_ESCAPE, GLFW_PRESS, closeWindow, this->window, GLFW_TRUE);
         activeContext->showUI();
         glfwSwapBuffers(window);
+        processProgramState();
     }
 }
 
@@ -67,8 +68,19 @@ void MyApp::setupResources()
     contextMap[ProgramState::SIMULATION] = std::make_shared<SPHSimulationContext>(window, programState);
     contextMap[ProgramState::MAIN_MENU] = std::make_shared<MainWindow>(window, programState);
     activeContext = contextMap[ProgramState::MAIN_MENU];
+    lastProgramState = ProgramState::MAIN_MENU;
     activeContext->initContext();
     setup::setupImGui(window); // needs to be called last, after creating window and opengl context
+}
+
+void MyApp::processProgramState()
+{
+    if (*programState.get() != lastProgramState)
+    {
+        activeContext = contextMap[*programState.get()];
+        lastProgramState = *programState.get();
+        activeContext->initContext();
+    }
 }
 
 void MyApp::initialize()
