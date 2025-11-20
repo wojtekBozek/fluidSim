@@ -12,8 +12,6 @@ public:
 private:
     void backToMenuButton();
     void openDialogButton();
-    std::shared_ptr<ProgramState> m_state;
     MainMenuState m_menu_state;
-    GLFWwindow *m_window;
 
 };

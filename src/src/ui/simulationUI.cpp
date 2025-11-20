@@ -7,7 +7,7 @@
 #include <string>
 
 
-SimulationUI::SimulationUI(GLFWwindow *window, std::shared_ptr<ProgramState> state) : m_window(window), m_state(state) {}
+SimulationUI::SimulationUI(GLFWwindow *window, std::shared_ptr<ProgramState> state) : BaseUI(window, state) {}
 
 void SimulationUI::showUI()
 {

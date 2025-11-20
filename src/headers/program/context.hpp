@@ -8,6 +8,7 @@
 class AbstractContext : public BaseUI
 {
 public:
+	AbstractContext(GLFWwindow* window, std::shared_ptr<ProgramState> state) : BaseUI(window, state) {};
 	virtual void initContext() = 0;
 	virtual void processContext(std::shared_ptr<rendering::Camera> camera) = 0;
 };
@@ -15,7 +16,7 @@ public:
 class SPHSimulationContext : public AbstractContext
 {
 public:
-	SPHSimulationContext() {}
+	SPHSimulationContext(GLFWwindow* window, std::shared_ptr<ProgramState> state) : AbstractContext(window, state){}
 	void processContext(std::shared_ptr<rendering::Camera> camera) override;
 	void initContext() override;
 	void showUI() override
@@ -30,3 +31,4 @@ private:
 	std::shared_ptr<SPHSimulationRenderer> sphRenderer;
 	std::shared_ptr<BaseUI> simulationUI;
 };
+

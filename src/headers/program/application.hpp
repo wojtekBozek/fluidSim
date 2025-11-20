@@ -13,7 +13,7 @@
 #include "particleRenderer.hpp"
 #include "FluidRenderer.hpp"
 #include "context.hpp"
-
+#include "mainWindow.hpp"
 class Application
 {
 public:
@@ -37,22 +37,11 @@ private:
     void cleanup();
     void setupResources();
 
-    std::vector<std::shared_ptr<BaseRenderer>> renderers;
-    std::shared_ptr<MeshRenderer> meshRenderer;
-    std::shared_ptr<ParticleRenderer> particleRenderer;
-    std::shared_ptr<SPHSimulationRenderer> sphRenderer;
-    std::shared_ptr<ShaderProgram> shaderProgram;
-    std::shared_ptr<ShaderProgram> particleShaderProgram;
-    std::shared_ptr<ShaderProgram> sphShaderProgram;
-    std::shared_ptr<ShaderProgram> particleComputeShaderProgram;
-    std::shared_ptr<ObjectMenager> objectsMenager;
     std::shared_ptr<ProgramState> programState;
     std::vector<std::shared_ptr<BaseUI>> UIs;
-    std::vector<std::shared_ptr<Mesh>> meshes;
-    std::shared_ptr<PositionedLight> light;
     std::unordered_map<std::string, std::shared_ptr<rendering::Camera>> cameras;
-
     std::shared_ptr<AbstractContext> activeContext;
+    std::unordered_map<ProgramState, std::shared_ptr<AbstractContext>> contextMap;
 
     double currentFrame = 0.0f;
     double lastFrame = 0.0f;
