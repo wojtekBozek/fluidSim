@@ -213,4 +213,8 @@ void SPHsimulationUI::pauseSimulationButton()
 
 void SPHsimulationUI::returnToMenuButton()
 {
+	if (ImGui::Button("BackToMenu"))
+	{
+		*m_state = ProgramState::MAIN_MENU;
+	}
 }

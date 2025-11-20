@@ -36,13 +36,14 @@ private:
     void mainLoop();
     void cleanup();
     void setupResources();
+    void processProgramState();
 
     std::shared_ptr<ProgramState> programState;
+    ProgramState lastProgramState;
     std::vector<std::shared_ptr<BaseUI>> UIs;
     std::unordered_map<std::string, std::shared_ptr<rendering::Camera>> cameras;
     std::shared_ptr<AbstractContext> activeContext;
     std::unordered_map<ProgramState, std::shared_ptr<AbstractContext>> contextMap;
-
     double currentFrame = 0.0f;
     double lastFrame = 0.0f;
     GLFWwindow* window = nullptr;
