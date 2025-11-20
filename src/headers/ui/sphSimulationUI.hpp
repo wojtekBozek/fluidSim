@@ -3,12 +3,12 @@
 #include "FluidSPHSimulation.hpp"
 #include "SPHContextState.hpp"
 
-
 class SPHsimulationUI : public BaseUI
 {
 public:
-	SPHsimulationUI() = default;
-	SPHsimulationUI(std::shared_ptr<FluidSPHSimulation> simulation, std::shared_ptr<ContextState> context) { refSimulation = simulation; simulationContext = context; }
+	//SPHsimulationUI() = default;
+	SPHsimulationUI(std::shared_ptr<FluidSPHSimulation> simulation, std::shared_ptr<ContextState> context, GLFWwindow* window, std::shared_ptr<ProgramState> state) : BaseUI(window, state)
+	{ refSimulation = simulation; simulationContext = context; }
 	void showUI() override;
 private:
 	enum SimulationState

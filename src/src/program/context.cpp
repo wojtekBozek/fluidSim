@@ -16,7 +16,7 @@ void SPHSimulationContext::initContext()
 	sphSimulation->setFluidAndParticles();
 	sphSimulation->setParticleBufferData();
 	state = std::make_shared<ContextState>(ContextState::SETUP());
-	simulationUI = std::make_shared<SPHsimulationUI>(SPHsimulationUI(sphSimulation, state));
+	simulationUI = std::make_shared<SPHsimulationUI>(SPHsimulationUI(sphSimulation, state, m_window, m_state));
 
 	sphShaderProgram = std::make_shared<ShaderProgram>();
 	sphShaderProgram->addShader(GL_VERTEX_SHADER, "shaders/FluidSPH/vertex.shader");

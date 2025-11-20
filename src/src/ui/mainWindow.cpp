@@ -4,7 +4,7 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-MainWindow::MainWindow(GLFWwindow *window, std::shared_ptr<ProgramState> state) : m_window(window), m_state(state) {}
+MainWindow::MainWindow(GLFWwindow* window, std::shared_ptr<ProgramState> state) : AbstractContext(window, state), m_menuState(MainMenuState::MAIN){}
 
 void MainWindow::showUI()
 {
@@ -20,6 +20,14 @@ void MainWindow::showUI()
         ImGui::Render();
         ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
     }
+}
+
+void MainWindow::initContext()
+{
+}
+
+void MainWindow::processContext(std::shared_ptr<rendering::Camera> camera)
+{
 }
 
 void MainWindow::chooseSimulationButton()
