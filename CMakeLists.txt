@@ -28,6 +28,7 @@ ${CMAKE_SOURCE_DIR}/src/src/properties/FluidSPHSimulation.cpp
 ${CMAKE_SOURCE_DIR}/src/src/properties/FluidRenderer.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/ui/mainWindow.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/ui/simulationUI.cpp
+${CMAKE_SOURCE_DIR}/src/src/ui/gridSimUI.cpp
 ${CMAKE_SOURCE_DIR}/src/src/program/application.cpp
 ${CMAKE_SOURCE_DIR}/src/src/camera/perspectiveCamera.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/camera/orthographicCamera.cpp 
@@ -44,6 +45,7 @@ ${CMAKE_SOURCE_DIR}/src/headers/program/
 ${CMAKE_SOURCE_DIR}/src/headers/properties/
 ${CMAKE_SOURCE_DIR}/src/headers/ui/
 ${CMAKE_SOURCE_DIR}/src/headers/lights/
+${CMAKE_SOURCE_DIR}/src/headers/gridSimulation/
 )
 
 add_definitions(-DGLEW_STATIC)

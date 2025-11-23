@@ -6,6 +6,7 @@
 
 #include "perspectiveCamera.hpp"
 #include "orthographicCamera.hpp"
+#include "gridContext.hpp"
 
 constexpr GLint WIDTH = 1200, HEIGHT = 900;
 constexpr int layoutPos = 0;
@@ -52,8 +53,6 @@ void MyApp::run()
 void MyApp::setupResources()   
 {
     programState = std::make_shared<ProgramState>(ProgramState::MAIN_MENU);
-    UIs.push_back(std::make_shared<MainWindow>(window, programState));
-    UIs.push_back(std::make_shared<SimulationUI>(window, programState));
 
     rendering::CameraHandler::addActiveCamera(std::make_shared<rendering::PerspectiveCamera>(glm::vec3(0, 2, 25), glm::vec3(0, 1, 0),
         float(WIDTH) / float(HEIGHT), 0.1f, 100.0f, window, 60.0f));
@@ -65,8 +64,9 @@ void MyApp::setupResources()
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
     rendering::CameraHandler::connectCallbacks(window);
     currentFrame = static_cast<float>(glfwGetTime());
-    contextMap[ProgramState::SIMULATION] = std::make_shared<SPHSimulationContext>(window, programState);
+    contextMap[ProgramState::SPH_SIM] = std::make_shared<SPHSimulationContext>(window, programState);
     contextMap[ProgramState::MAIN_MENU] = std::make_shared<MainWindow>(window, programState);
+    contextMap[ProgramState::GRID_SIM] = std::make_shared<GridSimulationContext>(window, programState);
     activeContext = contextMap[ProgramState::MAIN_MENU];
     lastProgramState = ProgramState::MAIN_MENU;
     activeContext->initContext();

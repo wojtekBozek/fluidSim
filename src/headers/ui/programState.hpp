@@ -3,7 +3,8 @@
 enum class ProgramState
 {
     MAIN_MENU,
-    SIMULATION
+    SPH_SIM,
+    GRID_SIM
 };
 
 enum class MainMenuState
