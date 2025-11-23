@@ -13,12 +13,16 @@ void SPHsimulationUI::showUI()
 	ImGui::Begin("SPH-Simulation");
 	fluidStiffKcoeffTextInput();
 	fluidStiffYcoeffTextInput();
-	fluidDensityTextInput();
-	dimensionComboBox();
-	fluidVolumeTextInputs();
-	fluidPositionTextInputs();
-	simulationVolumeTextInputs();
-	simulationPositionTextInputs();
+
+	if (*simulationContext != ContextState::RUNNING) 
+	{
+		fluidDensityTextInput();
+		dimensionComboBox();
+		fluidVolumeTextInputs();
+		fluidPositionTextInputs();
+		simulationVolumeTextInputs();
+		simulationPositionTextInputs();
+	}
 	sphKernelRadiusSizeInput();
 	visualRadiusSizeInput();
 
@@ -187,19 +191,34 @@ void SPHsimulationUI::frameRateTextInfo()
 
 void SPHsimulationUI::startSimulationButton()
 {
-	if (ImGui::Button("StartSimulation"))
+
+	if (*simulationContext != ContextState::RUNNING)
 	{
-		refSimulation->setMemoryLayout();
-		*simulationContext = ContextState::RUNNING;
+		if (ImGui::Button("StartSimulation"))
+		{
+			refSimulation->setMemoryLayout();
+			*simulationContext = ContextState::RUNNING;
+		}	
 	}
+	else
+	{
+		if (ImGui::Button("StopSimulation"))
+		{
+			refSimulation->setMemoryLayout();
+			*simulationContext = ContextState::SETUP;
+		}
+	}
+
 }
 
 void SPHsimulationUI::restartSimulationButton()
 {
 	if (ImGui::Button("SetSimulation"))
 	{
-		refSimulation->setFluidAndParticles();		
-		refSimulation->setParticleBufferData();
+		refSimulation->clearSimulation();
+		refSimulation->setInitialState();
+		refSimulation->setFluidAndParticles();
+		refSimulation->setMemoryLayout();
 	}
 }
 

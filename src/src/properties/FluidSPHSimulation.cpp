@@ -175,7 +175,10 @@ void FluidSPHSimulation::setMemoryLayout()
 {
     setParticleBufferData();
     GLuint bufsize = sizeof(Fluid);
-    glGenBuffers(1, &m_fluidBuf);
+    if (glIsBuffer(m_fluidBuf) == GL_FALSE)
+    {
+        glGenBuffers(1, &m_fluidBuf);
+    }
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_fluidBuf);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, &m_fluid, GL_DYNAMIC_DRAW);
 
@@ -183,11 +186,16 @@ void FluidSPHSimulation::setMemoryLayout()
     m_nextNodes = std::vector<GLint>(m_numOfParticles, -1);
 
     bufsize = m_numOfParticles * sizeof(GLint);
-    glGenBuffers(1, &m_hashBuf);
+    if (glIsBuffer(m_hashBuf) == GL_FALSE)
+    {
+        glGenBuffers(1, &m_hashBuf);
+    }
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_hashBuf);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, m_hashValues.data(), GL_DYNAMIC_DRAW);
-
-    glGenBuffers(1, &m_nextNodeBuf);
+    if (glIsBuffer(m_nextNodeBuf) == GL_FALSE)
+    {
+        glGenBuffers(1, &m_nextNodeBuf);
+    }
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_nextNodeBuf);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, m_nextNodes.data(), GL_DYNAMIC_DRAW);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
@@ -234,7 +242,10 @@ void FluidSPHSimulation::setParticleBufferData()
 {
     if (!m_partBUfferCreated)
     {
-        glGenBuffers(1, &m_partBuf);
+        if (glIsBuffer(m_partBuf) == GL_FALSE)
+        {
+            glGenBuffers(1, &m_partBuf);
+        }
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_partBuf);
         m_partBUfferCreated = true;
     }
@@ -291,4 +302,11 @@ void FluidSPHSimulation::simulationStep(float timeStep)
     glEndQuery(GL_TIME_ELAPSED);
 
     glGetQueryObjectui64v(query, GL_QUERY_RESULT, &m_computeTime);
+}
+
+void FluidSPHSimulation::clearSimulation()
+{
+    m_particles.clear();
+    m_partBUfferCreated = false;
+    m_particleBufferSize = 0;
 }
