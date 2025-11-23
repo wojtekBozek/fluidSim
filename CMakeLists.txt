@@ -32,7 +32,7 @@ ${CMAKE_SOURCE_DIR}/src/src/program/application.cpp
 ${CMAKE_SOURCE_DIR}/src/src/camera/perspectiveCamera.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/camera/orthographicCamera.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/program/context.cpp
-${CMAKE_SOURCE_DIR}/src/src/ui/sphSimulationUI.cpp)
+${CMAKE_SOURCE_DIR}/src/src/ui/sphSimulationUI.cpp "src/src/program/gridContext.cpp")
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
 ${CMAKE_SOURCE_DIR}/src/headers/camera/

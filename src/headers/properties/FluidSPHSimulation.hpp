@@ -135,8 +135,8 @@ public:
     GLuint getParticleBuffer() const {return m_partBuf;}
 
     GLuint getSimulationDimension() const { return m_dimension; }
-    void  setSimulationDimension(float dimension) { m_dimension = dimension; }
-
+    void setSimulationDimension(float dimension) { m_dimension = dimension; }
+    void clearSimulation();
 private:
     GLuint m_partBuf;
     GLuint m_fluidBuf;
