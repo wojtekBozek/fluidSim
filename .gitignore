@@ -4,3 +4,4 @@ external/imgui_glfw/imgui/
 obj/
 *.json
 .vs/
+out/
