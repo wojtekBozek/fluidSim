@@ -11,7 +11,7 @@ SimulationUI::SimulationUI(GLFWwindow *window, std::shared_ptr<ProgramState> sta
 
 void SimulationUI::showUI()
 {
-    if(*m_state == ProgramState::SIMULATION)
+    if(*m_state == ProgramState::SPH_SIM)
     {
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();

@@ -14,7 +14,8 @@ void MainWindow::showUI()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         ImGui::Begin("MainMenu");
-        chooseSimulationButton();
+        chooseSPHSimButton();
+        chooseGRIDSimButton();
         exitButton();
         ImGui::End();
         ImGui::Render();
@@ -30,11 +31,19 @@ void MainWindow::processContext(std::shared_ptr<rendering::Camera> camera)
 {
 }
 
-void MainWindow::chooseSimulationButton()
+void MainWindow::chooseSPHSimButton()
 {
-    if(ImGui::Button("Choose simulation"))
+    if(ImGui::Button("SPH Simulation"))
     {
-        *m_state = ProgramState::SIMULATION;
+        *m_state = ProgramState::SPH_SIM;
+    }
+}
+
+void MainWindow::chooseGRIDSimButton()
+{
+    if (ImGui::Button("Grid Simulation"))
+    {
+        *m_state = ProgramState::GRID_SIM;
     }
 }
 

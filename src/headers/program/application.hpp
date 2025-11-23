@@ -40,7 +40,6 @@ private:
 
     std::shared_ptr<ProgramState> programState;
     ProgramState lastProgramState;
-    std::vector<std::shared_ptr<BaseUI>> UIs;
     std::unordered_map<std::string, std::shared_ptr<rendering::Camera>> cameras;
     std::shared_ptr<AbstractContext> activeContext;
     std::unordered_map<ProgramState, std::shared_ptr<AbstractContext>> contextMap;

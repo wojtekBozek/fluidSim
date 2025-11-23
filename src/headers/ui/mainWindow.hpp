@@ -12,7 +12,8 @@ public:
     void initContext() override;
     void processContext(std::shared_ptr<rendering::Camera> camera) override;
 private:    
-    void chooseSimulationButton();
+    void chooseSPHSimButton();
+    void chooseGRIDSimButton();
     void exitButton();
     //std::shared_ptr<ProgramState> m_state;
     //GLFWwindow *m_window;

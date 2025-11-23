@@ -1,6 +1,7 @@
 #pragma once
 #include "context.hpp"
-
+#include "baseGrid.hpp"
+#include "gridSimUI.hpp"
 class GridSimulationContext : public AbstractContext
 {
 public:
@@ -9,4 +10,6 @@ public:
 	void initContext() override;
 	void showUI() override;
 private:
+	std::shared_ptr<BaseUI> simulationUI;
+	std::shared_ptr<BaseGrid> simulation;
 };
