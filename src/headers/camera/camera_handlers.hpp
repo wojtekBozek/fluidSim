@@ -6,6 +6,8 @@
 #include <list>
 #include <mutex>
 #include "keyboard.hpp"
+#include <imgui.h>
+
 namespace rendering {	
 	class CameraHandler {
 	public:
@@ -74,6 +76,9 @@ namespace rendering {
 
 		static void processMovement(GLFWwindow* window) 
 		{
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.WantCaptureKeyboard)	return;
+
 			CameraHandler* handler = CameraHandler::getInstance();
 			ProcessInput(window, handler->key_forward, GLFW_PRESS, CameraHandler::moveForward);
 			ProcessInput(window, handler->key_backward, GLFW_PRESS, CameraHandler::moveBackward);
@@ -117,7 +122,8 @@ namespace rendering {
 		}
 		static void mouseCallback(GLFWwindow* window, double xposIn, double yposIn)
 		{
-			
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.WantCaptureMouse) return;
 			CameraHandler* handler = CameraHandler::getInstance();
 			
 			float xpos = static_cast<float>(xposIn);
@@ -140,6 +146,8 @@ namespace rendering {
 		}
 		static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 		{
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.WantCaptureMouse) return;
 			CameraHandler* handler = CameraHandler::getInstance();
 			if(handler->camera_ptr)
 				handler->camera_ptr->processScrollback(static_cast<float>(yoffset));
@@ -153,6 +161,9 @@ namespace rendering {
 	private:
 		static void KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
 		{
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.WantCaptureKeyboard)	return;
+
 			CameraHandler* handler = CameraHandler::getInstance();
 			if (key == handler->key_rotation_on && action == handler->activation_type)
 			{

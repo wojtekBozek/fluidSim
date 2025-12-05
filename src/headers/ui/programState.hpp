@@ -4,7 +4,8 @@ enum class ProgramState
 {
     MAIN_MENU,
     SPH_SIM,
-    GRID_SIM
+    GRID_SIM,
+    TEXTURE_TEST
 };
 
 enum class MainMenuState
