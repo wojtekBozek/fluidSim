@@ -1,7 +1,7 @@
 #version 430
 
-layout (binding = 0, rgba32f) uniform image2D uTex;
-layout (binding = 1, rgba32f) uniform image2D vTex;
+layout (rgba32f ,binding = 0) uniform image2D uTex;
+layout (rgba32f ,binding = 1) uniform image2D vTex;
 
 layout (binding = 2) uniform sampler2D pressure;
 layout (binding = 3) uniform usampler2D cellType;
@@ -20,58 +20,54 @@ void main()
     ivec2 id = ivec2(gl_GlobalInvocationID.xy);
 
     //left-right projection
-    if(id.x <= gridSize.x && id.y < gridSize.y)
+    if(id.x < gridSize.x + 1 && id.y < gridSize.y)
     {
         int i = id.x;
         int j = id.y;
 
-        bool leftFluid = (i-1 >= 0 && texelFetch(cellType, ivec2(i-1,j), 0).r == FLUID);
-        bool rightFluid = (i+1 < gridSize.x && texelFetch(cellType, ivec2(i+1,j), 0).r == FLUID);
+        uint leftType= (i-1 < 0) ? SOLID : texelFetch(cellType, ivec2(i-1,j), 0).r;
+        uint rightType = (i >= gridSize.x) ? SOLID : texelFetch(cellType, ivec2(i,j), 0).r;
 
         float u = imageLoad(uTex, id).r;
 
-        if (leftFluid || rightFluid)
+        if (leftType == SOLID || rightType == SOLID)
         {
-            float pressureL = (i-1 >= 0) ? texelFetch(pressure, ivec2(i-1, j), 0).r : texelFetch(pressure, ivec2(i,j), 0).r;
-            float pressureR = (i+1 < gridSize.x) ? texelFetch(pressure, ivec2(i+1, j), 0).r : texelFetch(pressure, ivec2(i,j), 0).r;
+            u = 0.0;
+        }
+        else if(leftType == FLUID && rightType == FLUID)
+        {
+            float pressureL = texelFetch(pressure, ivec2(i-1,j), 0).r;
+            float pressureR = texelFetch(pressure, ivec2(i,j), 0).r;
 
             float gradPressure = (pressureR - pressureL)/ dx;
             u -= dt * gradPressure;
         }
-
-        if(!leftFluid || !rightFluid)
-        {
-            u = 0.0;
-        }
-
         imageStore(uTex, id, vec4(u));
     }
 
     //bottom-top projection
-    if(id.y <= gridSize.y && id.x < gridSize.x)
+    if(id.y < gridSize.y + 1 && id.x < gridSize.x)
     {
         int i = id.x;
         int j = id.y;
 
-        bool bottomFluid = (j-1 >= 0 && texelFetch(cellType, ivec2(i,j-1), 0).r == FLUID);
-        bool topFluid = (j+1 < gridSize.y && texelFetch(cellType, ivec2(i,j+1), 0).r == FLUID);
+        uint bottomType = (j-1 < 0) ? SOLID : texelFetch(cellType, ivec2(i,j-1), 0).r;
+        uint topType = (j >= gridSize.y) ? SOLID : texelFetch(cellType, ivec2(i,j), 0).r;
 
         float v = imageLoad(vTex, id).r;
 
-        if (bottomFluid || topFluid)
-        {
-            float pressureB = (j-1 >= 0) ? texelFetch(pressure, ivec2(i, j-1), 0).r : texelFetch(pressure, ivec2(i,j), 0).r;
-            float pressureT = (j+1 < gridSize.y) ? texelFetch(pressure, ivec2(i, j+1), 0).r : texelFetch(pressure, ivec2(i,j), 0).r;
-
-            float gradPressure = (pressureT - pressureB)/ dx;
-            v -= dt * gradPressure;
-        }
-
-        if(!bottomFluid || !topFluid)
+        if (bottomType==SOLID || topType==SOLID)
         {
             v = 0.0;
         }
-        
+        else if(bottomType == FLUID && topType == FLUID)
+        {
+            float pressureB = texelFetch(pressure, ivec2(i, j-1), 0).r;
+            float pressureT = texelFetch(pressure, ivec2(i,j), 0).r;
+
+            float gradPressure = (pressureT - pressureB)/ dx;
+            v -= dt * gradPressure;
+        }        
         imageStore(vTex, id, vec4(v));
     }
 }

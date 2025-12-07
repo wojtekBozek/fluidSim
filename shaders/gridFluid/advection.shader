@@ -17,13 +17,13 @@ uniform ivec2 gridSize;
 
 float sampleU(vec2 pos)
 {
-    vec2 uv = (pos + vec2(0.5, 0.0)) / vec2(size.x+1, size.y);
+    vec2 uv = (pos + vec2(0.5, 0.0)) / vec2(gridSize.x+1, gridSize.y);
     return texture(uTex, uv).r;
 }
 
 float sampleV(vec2 pos)
 {
-    vec2 uv = (pos + vec2(0.5, 0.0)) / vec2(size.x, size.y+1);
+    vec2 uv = (pos + vec2(0.5, 0.0)) / vec2(gridSize.x, gridSize.y+1);
     return texture(vTex, uv).r;
 }
 
@@ -40,7 +40,7 @@ const uint SOLID = 2u;
 void main()
 {
     ivec2 id = ivec2(gl_GlobalInvocationID.xy);
-    if(id.x > size.x || id.y > size.y) return ;
+    if(id.x >= gridSize.x || id.y >= gridSize.y) return ;
 
     uint type = texelFetch(cellType, id, 0).r;
 
@@ -54,8 +54,8 @@ void main()
     float u = sampleU(pos);
     float v = sampleV(pos);
 
-    vec2 vel = vec2(v,u);
-    vec2 prev = pos = dt * vel/dx;
+    vec2 vel = vec2(u,v);
+    vec2 prev = pos - dt * vel/dx;
 
     prev = clamp(prev, vec2(0.0), vec2(size) - 1.001);
 

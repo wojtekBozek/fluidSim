@@ -36,6 +36,37 @@ void FluidSPHSimulation::setInitialState()
     m_kernelRadius = m_kernelCof * m_particleRadius;
 }
 
+void FluidSPHSimulation::setInitialSimulationDomain()
+{
+    if (m_dimension == SimDim::DIMENSION_3)
+    {
+        m_simulationDomain.posittion = glm::vec3(-5.0, -2.5, -5.0);
+
+        m_simulationDomain.size = glm::vec3(10.0, 10.0, 10.0);
+    }
+    else if (m_dimension == SimDim::DIMENSION_2)
+    {
+        m_simulationDomain.posittion = glm::vec3(-15.0, -2.5, 0.0);
+        m_simulationDomain.size = glm::vec3(30.0, 20.0, 0.0);
+    }
+}
+
+void FluidSPHSimulation::setSimulationState()
+{
+    if (m_dimension == SimDim::DIMENSION_3)
+    {
+        m_fluid.volume = m_initialDomain.size.x * m_initialDomain.size.y * m_initialDomain.size.z;
+        m_numOfParticles = m_fluid.volume / (1.33 * std::pow(m_particleRadius, 3) * M_PI);
+    }
+    else if (m_dimension == SimDim::DIMENSION_2)
+    {
+        m_fluid.fluidDensity *= m_particleRadius;
+        m_fluid.volume = m_initialDomain.size.x * m_initialDomain.size.y;// *m_initialDomain.size.z;
+        m_numOfParticles = m_fluid.volume / (std::pow(m_particleRadius, 2) * M_PI);
+    }
+    m_kernelRadius = m_kernelCof * m_particleRadius;
+}
+
 void FluidSPHSimulation::setFluidAndParticles()
 {    
     m_particles.clear();
