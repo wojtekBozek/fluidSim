@@ -216,7 +216,7 @@ void SPHsimulationUI::restartSimulationButton()
 	if (ImGui::Button("SetSimulation"))
 	{
 		refSimulation->clearSimulation();
-		refSimulation->setInitialState();
+		refSimulation->setSimulationState();
 		refSimulation->setFluidAndParticles();
 		refSimulation->setMemoryLayout();
 	}

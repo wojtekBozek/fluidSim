@@ -7,10 +7,10 @@ layout (binding = 1) uniform sampler2D vTex;
 
 layout (binding = 2) uniform usampler2D cellType;
 
-layout (binding = 3, r32f) uniform writeonly image2D divergance;
+layout (binding = 3, r32f) uniform writeonly image2D divergence;
 
 uniform float dx; 
-uniform ivec2 size;
+uniform ivec2 gridSize;
 uniform float dt;
 
 float U(int i, int j) {return texelFetch(uTex, ivec2(i, j), 0).r;}
@@ -23,13 +23,13 @@ const uint SOLID = 2u;
 void main()
 {
     ivec2 id = ivec2(gl_GlobalInvocationID.xy);
-    if(id.x >= size.x || id.y >= size.y) return;
+    if(id.x >= gridSize.x || id.y >= gridSize.y) return;
 
 
     uint type = texelFetch(cellType, id, 0).r;
     if(type == SOLID)
     {
-        imageStore(divergance, id, vec4(0.0));
+        imageStore(divergence, id, vec4(0.0));
         return;
     }
     int i = id.x;
@@ -37,19 +37,19 @@ void main()
 
     float uR, uL, vT, vB;
 
-    bool rightSolid = (i+1 < size.x && texelFetch(cellType, ivec2(i+1,j),0).r == SOLID);
+    bool rightSolid = (i+1 < gridSize.x && texelFetch(cellType, ivec2(i+1,j),0).r == SOLID);
     uR = rightSolid ? 0.0 : U(i+1,j);
 
     bool leftSolid = (i-1 >= 0 && texelFetch(cellType, ivec2(i-1,j),0).r == SOLID);
     uL = leftSolid ? 0.0 : U(i,j);
 
-    bool topSolid = (j+1 < size.y && texelFetch(cellType, ivec2(i,j+1),0).r == SOLID);
-    vT = topSolid ? 0.0 : U(i,j);
+    bool topSolid = (j+1 < gridSize.y && texelFetch(cellType, ivec2(i,j+1),0).r == SOLID);
+    vT = topSolid ? 0.0 : V(i,j+1);
 
     bool bottomSolid = (j-1 >= 0 && texelFetch(cellType, ivec2(i,j-1),0).r == SOLID);
-    vB = bottomSolid ? 0.0 : U(i,j);
+    vB = bottomSolid ? 0.0 : V(i,j);
 
     float div = (uR - uL  + vT - vB) / dx;
-    imageStore(divergance, div, vec4(div));
+    imageStore(divergence, id, vec4(div));
 }
 

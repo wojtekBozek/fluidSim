@@ -157,6 +157,11 @@ namespace rendering {
 			
 		}
 
+		bool isRotationOn() const
+		{
+			return rotation_on;
+		}
+
 		~CameraHandler() {}
 	private:
 		static void KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
@@ -201,12 +206,12 @@ namespace rendering {
 			key_vertical_down = GLFW_KEY_PAGE_DOWN;
 			key_vertical_up = GLFW_KEY_PAGE_UP;
 			key_rotation_on = GLFW_KEY_TAB;
-			key_camera1 = GLFW_KEY_1;
-			key_camera2 = GLFW_KEY_2;
+			key_camera1 = GLFW_KEY_F1;
+			key_camera2 = GLFW_KEY_F2;
 			delta_time = 0.0f;
 			mouse_sensitivity = 0.1f;
 			first_mouse = true;
-			rotation_on = true;
+			rotation_on = false;
 		}
 		static void moveForward() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(FORWARD, handler->delta_time); }
 		static void moveBackward() { CameraHandler* handler = CameraHandler::getInstance(); if (handler->camera_ptr.get() != nullptr)handler->camera_ptr->processMovement(BACKWARD, handler->delta_time); }

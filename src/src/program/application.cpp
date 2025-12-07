@@ -36,8 +36,9 @@ void MyApp::mainLoop()
         glBindVertexArray(0);
         glUseProgram(0);
 
-        ProcessInput(window, GLFW_KEY_ESCAPE, GLFW_PRESS, closeWindow, this->window, GLFW_TRUE);
-        activeContext->showUI();
+        //ProcessInput(window, GLFW_KEY_ESCAPE, GLFW_PRESS, closeWindow, this->window, GLFW_TRUE);
+        if((rendering::CameraHandler::getInstance())->isRotationOn() == false)
+            activeContext->showUI();
         glfwSwapBuffers(window);
         processProgramState();
     }

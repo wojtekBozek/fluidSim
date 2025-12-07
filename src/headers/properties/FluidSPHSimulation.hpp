@@ -86,6 +86,8 @@ public:
     FluidSPHSimulation(std::unique_ptr<ShaderProgram> computePressureShader, std::unique_ptr<ShaderProgram> computeMovementShader, Domain simulationDomain, Fluid fluid, uint32_t numOfParticles);
 
     void setInitialState();
+    void setInitialSimulationDomain();
+    void setSimulationState();
 
     void setFluidAndParticles();
     void setMemoryLayout();
