@@ -1,5 +1,5 @@
 #version 430
-
+//Zmienić na adwekcję pola prędkości meh
 layout(local_size_x=16, local_size_y=16);
 
 layout(rgba32f, binding = 0) uniform sampler2D uTex;
@@ -29,7 +29,7 @@ float sampleV(vec2 pos)
 
 float sampleQuantity(vec2 pos)
 {
-    vec2 uv = (pos + vec2(0.5)) / vec2(size);
+    vec2 uv = (pos + vec2(0.5)) / vec2(gridSize);
     return texture(quantity, uv).r;
 }
 
@@ -57,7 +57,7 @@ void main()
     vec2 vel = vec2(u,v);
     vec2 prev = pos - dt * vel/dx;
 
-    prev = clamp(prev, vec2(0.0), vec2(size) - 1.001);
+    prev = clamp(prev, vec2(0.0), vec2(gridSize) - 1.001);
 
     ivec2 prevCell = ivec2(prev);
     if(texelFetch(cellType, prevCell, 0).r == SOLID)
