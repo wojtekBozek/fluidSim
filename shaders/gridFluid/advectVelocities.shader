@@ -150,7 +150,7 @@ vec2 backTracePositionRK2(vec2 position, vec2 velocity)
 {
     vec2 halfPos = position - dt*velocity/2.0;
     halfPos = clampPosition(halfPos);
-    vec2 halfVelocity = vec2(interpolateUinGrid(halfPos), interpolateVinGrid(halfPos));
+    vec2 halfVelocity = vec2(sampleU(halfPos), sampleV(halfPos));
 
     vec2 backtracedPosition = position - dt*halfVelocity;
     backtracedPosition = clampPosition(backtracedPosition);
