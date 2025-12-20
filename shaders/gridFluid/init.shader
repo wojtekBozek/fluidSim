@@ -14,11 +14,10 @@
 layout(local_size_x = 16, local_size_y = 16) in;
 
 layout(binding = 0) uniform writeonly image2D cellTypeOut;
-layout(rgba32f, binding = 1) uniform writeonly image2D quantityOut;
-layout (binging = 0, rgba32f) uniform writeonly image2D uTex;
-layout (binging = 1, rgba32f) uniform writeonly image2D vTex;
-layout (binging = 2, rgba32f) uniform writeonly image2D pressure;
-layout (binging = 3, rgba32f) uniform writeonly image2D divergence;
+layout (binging = 1, r32f) uniform writeonly image2D uTex;
+layout (binging = 2, r32f) uniform writeonly image2D vTex;
+layout (binging = 3, r32f) uniform writeonly image2D pressure;
+layout (binging = 4, r32f) uniform writeonly image2D divergence;
 
 uniform ivec2 gridSize;
 
@@ -49,9 +48,7 @@ void main() {
 
     if (isFluid) {
         imageStore(cellTypeOut, id, uvec4(FLUID));
-        imageStore(quantityOut, id, vec4(1.0,0,0,0));
     } else {
         imageStore(cellTypeOut, id, uvec4(AIR));
-        imageStore(quantityOut, id, vec4(0.0,0,0,0));
     }
 }

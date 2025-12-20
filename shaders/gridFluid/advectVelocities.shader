@@ -2,12 +2,12 @@
 
 #version 430
 
-layout (binding = 0) sampler2D uTex;
-layout (binding = 1) sampler2D vTex;
+layout (r32f, binding = 0) sampler2D uTex;
+layout (r32f, binding = 1) sampler2D vTex;
 layout(binding = 3) uniform usampler2D cellType;
 
-layout(rgba32f, binding = 4) uniform writeonly image2D uOut;
-layout(rgba32f, binding = 5) uniform writeonly image2D vOut;
+layout(r32f, binding = 4) uniform writeonly image2D uOut;
+layout(r32f, binding = 5) uniform writeonly image2D vOut;
 
 uniform vec2 gridSize;
 uniform float dt;
