@@ -13,25 +13,36 @@ uniform vec2 gridSize;
 uniform float dt;
 uniform float dx;
 
-const int Nx = gridSize.x;
+const int Nx = gridSize.x; 
 const int Ny = gridSize.y;
 // functions for interpolating values of missing velocity component (v for velocity on u face and u for velocity on v face) from neighboring perpendicular faces 
 // we assume that i and j check for border faces have been dealt on earlier as update of velocity on those faces is not needed since it will still b zero by bc.
 float interpolateUonVFace(int i, int j)
 {
-    float leftUp = texelFetch(uTex, ivec2(i,j),0).r;
-    float leftDown = texelFetch(uTex, ivec2(i,j-1),0).r;
-    float rightUp = texelFetch(uTex, ivec2(i+1,j),0).r;
-    float rightDown = texelFetch(uTex, ivec2(i+1,j-1),0).r;
+    int i0 = clamp(i,     0, Nx);
+    int i1 = clamp(i + 1, 0, Nx);
+
+    int j0 = clamp(j - 1, 0, Ny - 1);
+    int j1 = clamp(j,     0, Ny - 1);
+
+    float leftUp = texelFetch(uTex, ivec2(i0,j1),0).r;
+    float leftDown = texelFetch(uTex, ivec2(i0,j0),0).r;
+    float rightUp = texelFetch(uTex, ivec2(i1,j1),0).r;
+    float rightDown = texelFetch(uTex, ivec2(i1,j0),0).r;
     return (leftUp+leftDown+rightUp+rightDown)/4.0;
 }
 
 float interpolateVonUFace(int i, int j)
 {
-    float leftUp = texelFetch(vTex, ivec2(i-1,j+1),0).r;
-    float leftDown = texelFetch(vTex, ivec2(i-1,j),0).r;
-    float rightUp = texelFetch(vTex, ivec2(i,j+1),0).r;
-    float rightDown = texelFetch(vTex, ivec2(i,j),0).r;
+    int i0 = clamp(i-1,     0, Nx-1);
+    int i1 = clamp(i + 1, 0, Nx-1);
+
+    int j0 = clamp(j, 0, Ny);
+    int j1 = clamp(j+1,     0, Ny);
+    float leftUp = texelFetch(vTex, ivec2(i0,j1),0).r;
+    float leftDown = texelFetch(vTex, ivec2(i0,j0),0).r;
+    float rightUp = texelFetch(vTex, ivec2(i1,j1),0).r;
+    float rightDown = texelFetch(vTex, ivec2(i1,j0),0).r;
     return (leftUp+leftDown+rightUp+rightDown)/4.0;
 }
 
@@ -92,12 +103,30 @@ float interpolateUinGrid(vec2 position)
     float w10 = 1.0 - downDistance/dx; 
     float w11 = downDistance/dx; 
 
-    float leftDown = uBlocked(i,j) ? 0.0 : texelFetch(uTex, ivec2(i,j),0).r * w00 * w10;
-    float leftUp = uBlocked(i,j+1) ? 0.0 : texelFetch(uTex, ivec2(i,j+1),0).r * w00 * w11;
-    float rightUp = uBlocked(i+1,j+1) ? 0.0 : texelFetch(uTex, ivec2(i+1,j+1),0).r * w01 * w11;
-    float rightDown = uBlocked(i+1,j) ? 0.0 : texelFetch(uTex, ivec2(i+1,j),0).r * w01 * w10;
+    float value = 0.0;
+    float sumW = 0.0;
+    if(!uBlocked(i,j))
+    {
+        value += texelFetch(uTex, ivec2(i,j),0).r * w00 * w10;
+        sumW += w00 * w10;
+    }
+    if(!uBlocked(i,j+1))
+    {
+        value += texelFetch(uTex, ivec2(i,j+1),0).r * w00 * w11;
+        sumW += w00 * w11;
+    }
+    if(!uBlocked(i+1,j+1))
+    {
+        value += texelFetch(uTex, ivec2(i+1,j+1),0).r * w01 * w11;
+        sumW += w01 * w11;
+    }
+    if(!uBlocked(i+1,j))
+    {
+        value += texelFetch(uTex, ivec2(i+1,j),0).r * w01 * w10;
+        sumW += w01 * w10;
+    }
 
-    return (leftUp + leftDown + rightUp + rightDown);
+    return (sumW > 0.0) ? value/sumW : 0.0;
 }
 
 float interpolateVinGrid(vec2 position)
@@ -119,12 +148,30 @@ float interpolateVinGrid(vec2 position)
     float w10 = 1.0 - downDistance/dx; 
     float w11 = downDistance/dx; 
 
-    float leftDown = vBlocked(i,j) ? 0.0 : texelFetch(vTex, ivec2(i,j),0).r * w00 * w10;
-    float leftUp = vBlocked(i,j+1) ? 0.0 : texelFetch(vTex, ivec2(i,j+1),0).r * w00 * w11;
-    float rightUp = vBlocked(i+1,j+1) ? 0.0 : texelFetch(vTex, ivec2(i+1,j+1),0).r * w01 * w11;
-    float rightDown = vBlocked(i+1,j) ? 0.0 : texelFetch(vTex, ivec2(i+1,j),0).r * w01 * w10;
+    float value = 0.0;
+    float sumW = 0.0;
+    if(!vBlocked(i,j))
+    {
+        value += texelFetch(vTex, ivec2(i,j),0).r * w00 * w10;
+        sumW += w00 * w10;
+    }
+    if(!vBlocked(i,j+1))
+    {
+        value += texelFetch(vTex, ivec2(i,j+1),0).r * w00 * w11;
+        sumW += w00 * w11;
+    }
+    if(!vBlocked(i+1,j+1))
+    {
+        value += texelFetch(vTex, ivec2(i+1,j+1),0).r * w01 * w11;
+        sumW += w01 * w11;
+    }
+    if(!vBlocked(i+1,j))
+    {
+        value += texelFetch(vTex, ivec2(i+1,j),0).r * w01 * w10;
+        sumW += w01 * w10;
+    }
 
-    return (leftUp + leftDown + rightUp + rightDown);
+    return (sumW > 0.0) ? value/sumW : 0.0;
 }
 
 float sampleV(vec2 position)
@@ -174,10 +221,19 @@ vec2 clampV(vec2 p)
 void main()
 {
     ivec2 id = gl_GlobalInvocationID.xy;
+    if(id.x >= gridSize.x || id.y >= gridSize.y) return ;
+    uint type = texelFetch(cellType, id, 0).r;
 
+    if(type == SOLID)
+    {
+        float q = texelFetch(quantity, id, 0).r;
+        imageStore(quantityOut, id, vec4(q));
+        return;
+    }
     int i = id.x;
     int j = id.y;
-    if(i > 0 && i < gridSize.x && j < gridSize.y)
+
+    if(i < gridSize.x + 1 && j < gridSize.y)
     {
         vec2 positionU = vec2(i*dx+0.5*dx, j*dx);
         vec2 velocityOnU = vec2(texelFetch(uTex, ivec2(i,j), 0).r, interpolateVonUFace(i,j));
@@ -185,7 +241,7 @@ void main()
         float u = sampleU(backtracedPosition);
         imageStore(uOut, id, vec4(u));
     }
-    if(i < gridSize.x && j < gridSize.y && j > 0)
+    if(i < gridSize.x && j < gridSize.y + 1)
     {
         vec2 positionV = vec2(i*dx, j*dx+0.5*dx);
         vec2 velocityOnV = vec2(interpolateUonUFace(i,j), texelFetch(vTex, ivec2(i,j), 0).r);
