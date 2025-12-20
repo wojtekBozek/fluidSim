@@ -1,50 +1,30 @@
-//This shader advects velocities on the grid faces 
+#version 430 
 
-#version 430
+layout(local_size_x = 256) in;
 
-layout (binding = 0) sampler2D uTex;
-layout (binding = 1) sampler2D vTex;
-layout(binding = 3) uniform usampler2D cellType;
+layout(r8ui, binding = 0) uniform usampler2D cellType;
 
-layout(rgba32f, binding = 4) uniform writeonly image2D uOut;
-layout(rgba32f, binding = 5) uniform writeonly image2D vOut;
+uniform ivec2 gridSize;
 
-uniform vec2 gridSize;
+struct Particle {
+    vec2 position;
+};
+
+layout(std430, binding = 1) buffer Particles {
+    Particle particles[];
+};
+
+
+layout (binding = 2) sampler2D uTex;
+layout (binding = 3) sampler2D vTex;
+
+
 uniform float dt;
 uniform float dx;
-
-const int Nx = gridSize.x; 
+uniform uint numOfParticles;
+const int Nx = gridSize.x;
 const int Ny = gridSize.y;
-// functions for interpolating values of missing velocity component (v for velocity on u face and u for velocity on v face) from neighboring perpendicular faces 
-// we assume that i and j check for border faces have been dealt on earlier as update of velocity on those faces is not needed since it will still b zero by bc.
-float interpolateUonVFace(int i, int j)
-{
-    int i0 = clamp(i,     0, Nx);
-    int i1 = clamp(i + 1, 0, Nx);
 
-    int j0 = clamp(j - 1, 0, Ny - 1);
-    int j1 = clamp(j,     0, Ny - 1);
-
-    float leftUp = texelFetch(uTex, ivec2(i0,j1),0).r;
-    float leftDown = texelFetch(uTex, ivec2(i0,j0),0).r;
-    float rightUp = texelFetch(uTex, ivec2(i1,j1),0).r;
-    float rightDown = texelFetch(uTex, ivec2(i1,j0),0).r;
-    return (leftUp+leftDown+rightUp+rightDown)/4.0;
-}
-
-float interpolateVonUFace(int i, int j)
-{
-    int i0 = clamp(i-1,     0, Nx-1);
-    int i1 = clamp(i + 1, 0, Nx-1);
-
-    int j0 = clamp(j, 0, Ny);
-    int j1 = clamp(j+1,     0, Ny);
-    float leftUp = texelFetch(vTex, ivec2(i0,j1),0).r;
-    float leftDown = texelFetch(vTex, ivec2(i0,j0),0).r;
-    float rightUp = texelFetch(vTex, ivec2(i1,j1),0).r;
-    float rightDown = texelFetch(vTex, ivec2(i1,j0),0).r;
-    return (leftUp+leftDown+rightUp+rightDown)/4.0;
-}
 
 int checkCellType(ivec2 c)
 {
@@ -83,7 +63,6 @@ vec2 clampV(vec2 p)
         vec2(0.5*dx, 0.0),
         vec2((gridSize.x-0.5)*dx, gridSize.y*dx));
 }
-
 
 float interpolateUinGrid(vec2 position)
 { 
@@ -192,61 +171,26 @@ vec2 clampPosition(vec2 position)
     position = clamp(position, minPos, maxPos);
     return position;
 }
-
-vec2 backTracePositionRK2(vec2 position, vec2 velocity)
+vec2 forwardPosition(vec2 position, vec2 velocity)
 {
-    vec2 halfPos = position - dt*velocity/2.0;
-    halfPos = clampPosition(halfPos);
-    vec2 halfVelocity = vec2(sampleU(halfPos), sampleV(halfPos));
-
-    vec2 backtracedPosition = position - dt*halfVelocity;
-    backtracedPosition = clampPosition(backtracedPosition);
-    return backtracedPosition;
-}
-
-vec2 clampU(vec2 p)
-{
-    return clamp(p,
-        vec2(0.0,        0.5*dx),
-        vec2(Nx*dx, (Ny-0.5)*dx));
-}
-
-vec2 clampV(vec2 p)
-{
-    return clamp(p,
-        vec2(0.5*dx, 0.0),
-        vec2((Nx-0.5)*dx, Ny*dx));
+    vec2 newPosition = position + dt*velocity;
+    newPosition = clampPosition(newPosition);
+    ivec2 newCell = ivec2(newPosition);
+    if(texelFetch(cellType, newCell, 0).r == SOLID)
+    {
+        newPosition = position;
+    }
+    return newPosition;
 }
 
 void main()
 {
-    ivec2 id = gl_GlobalInvocationID.xy;
-    if(id.x >= gridSize.x || id.y >= gridSize.y) return ;
-    uint type = texelFetch(cellType, id, 0).r;
+    uint id = gl_GlobalInvocationID.x;
+    if(id > numOfParticles) return;
 
-    if(type == SOLID)
-    {
-        float q = texelFetch(quantity, id, 0).r;
-        imageStore(quantityOut, id, vec4(q));
-        return;
-    }
-    int i = id.x;
-    int j = id.y;
-
-    if(i < gridSize.x + 1 && j < gridSize.y)
-    {
-        vec2 positionU = vec2(i*dx+0.5*dx, j*dx);
-        vec2 velocityOnU = vec2(texelFetch(uTex, ivec2(i,j), 0).r, interpolateVonUFace(i,j));
-        vec2 backtracedPosition = backTracePositionRK2(position, velocityOnU);
-        float u = sampleU(backtracedPosition);
-        imageStore(uOut, id, vec4(u));
-    }
-    if(i < gridSize.x && j < gridSize.y + 1)
-    {
-        vec2 positionV = vec2(i*dx, j*dx+0.5*dx);
-        vec2 velocityOnV = vec2(interpolateUonUFace(i,j), texelFetch(vTex, ivec2(i,j), 0).r);
-        vec2 backtracedPosition = backTracePositionRK2(position, velocityOnV);
-        float v = sampleV(backtracedPosition);
-        imageStore(vOut, id, vec4(v));
-    }
+    Particle particle = particles[id];
+    vec2 position = particle.position;
+    vec2 velocity = vec2(sampleU(position), sampleV(position));
+    vec2 newPosition = forwardPosition(position, velocity);
+    particle[id].position = newPosition;
 }
