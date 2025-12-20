@@ -1,9 +1,9 @@
 #version 430 
 
-layout (binding = 0, rgba32f) uniform image2D uTex;
-layout (binding = 1, rgba32f) unfiorm image2D vTex;
+layout (binding = 0, r32f) uniform image2D uTex;
+layout (binding = 1, r32f) unfiorm image2D vTex;
 
-layout (binding = 2, rgba32f) uniform usampler2D cellType;
+layout (binding = 2, r32f) uniform usampler2D cellType;
 
 
 const uint FLUID = 0u;

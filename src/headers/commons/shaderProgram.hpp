@@ -25,6 +25,11 @@ public:
     { 
         glUniform1i(glGetUniformLocation(m_programID, name.c_str()), value); 
     }
+
+    void setInt2(const std::string& name, int value1, int value2) const
+    {
+        glUniform2i(glGetUniformLocation(m_programID, name.c_str()), value1, value2);
+    }
     void setUint(const std::string &name, GLuint value) const
     { 
         glUniform1ui(glGetUniformLocation(m_programID, name.c_str()), value); 

@@ -1,7 +1,7 @@
 #version 430
 
-layout (rgba32f ,binding = 0) uniform image2D uTex;
-layout (rgba32f ,binding = 1) uniform image2D vTex;
+layout (r32f ,binding = 0) uniform image2D uTex;
+layout (r32f ,binding = 1) uniform image2D vTex;
 
 layout (binding = 2) uniform sampler2D pressure;
 layout (binding = 3) uniform usampler2D cellType;
