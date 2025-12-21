@@ -2,6 +2,8 @@
 #include "context.hpp"
 #include "baseGrid.hpp"
 #include "gridSimUI.hpp"
+#include "gridrenderer.hpp"
+#include "grid2d.hpp"
 class GridSimulationContext : public AbstractContext
 {
 public:
@@ -11,5 +13,6 @@ public:
 	void showUI() override;
 private:
 	std::shared_ptr<BaseUI> simulationUI;
-	std::shared_ptr<BaseGrid> simulation;
+	std::shared_ptr<Grid2D> simulation;
+	std::shared_ptr<GridRenderer> renderer;
 };

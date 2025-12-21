@@ -1,7 +1,7 @@
 #pragma once
 #include "baseUI.hpp"
 #include "baseGrid.hpp"
-
+#include "grid2d.hpp"
 class GridSimulationUI : public BaseUI
 {
 public:

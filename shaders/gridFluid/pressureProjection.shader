@@ -1,10 +1,11 @@
 #version 430
 
-layout (r32f ,binding = 0) uniform image2D uTex;
-layout (r32f ,binding = 1) uniform image2D vTex;
+layout(local_size_x=16, local_size_y=16) in;
+layout(r32f ,binding = 0) uniform image2D uTex;
+layout(r32f ,binding = 1) uniform image2D vTex;
 
-layout (binding = 2) uniform sampler2D pressure;
-layout (binding = 3) uniform usampler2D cellType;
+layout(binding = 2) uniform sampler2D pressure;
+layout(binding = 3) uniform usampler2D cellType;
 
 uniform float dt;
 uniform float dx;

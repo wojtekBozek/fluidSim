@@ -1,7 +1,7 @@
 #version 430
-
-layout (rgba32f, binding=0) image2D vTex;
-layout(rgba32f, binding = 1) image2D writeonly vOut;
+layout(local_size_x=16, local_size_y=16) in;
+layout(r32f, binding=0) image2D vTex;
+layout(r32f, binding = 1) image2D writeonly vOut;
 uniform float vAccelerations;
 unfiorm float dt;
 uniform uvec2 gridSize;

@@ -1,9 +1,9 @@
-#version 430 
+#version 430
+layout(local_size_x=16, local_size_y=16) in;
+layout(binding = 0, r32f) uniform image2D uTex;
+layout(binding = 1, r32f) uniform image2D vTex;
 
-layout (binding = 0, r32f) uniform image2D uTex;
-layout (binding = 1, r32f) unfiorm image2D vTex;
-
-layout (binding = 2, r32f) uniform usampler2D cellType;
+layout(binding = 2) uniform usampler2D cellType;
 
 
 const uint FLUID = 0u;

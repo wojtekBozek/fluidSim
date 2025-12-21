@@ -1,13 +1,13 @@
 #version 430
 
-layout (local_size_x=16, local_size_y=16);
+layout(local_size_x=16, local_size_y=16) in;
 
-layout (binding = 0) uniform sampler2D uTex;
-layout (binding = 1) uniform sampler2D vTex;
+layout(binding = 0) uniform sampler2D uTex;
+layout(binding = 1) uniform sampler2D vTex;
 
-layout (binding = 2) uniform usampler2D cellType;
+layout(binding = 2) uniform usampler2D cellType;
 
-layout (binding = 3, r32f) uniform writeonly image2D divergence;
+layout(binding = 3, r32f) uniform writeonly image2D divergence;
 
 uniform float dx; 
 uniform ivec2 gridSize;

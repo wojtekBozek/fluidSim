@@ -2,14 +2,15 @@
 
 #version 430
 
-layout (r32f, binding = 0) sampler2D uTex;
-layout (r32f, binding = 1) sampler2D vTex;
+layout(local_size_x=16, local_size_y=16) in;
+layout(binding = 0) uniform sampler2D uTex;
+layout(binding = 1) uniform sampler2D vTex;
 layout(binding = 3) uniform usampler2D cellType;
 
 layout(r32f, binding = 4) uniform writeonly image2D uOut;
 layout(r32f, binding = 5) uniform writeonly image2D vOut;
 
-uniform vec2 gridSize;
+uniform ivec2 gridSize;
 uniform float dt;
 uniform float dx;
 
@@ -87,9 +88,9 @@ vec2 clampV(vec2 p)
 
 float interpolateUinGrid(vec2 position)
 { 
-    int i = position.x/dx;
+    int i = int(position.x/dx);
     float backDistance = position.x - i*dx;
-    int j = position.y/dx;
+    int j = int(position.y/dx);
     float downDistance = (position.y - j*dx);
 
     if(downDistance < dx/2.0)
@@ -131,10 +132,10 @@ float interpolateUinGrid(vec2 position)
 
 float interpolateVinGrid(vec2 position)
 { 
-    int i = position.x/dx;
+    int i = int(position.x/dx);
     float backDistance = position.x - i*dx;
     
-    int j = position.y/dx;
+    int j = int(position.y/dx);
     float downDistance = position.y - j*dx;
 
     if(backDistance < dx/2.0)
@@ -204,30 +205,14 @@ vec2 backTracePositionRK2(vec2 position, vec2 velocity)
     return backtracedPosition;
 }
 
-vec2 clampU(vec2 p)
-{
-    return clamp(p,
-        vec2(0.0,        0.5*dx),
-        vec2(Nx*dx, (Ny-0.5)*dx));
-}
-
-vec2 clampV(vec2 p)
-{
-    return clamp(p,
-        vec2(0.5*dx, 0.0),
-        vec2((Nx-0.5)*dx, Ny*dx));
-}
-
 void main()
 {
-    ivec2 id = gl_GlobalInvocationID.xy;
+    ivec2 id = ivec2(gl_GlobalInvocationID.xy);
     if(id.x >= gridSize.x || id.y >= gridSize.y) return ;
     uint type = texelFetch(cellType, id, 0).r;
 
     if(type == SOLID)
     {
-        float q = texelFetch(quantity, id, 0).r;
-        imageStore(quantityOut, id, vec4(q));
         return;
     }
     int i = id.x;
@@ -237,15 +222,15 @@ void main()
     {
         vec2 positionU = vec2(i*dx+0.5*dx, j*dx);
         vec2 velocityOnU = vec2(texelFetch(uTex, ivec2(i,j), 0).r, interpolateVonUFace(i,j));
-        vec2 backtracedPosition = backTracePositionRK2(position, velocityOnU);
+        vec2 backtracedPosition = backTracePositionRK2(positionU, velocityOnU);
         float u = sampleU(backtracedPosition);
         imageStore(uOut, id, vec4(u));
     }
     if(i < gridSize.x && j < gridSize.y + 1)
     {
         vec2 positionV = vec2(i*dx, j*dx+0.5*dx);
-        vec2 velocityOnV = vec2(interpolateUonUFace(i,j), texelFetch(vTex, ivec2(i,j), 0).r);
-        vec2 backtracedPosition = backTracePositionRK2(position, velocityOnV);
+        vec2 velocityOnV = vec2(interpolateUonVFace(i,j), texelFetch(vTex, ivec2(i,j), 0).r);
+        vec2 backtracedPosition = backTracePositionRK2(positionV, velocityOnV);
         float v = sampleV(backtracedPosition);
         imageStore(vOut, id, vec4(v));
     }

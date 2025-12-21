@@ -1,11 +1,12 @@
 #version 430 
 
-layout (binding = 0) uniform sampler2D pressureIn;
-layout (binding = 1) uniform sampler2D divergence;
+layout(local_size_x=16, local_size_y=16) in;
+layout(binding = 0) uniform sampler2D pressureIn;
+layout(binding = 1) uniform sampler2D divergence;
 
-layout (binding = 2) uniform usampler2D cellType;
+layout(binding = 2) uniform usampler2D cellType;
 
-layout (binding = 3) uniform writeonly image2D pressureOut;
+layout(binding = 3, r32f) uniform writeonly image2D pressureOut;
 
 uniform float dx;
 uniform ivec2 gridSize;
