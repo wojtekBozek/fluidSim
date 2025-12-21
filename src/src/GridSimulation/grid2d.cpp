@@ -5,7 +5,7 @@ void Grid2D::run()
 {
     /*
     0. calculate timestep based on max velocity
-    1. LevelSet method instead of particle advection
+    1. particle advection
     2. cell reconfiguration
     3. velocity advection
     4. External forces
@@ -14,8 +14,37 @@ void Grid2D::run()
     7. Boundary conditions (optional if not already applied)
     */
 
+    GLuint query;
+    glGenQueries(1, &query);
 
+    glBeginQuery(GL_TIME_ELAPSED, query);
+    
+    m_clearFluidShader->useProgram();
+    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0,
+        GL_READ_WRITE, GL_R32F);
+    
+    glDispatchCompute(nx / 16, ny / 16, 1);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
+    
+    m_cellUpdateShader->useProgram();
+    
+    m_cellUpdateShader->setIVec2("gridSize", glm::ivec2(nx,ny));
+    m_cellUpdateShader->setVec2("gridMin", glm::vec2(0,0));
+    m_cellUpdateShader->setVec2("gridMax", glm::vec2(nx*dx-dx,ny*dx-dx));
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_particleBuffer);
+    glDispatchCompute((particles.size() + 255) / 256, 1, 1);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
+    
+    glEndQuery(GL_TIME_ELAPSED);
+    
+    glGetQueryObjectui64v(query, GL_QUERY_RESULT, &m_computeTime);
+}
 
+void Grid2D::setup()
+{
+    setShaders();
+    setTextures();
+    initilizeGrid();
 }
 
 void Grid2D::setDimensions(uint32_t x, uint32_t y)
@@ -39,7 +68,7 @@ void Grid2D::initilizeGrid()
     /*
     m_initShader->useProgram();
 
-    glBindImageTexture(0, CellTypeTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R8UI);
+    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R8UI);
     glBindImageTexture(1, uInTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
     glBindImageTexture(2, vInTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
     glBindImageTexture(3, pressureInTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
@@ -52,7 +81,7 @@ void Grid2D::initilizeGrid()
     std::vector<GLubyte> type(nx * ny, 0);
     for (uint32_t y = 0; y < ny; ++y)
     {
-        for (uint32_t x = nx; x < nx; ++x)
+        for (uint32_t x = 0; x < nx; ++x)
         {
             if (x >= initFluidX && x < initFluidX + initFluidWidth && y >= initFluidY && y < initFluidY + initFluidHeight)
             {
@@ -65,9 +94,9 @@ void Grid2D::initilizeGrid()
             }
         }
     }
-    std::cout << "Num of Particles: " << type.size() << ".\n";
-    glBindTexture(GL_TEXTURE_2D, CellTypeTex);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, nx, ny, GL_RED, GL_UNSIGNED_BYTE, type.data());
+    std::cout << "Num of Particles: " << particles.size() << ".\n";
+    glBindTexture(GL_TEXTURE_2D, cellTypeTex);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, nx, ny, GL_RED_INTEGER, GL_UNSIGNED_BYTE, type.data());
 
     GLuint bufsize = sizeof(particles);
     if (glIsBuffer(m_particleBuffer) == GL_FALSE)
@@ -75,7 +104,7 @@ void Grid2D::initilizeGrid()
         glGenBuffers(1, &m_particleBuffer);
     }
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_particleBuffer);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, &m_particleBuffer, GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, particles.data(), GL_DYNAMIC_DRAW);
 }
 
 void Grid2D::setTextures()
@@ -132,38 +161,41 @@ void Grid2D::setTextures()
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_R32F, nx, ny);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, nx, ny, GL_RED, GL_FLOAT, zeros.data());
 
-    glGenTextures(1, &CellTypeTex);
-    glBindTexture(GL_TEXTURE_2D, CellTypeTex);
+    glGenTextures(1, &cellTypeTex);
+    glBindTexture(GL_TEXTURE_2D, cellTypeTex);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glTexStorage2D(GL_TEXTURE_2D, 1, GL_R8UI, nx, ny);
     std::vector<GLubyte> type(nx * ny, 0);
-    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, nx, ny, GL_RED, GL_UNSIGNED_BYTE, type.data());
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, nx, ny, GL_RED_INTEGER, GL_UNSIGNED_BYTE, type.data());
 
 }
 
 void Grid2D::setShaders()
 {
-    m_initShader = std::make_unique<ShaderProgram>();
-    m_initShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/initShader.shader");
-    m_initShader->linkProgram();
+    //m_initShader = std::make_unique<ShaderProgram>();
+    //m_initShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/initShader.shader");
+    //m_initShader->linkProgram();
 
+    
     m_boundaryShader = std::make_unique<ShaderProgram>();
-    m_boundaryShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/boundaryNoSplip.shader");
+    m_boundaryShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/boundaryNoSlip.shader");
     m_boundaryShader->linkProgram();
-
+    
     m_divergenceShader = std::make_unique<ShaderProgram>();
     m_divergenceShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/divergence.shader");
     m_divergenceShader->linkProgram();
-
+    
     m_particleAdvectionShader = std::make_unique<ShaderProgram>();
     m_particleAdvectionShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/particleForwardAdvection.shader");
     m_particleAdvectionShader->linkProgram();
-
+    
     m_velocityAdvectionShader = std::make_unique<ShaderProgram>();
     m_velocityAdvectionShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/advectVelocities.shader");
     m_velocityAdvectionShader->linkProgram();
-
+    /*
     m_jacobiPSolverShader = std::make_unique<ShaderProgram>();
     m_jacobiPSolverShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/jacobiPressureSolver.shader");
     m_jacobiPSolverShader->linkProgram();
@@ -171,12 +203,16 @@ void Grid2D::setShaders()
     m_pressureProjectionShader = std::make_unique<ShaderProgram>();
     m_pressureProjectionShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/pressureProjection.shader");
     m_pressureProjectionShader->linkProgram();
-
+    */
     m_cellUpdateShader = std::make_unique<ShaderProgram>();
     m_cellUpdateShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/gridCellTypeUpdate.shader");
     m_cellUpdateShader->linkProgram();
 
-    m_addForcesShader = std::make_unique<ShaderProgram>();
-    m_addForcesShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/addForces.shader");
-    m_addForcesShader->linkProgram();
+    //m_addForcesShader = std::make_unique<ShaderProgram>();
+    //m_addForcesShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/addExternalForces.shader");
+    //m_addForcesShader->linkProgram();
+
+    m_clearFluidShader = std::make_unique<ShaderProgram>();
+    m_clearFluidShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/zeroFluid.shader");
+    m_clearFluidShader->linkProgram();
 }

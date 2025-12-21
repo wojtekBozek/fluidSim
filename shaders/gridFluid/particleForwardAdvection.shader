@@ -2,7 +2,7 @@
 
 layout(local_size_x = 256) in;
 
-layout(r8ui, binding = 0) uniform usampler2D cellType;
+layout(binding = 0) uniform usampler2D cellType;
 
 uniform ivec2 gridSize;
 
@@ -15,8 +15,8 @@ layout(std430, binding = 1) buffer Particles {
 };
 
 
-layout (binding = 2) sampler2D uTex;
-layout (binding = 3) sampler2D vTex;
+layout(binding = 2) uniform sampler2D uTex;
+layout(binding = 3) uniform sampler2D vTex;
 
 
 uniform float dt;
@@ -66,9 +66,9 @@ vec2 clampV(vec2 p)
 
 float interpolateUinGrid(vec2 position)
 { 
-    int i = position.x/dx;
+    int i = int(position.x/dx);
     float backDistance = position.x - i*dx;
-    int j = position.y/dx;
+    int j = int(position.y/dx);
     float downDistance = (position.y - j*dx);
 
     if(downDistance < dx/2.0)
@@ -110,10 +110,10 @@ float interpolateUinGrid(vec2 position)
 
 float interpolateVinGrid(vec2 position)
 { 
-    int i = position.x/dx;
+    int i = int(position.x/dx);
     float backDistance = position.x - i*dx;
     
-    int j = position.y/dx;
+    int j = int(position.y/dx);
     float downDistance = position.y - j*dx;
 
     if(backDistance < dx/2.0)
@@ -192,5 +192,5 @@ void main()
     vec2 position = particle.position;
     vec2 velocity = vec2(sampleU(position), sampleV(position));
     vec2 newPosition = forwardPosition(position, velocity);
-    particle[id].position = newPosition;
+    particles[id].position = newPosition;
 }

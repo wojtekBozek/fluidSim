@@ -16,6 +16,11 @@ layout(std430, binding = 1) buffer Particles {
     Particle particles[];
 };
 
+const uint FLUID = 0u;
+const uint AIR = 1u;
+const uint SOLID = 2u;
+
+
 void main()
 {
     uint id = gl_GlobalInvocationID.x;
@@ -28,5 +33,5 @@ void main()
         any(greaterThanEqual(cell, gridSize)))
         return;
 
-    imageStore(grid, cell, uvec4(1)); 
+    imageStore(grid, cell, uvec4(FLUID)); 
 }

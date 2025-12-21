@@ -1,11 +1,11 @@
 #version 430
 //Zmienić na adwekcję pola prędkości meh
-layout(local_size_x=16, local_size_y=16);
+layout(local_size_x=16, local_size_y=16) in;
 
-layout(r32f, binding = 0) uniform sampler2D uTex;
-layout(r32f, binding = 1) uniform sampler2D vTex;
+layout(binding = 0) uniform sampler2D uTex;
+layout(binding = 1) uniform sampler2D vTex;
 
-layout(r32f, binding = 2) uniform sampler2D quantity;
+layout(binding = 2) uniform sampler2D quantity;
 layout(binding = 3) uniform usampler2D cellType;
 
 layout(r32f, binding = 4) uniform writeonly image2D quantityOut;
