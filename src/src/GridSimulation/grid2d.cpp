@@ -175,11 +175,6 @@ void Grid2D::setTextures()
 
 void Grid2D::setShaders()
 {
-    //m_initShader = std::make_unique<ShaderProgram>();
-    //m_initShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/initShader.shader");
-    //m_initShader->linkProgram();
-
-    
     m_boundaryShader = std::make_unique<ShaderProgram>();
     m_boundaryShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/boundaryNoSlip.shader");
     m_boundaryShader->linkProgram();
@@ -195,7 +190,7 @@ void Grid2D::setShaders()
     m_velocityAdvectionShader = std::make_unique<ShaderProgram>();
     m_velocityAdvectionShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/advectVelocities.shader");
     m_velocityAdvectionShader->linkProgram();
-    /*
+
     m_jacobiPSolverShader = std::make_unique<ShaderProgram>();
     m_jacobiPSolverShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/jacobiPressureSolver.shader");
     m_jacobiPSolverShader->linkProgram();
@@ -203,14 +198,14 @@ void Grid2D::setShaders()
     m_pressureProjectionShader = std::make_unique<ShaderProgram>();
     m_pressureProjectionShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/pressureProjection.shader");
     m_pressureProjectionShader->linkProgram();
-    */
+    
     m_cellUpdateShader = std::make_unique<ShaderProgram>();
     m_cellUpdateShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/gridCellTypeUpdate.shader");
     m_cellUpdateShader->linkProgram();
 
-    //m_addForcesShader = std::make_unique<ShaderProgram>();
-    //m_addForcesShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/addExternalForces.shader");
-    //m_addForcesShader->linkProgram();
+    m_addForcesShader = std::make_unique<ShaderProgram>();
+    m_addForcesShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/addExternalForces.shader");
+    m_addForcesShader->linkProgram();
 
     m_clearFluidShader = std::make_unique<ShaderProgram>();
     m_clearFluidShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/zeroFluid.shader");

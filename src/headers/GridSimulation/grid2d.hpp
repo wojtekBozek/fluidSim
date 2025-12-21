@@ -36,7 +36,7 @@ private:
 
 	GLuint m_particleBuffer;
 	GLuint64 m_computeTime;
-	std::unique_ptr<ShaderProgram> m_initShader;
+
 	std::unique_ptr<ShaderProgram> m_clearFluidShader;
 	std::unique_ptr<ShaderProgram> m_velocityAdvectionShader;
 	std::unique_ptr<ShaderProgram> m_divergenceShader;
