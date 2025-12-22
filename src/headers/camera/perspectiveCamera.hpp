@@ -21,9 +21,11 @@ namespace rendering
 
 		void updateWindowProperties() override
 		{
-
 			int width, height;
 			glfwGetFramebufferSize(window, &width, &height);
+			printf("Framebuffer: %d x %d\n", width, height);
+			if(height == 0) { return;}
+			
 			if (windowWidth != width || height != windowHeight)
 			{
 				windowWidth = width;

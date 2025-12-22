@@ -10,6 +10,8 @@ struct FluidParticle{
     uint type;
 };
 
+layout (location = 0) in float dummy;
+
 layout(std430, binding = 0) buffer PosBuffer {
     FluidParticle particles[];
 };
@@ -28,8 +30,13 @@ flat out uint isFluid;
 
 void main() {
     
-    uint particleID = gl_InstanceID.x;
-    if(particleID >= numOfParticles) return;
+    uint particleID = uint(gl_InstanceID);
+    if (particleID >= numOfParticles)
+    {
+        gl_Position = vec4(0.0, 0.0, 0.0, 1.0);
+        gl_PointSize = 0.0;
+        return;
+    }
     vec4 pos = particles[particleID].position; //particles[particleID].position;
     isFluid = particles[particleID].type;
     vec4 viewPos = view * pos;

@@ -5,16 +5,14 @@
 #include "orthographicCamera.hpp"
 
 void SPHSimulationRenderer::render(std::shared_ptr<rendering::Camera> camera)
-{
+{/**/
     //simulation.simulationStep(m_timeStep);
     shaderProgram->useProgram();
     glm::mat4 viewMatrix = camera->getView();
     glm::mat4 projMatrix = camera->getProjection();
     shaderProgram->setMat4("view", viewMatrix);
     shaderProgram->setMat4("proj", projMatrix);
-    int height, width;
-    glfwGetFramebufferSize(camera->getWindow(), &width, &height);
-    shaderProgram->setFloat("viewportHeight", height);
+    shaderProgram->setFloat("viewportHeight", camera->getWindowHeight());
     shaderProgram->setUint("numOfParticles", simulation->getNumOfParticles());
     if(camera->getCameraType() == rendering::CameraType::perspective)
     {
@@ -37,8 +35,27 @@ void SPHSimulationRenderer::render(std::shared_ptr<rendering::Camera> camera)
 void SPHSimulationRenderer::setupBackend()
 {
     //simulation->setFluidAndParticles();
+
+    GLuint dummyVBO;
+    float dummy = 0.0f;
+
+    glGenBuffers(1, &dummyVBO);
+    glBindBuffer(GL_ARRAY_BUFFER, dummyVBO);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(float), &dummy, GL_STATIC_DRAW);
+
     glGenVertexArrays(1, &quadVAO);
     glBindVertexArray(quadVAO);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(
+        0,              // location
+        1,              // size
+        GL_FLOAT,
+        GL_FALSE,
+        sizeof(float),
+        (void*)0
+    );
+    glBindVertexArray(0);
+
     glEnable(GL_PROGRAM_POINT_SIZE);
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);  // Default: passes if incoming depth < stored depth
