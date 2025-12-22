@@ -25,18 +25,15 @@ void MyApp::mainLoop()
     {
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glfwPollEvents();
-
+        
         rendering::CameraHandler::processMovement(window);
         currentFrame = glfwGetTime();
         rendering::CameraHandler::setCurrentSpeed(static_cast<float>(currentFrame - lastFrame));
         lastFrame = currentFrame;
-        glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
         activeContext->processContext(rendering::CameraHandler::getInstance()->getCamera());
         glBindVertexArray(0);
         glUseProgram(0);
 
-        //ProcessInput(window, GLFW_KEY_ESCAPE, GLFW_PRESS, closeWindow, this->window, GLFW_TRUE);
         if((rendering::CameraHandler::getInstance())->isRotationOn() == false)
             activeContext->showUI();
         glfwSwapBuffers(window);
@@ -108,9 +105,8 @@ void MyApp::initialize()
 
     int  bufferWidth, bufferHeight;
     glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
+	printf("Framebuffer: %d x %d\n", bufferWidth, bufferHeight);
     glfwMakeContextCurrent(window);
-
-    
     // Set context for GLEW to use
 
     //Allow modern extension feature;
@@ -123,11 +119,20 @@ void MyApp::initialize()
         glfwTerminate();
         exit(1);
     }
+    glfwGetFramebufferSize(window, &bufferWidth, &bufferHeight);
     glViewport(0, 0, bufferWidth, bufferHeight);
+	printf("Framebuffer: %d x %d\n", bufferWidth, bufferHeight);
+    
+    
+    glClearColor(1.0f, 1.0f, 1.0f, 0.0f);
     glEnable(GL_CULL_FACE);
     glEnable(GL_DEPTH_TEST); 
     
     glCullFace(GL_BACK);
+
+    printf("Vendor:   %s\n", glGetString(GL_VENDOR));
+    printf("Renderer: %s\n", glGetString(GL_RENDERER));
+    printf("Version:  %s\n", glGetString(GL_VERSION));
 }
 
 void MyApp::cleanup()
