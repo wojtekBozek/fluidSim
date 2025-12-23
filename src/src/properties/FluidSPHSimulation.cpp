@@ -303,7 +303,8 @@ void FluidSPHSimulation::simulationStep(float timeStep)
 
     
     GLuint64 temp = 0;
-    while(temp < 16000000){
+    uint32_t steps = 0;
+    while(temp < 16000000 && steps*m_timeStep < 0.0166){
     glBeginQuery(GL_TIME_ELAPSED, query);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_hashBuf);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_nextNodeBuf);
@@ -340,6 +341,7 @@ void FluidSPHSimulation::simulationStep(float timeStep)
 
     glGetQueryObjectui64v(query, GL_QUERY_RESULT, &m_computeTime);
     temp += m_computeTime;
+    steps++;
     }
 }
 
