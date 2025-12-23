@@ -27,7 +27,7 @@ namespace rendering
 		}
 		void updateWindowProperties() override
 		{
-
+			glfwGetFramebufferSize(window, &windowWidth, &windowHeight);
 		}
 
 	private:
