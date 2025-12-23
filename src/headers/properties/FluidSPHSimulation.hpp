@@ -110,7 +110,7 @@ public:
 
     void simulationStep(float timeStep);
     float getSimulationStep() const { return m_timeStep; }
-    float setSimulationStep(float timeStep) { m_timeStep = timeStep; }
+    void setSimulationStep(float timeStep) { m_timeStep = timeStep; }
 
     const Domain& getSimulationDomain() const { return m_simulationDomain; }
     void setSimuilationDomainSize(glm::vec3 sizeVec) { m_simulationDomain.size = sizeVec; }
@@ -159,6 +159,7 @@ private:
     Fluid m_fluid, refFluid;
     std::vector<FluidParticle> m_particles;
     std::vector<FluidParticle> m_boundaryParticles;
+    GLuint hashCoef = 1;
     uint32_t m_numOfParticles = 0;
     float m_timeStep = 0.001f;
     float m_particleRadius = 0.05f;

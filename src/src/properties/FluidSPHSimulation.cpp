@@ -217,7 +217,7 @@ void FluidSPHSimulation::setMemoryLayout()
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_fluidBuf);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, &m_fluid, GL_DYNAMIC_DRAW);
 
-    m_hashValues = std::vector<GLint>(m_numOfParticles, -1);
+    m_hashValues = std::vector<GLint>(hashCoef * m_numOfParticles, -1);
     m_nextNodes = std::vector<GLint>(m_numOfParticles, -1);
 
     bufsize = m_numOfParticles * sizeof(GLint);
@@ -226,7 +226,7 @@ void FluidSPHSimulation::setMemoryLayout()
         glGenBuffers(1, &m_hashBuf);
     }
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_hashBuf);
-    glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, m_hashValues.data(), GL_DYNAMIC_DRAW);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, hashCoef * bufsize, m_hashValues.data(), GL_DYNAMIC_DRAW);
     if (glIsBuffer(m_nextNodeBuf) == GL_FALSE)
     {
         glGenBuffers(1, &m_nextNodeBuf);
@@ -238,17 +238,17 @@ void FluidSPHSimulation::setMemoryLayout()
 
     m_resetHashTableComputeShader->useProgram();
     m_resetHashTableComputeShader->setUint("numOfParticles", m_numOfParticles);
-    m_resetHashTableComputeShader->setUint("tableSize", m_numOfParticles);
+    m_resetHashTableComputeShader->setUint("tableSize", hashCoef * m_numOfParticles);
 
     m_initHashTableComputeShader->useProgram();
     m_initHashTableComputeShader->setUint("numOfParticles", m_numOfParticles);
-    m_initHashTableComputeShader->setUint("tableSize", m_numOfParticles);
+    m_initHashTableComputeShader->setUint("tableSize", hashCoef * m_numOfParticles);
     m_initHashTableComputeShader->setFloat("cellSize", 2.0 * m_kernelRadius);
 
     m_pressureNdensityComputeShader->useProgram();
     m_pressureNdensityComputeShader->setUint("numOfParticles", m_numOfParticles);
     m_pressureNdensityComputeShader->setFloat("sphKernelRadius", m_kernelRadius);
-    m_pressureNdensityComputeShader->setUint("tableSize", m_numOfParticles);
+    m_pressureNdensityComputeShader->setUint("tableSize", hashCoef * m_numOfParticles);
     m_pressureNdensityComputeShader->setFloat("cellSize", 2.0 * m_kernelRadius);
     m_pressureNdensityComputeShader->setUint("DIMENSION", m_dimension);
 
@@ -260,7 +260,7 @@ void FluidSPHSimulation::setMemoryLayout()
     m_accelerationComputeShader->setVec3("domainRefPos", m_simulationDomain.posittion);
     m_accelerationComputeShader->setVec3("domainDimennsions", m_simulationDomain.size);
     m_accelerationComputeShader->setFloat("boundaryMaxDist", m_boundCof * m_kernelRadius);
-    m_accelerationComputeShader->setUint("tableSize", m_numOfParticles);
+    m_accelerationComputeShader->setUint("tableSize", hashCoef * m_numOfParticles);
     m_accelerationComputeShader->setFloat("cellSize", 2.0 * m_kernelRadius);
     m_accelerationComputeShader->setUint("toonerP", 7);
     m_accelerationComputeShader->setFloat("stiffnessK", 35000);
