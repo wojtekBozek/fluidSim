@@ -80,7 +80,28 @@ void SPHsimulationUI::fluidDensityTextInput()
 
 void SPHsimulationUI::dimensionComboBox()
 {
-	
+	if (refSimulation->getSimulationDimension() == DIMENSION_2)
+	{
+		if (ImGui::Button("Set 3D dim"))
+		{
+			refSimulation->setSimulationDimension(DIMENSION_3);
+			refSimulation->clearSimulation();
+			refSimulation->setSimulationState();
+			refSimulation->setFluidAndParticles();
+			refSimulation->setMemoryLayout();
+		}	
+	}
+	else if(refSimulation->getSimulationDimension() == DIMENSION_3)
+	{
+		if (ImGui::Button("Set 2D dim"))
+		{
+			refSimulation->setSimulationDimension(DIMENSION_2);
+			refSimulation->clearSimulation();
+			refSimulation->setSimulationState();
+			refSimulation->setFluidAndParticles();
+			refSimulation->setMemoryLayout();
+		}
+	}
 }
 
 void SPHsimulationUI::fluidVolumeTextInputs()
