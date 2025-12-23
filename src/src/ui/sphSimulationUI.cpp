@@ -25,7 +25,7 @@ void SPHsimulationUI::showUI()
 	}
 	sphKernelRadiusSizeInput();
 	visualRadiusSizeInput();
-
+	timeStepInput();
 	numOfParticlesTextInfo();
 	volumeTextInfo();
 	nsComputationTextInfo();
@@ -153,10 +153,10 @@ void SPHsimulationUI::simulationPositionTextInputs()
 {
 	glm::vec3 PrevValue = refSimulation->getSimulationDomain().posittion;
 	uiValues.simDomainPos = PrevValue;
-	ImGui::InputFloat("simDomainPosX", &uiValues.simDomainPos.x, -10000000.0f, 10000000.0f, "%.0001f");
-	ImGui::InputFloat("simDomainPosY", &uiValues.simDomainPos.y, -10000000.0f, 10000000.0f, "%.0001f");
+	ImGui::InputFloat("simDomainPosX", &uiValues.simDomainPos.x, -10000000.0f, 10000000.0f, "%.3f");
+	ImGui::InputFloat("simDomainPosY", &uiValues.simDomainPos.y, -10000000.0f, 10000000.0f, "%.3f");
 	if (refSimulation->getSimulationDimension() == SimDim::DIMENSION_3)
-		ImGui::InputFloat("simDomainPosZ", &uiValues.simDomainPos.z, -10000000.0f, 10000000.0f, "%.0001f");
+		ImGui::InputFloat("simDomainPosZ", &uiValues.simDomainPos.z, -10000000.0f, 10000000.0f, "%.3f");
 	//if (uiValues.simDomainPos != PrevValue)
 	//{
 		refSimulation->setSimulationsDomainPosition(uiValues.simDomainPos);
@@ -167,7 +167,7 @@ void SPHsimulationUI::sphKernelRadiusSizeInput()
 {
 	float PrevValue = refSimulation->getKernelRadius();
 	uiValues.kernelRadius = PrevValue;
-	ImGui::InputFloat("kernelRadius", &uiValues.kernelRadius, 0.0f, 10.0f, "%.01f");
+	ImGui::InputFloat("kernelRadius", &uiValues.kernelRadius, 0.001f, 10.0f, "%.3f");
 
 	if (uiValues.kernelRadius != PrevValue)
 	{
@@ -179,7 +179,7 @@ void SPHsimulationUI::visualRadiusSizeInput()
 {
 	float PrevValue = refSimulation->getParticleRadius();
 	uiValues.visualRadius = PrevValue;
-	ImGui::InputFloat("ParticleRadius", &uiValues.visualRadius, 0.0f, 10.0f, "%.01f");
+	ImGui::InputFloat("ParticleRadius", &uiValues.visualRadius, 0.001f, 10.0f, "%.3f");
 
 	if (uiValues.visualRadius != PrevValue)
 	{
@@ -205,9 +205,21 @@ void SPHsimulationUI::nsComputationTextInfo()
 
 void SPHsimulationUI::frameRateTextInfo()
 {
-	float fr = 1.0f / (static_cast<float>(refSimulation->getComputeTime())/1000000000.0f);
+	float fr = 1.0f / (static_cast<float>(refSimulation->getComputeTime())/1000000000.000f);
 
 	ImGui::Value("FrameRate", fr, "%.001f");
+}
+
+void SPHsimulationUI::timeStepInput()
+{
+	float PrevValue = refSimulation->getSimulationStep();
+	uiValues.timeStep = PrevValue;
+	ImGui::InputFloat("TimeStep", &uiValues.timeStep, 0.0001f, 0.1f, "%.4f");
+
+	if (uiValues.timeStep != PrevValue)
+	{
+		refSimulation->setSimulationStep(uiValues.timeStep);
+	}
 }
 
 void SPHsimulationUI::startSimulationButton()

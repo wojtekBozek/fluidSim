@@ -34,6 +34,8 @@ private:
 	void nsComputationTextInfo();
 	void frameRateTextInfo();
 
+	void timeStepInput();
+
 	void startSimulationButton();
 	void restartSimulationButton();
 	void stopSimulationButton();
