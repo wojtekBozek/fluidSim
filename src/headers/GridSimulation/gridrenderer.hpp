@@ -23,6 +23,9 @@ public:
 		shaderProgram->linkProgram();
 
 		quadVAO = createQuadVAO();
+		glDisable(GL_PROGRAM_POINT_SIZE);
+    	glDisable(GL_DEPTH_TEST);
+    	glDisable(GL_BLEND);
 	}
 
 	GLuint createQuadVAO()
