@@ -5,11 +5,13 @@ FluidSPHSimulation::FluidSPHSimulation(std::unique_ptr<ShaderProgram> computePre
 {
     m_simulationDomain = simulationDomain;
     m_fluid = fluid;
+    refFluid = fluid;
     setInitialState();
 }
 
 void FluidSPHSimulation::setInitialState()
 {
+    m_fluid = refFluid;
     if (m_dimension == SimDim::DIMENSION_3)
     {
         m_initialDomain.posittion = glm::vec3(-2.5 + 4 * m_particleRadius, 0.0 + 4 * m_particleRadius, -1.0 + 0.4 * m_particleRadius);
@@ -53,6 +55,8 @@ void FluidSPHSimulation::setInitialSimulationDomain()
 
 void FluidSPHSimulation::setSimulationState()
 {
+    
+    m_fluid = refFluid;
     if (m_dimension == SimDim::DIMENSION_3)
     {
         m_fluid.volume = m_initialDomain.size.x * m_initialDomain.size.y * m_initialDomain.size.z;
@@ -297,8 +301,10 @@ void FluidSPHSimulation::simulationStep(float timeStep)
     GLuint query;
     glGenQueries(1, &query);
 
+    
+    GLuint64 temp = 0;
+    while(temp < 16000000){
     glBeginQuery(GL_TIME_ELAPSED, query);
-
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_hashBuf);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_nextNodeBuf);
     m_resetHashTableComputeShader->useProgram();
@@ -333,6 +339,8 @@ void FluidSPHSimulation::simulationStep(float timeStep)
     glEndQuery(GL_TIME_ELAPSED);
 
     glGetQueryObjectui64v(query, GL_QUERY_RESULT, &m_computeTime);
+    temp += m_computeTime;
+    }
 }
 
 void FluidSPHSimulation::clearSimulation()

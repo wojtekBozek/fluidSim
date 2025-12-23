@@ -14,6 +14,7 @@ rendering::OrthographicCamera::OrthographicCamera(glm::vec3 position_, glm::vec3
 	yaw = yaw_;
 	pitch = pitch_;
 	window = window_;
+	glfwGetFramebufferSize(window, &windowWidth, &windowHeight);
 	makeProjectionMatrix();
 	makeViewMatrix();
 }

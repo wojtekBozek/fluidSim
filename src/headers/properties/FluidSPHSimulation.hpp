@@ -156,19 +156,19 @@ private:
     std::unique_ptr<ShaderProgram> m_pressureNdensityComputeShader;
     std::unique_ptr<ShaderProgram> m_boundaryParticleMassComputeShader;
     Domain m_simulationDomain, m_initialDomain;
-    Fluid m_fluid;
+    Fluid m_fluid, refFluid;
     std::vector<FluidParticle> m_particles;
     std::vector<FluidParticle> m_boundaryParticles;
     uint32_t m_numOfParticles = 0;
     float m_timeStep = 0.001f;
     float m_particleRadius = 0.05f;
     float m_kernelCof = 2.5;
-    float m_boundCof = 2.0;
+    float m_boundCof = 1.0;
     float m_kernelRadius = 0.2f;
     bool m_partBUfferCreated = false;
     GLuint m_particleBufferSize = 0;
     GLuint64 m_computeTime = 0;
-    GLuint invocations = 512;
+    GLuint invocations = 128;
 };
 
 
