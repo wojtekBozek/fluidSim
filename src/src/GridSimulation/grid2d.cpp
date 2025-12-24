@@ -18,10 +18,9 @@ void Grid2D::run()
     glGenQueries(1, &query);
 
     glBeginQuery(GL_TIME_ELAPSED, query);
-    
+    //czyszczenie
     m_clearFluidShader->useProgram();
-    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0,
-        GL_READ_WRITE, GL_R32F);
+    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
     
     glDispatchCompute(nx / 16, ny / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
@@ -34,10 +33,80 @@ void Grid2D::run()
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_particleBuffer);
     glDispatchCompute((particles.size() + 255) / 256, 1, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
+
+    m_addForcesShader->useProgram();
+    //set textures
     
+    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    //
+    m_addForcesShader->setFloat("vAccelelerations", 9.8f);
+    m_addForcesShader->setFloat("dt", dt);
+    m_addForcesShader->setIVec2("gridSize", glm::ivec2(nx,ny));
+    
+    glDispatchCompute((nx + 15) / 16, (ny+15) / 16, 1);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
+
+
+    m_velocityAdvectionShader->useProgram();
+    //setTextures
+    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    //
+    m_velocityAdvectionShader->setIVec2("gridSize", glm::ivec2(nx,ny));
+    m_velocityAdvectionShader->setFloat("dt", dt);
+    m_velocityAdvectionShader->setFloat("dx", dx);
+        
+    glDispatchCompute((nx + 15) / 16, (ny+15) / 16, 1);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
+
+    m_jacobiPSolverShader->useProgram();
+    //setTextures
+    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    //
+    m_jacobiPSolverShader->setIVec2("gridSize", glm::ivec2(nx,ny));
+    m_jacobiPSolverShader->setFloat("dx", dx);
+    for(int i=0; i<pressureIterations; ++i)
+    {
+        glDispatchCompute((nx + 15) / 16, (ny+15) / 16, 1);
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
+    }
+
+    m_pressureProjectionShader->useProgram();
+    //setTextures
+    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    //
+    m_pressureProjectionShader->setIVec2("gridSize", glm::ivec2(nx,ny));
+    m_pressureProjectionShader->setFloat("dt", dt);
+    m_pressureProjectionShader->setFloat("dx", dx);
+
+    glDispatchCompute((nx + 15) / 16, (ny+15) / 16, 1);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
+
+
+    m_boundaryShader->useProgram();
+    //setTextures
+    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    //
+    m_boundaryShader->setIVec2("gridSize", glm::ivec2(nx,ny));
+
+    glDispatchCompute((nx + 15) / 16, (ny+15) / 16, 1);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
+
     glEndQuery(GL_TIME_ELAPSED);
     
     glGetQueryObjectui64v(query, GL_QUERY_RESULT, &m_computeTime);
+    
+    //przesuwanie cząsteczek
+    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    //
+    m_particleAdvectionShader->useProgram();
+    
+    m_particleAdvectionShader->setIVec2("gridSize", glm::ivec2(nx,ny));    
+    m_particleAdvectionShader->setUint("numOfParticles", particles.size());
+    m_pressureProjectionShader->setFloat("dt", dt);
+    m_pressureProjectionShader->setFloat("dx", dx);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_particleBuffer);
+    glDispatchCompute((particles.size() + 255) / 256, 1, 1);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
 }
 
 void Grid2D::setup()
