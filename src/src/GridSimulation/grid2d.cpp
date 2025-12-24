@@ -9,6 +9,7 @@ void Grid2D::run()
     2. cell reconfiguration
     3. velocity advection
     4. External forces
+    5. divergence
     5. Pressure calculation (40-80 iterations)
     6. Pressure projection
     7. Boundary conditions (optional if not already applied)
@@ -20,7 +21,7 @@ void Grid2D::run()
     glBeginQuery(GL_TIME_ELAPSED, query);
     //czyszczenie
     m_clearFluidShader->useProgram();
-    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R8UI);
     
     glDispatchCompute(nx / 16, ny / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
@@ -37,25 +38,45 @@ void Grid2D::run()
     m_addForcesShader->useProgram();
     //set textures
     
-    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    glBindImageTexture(0, vInTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    //glBindImageTexture(0, vOutTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
     //
     m_addForcesShader->setFloat("vAccelelerations", 9.8f);
     m_addForcesShader->setFloat("dt", dt);
     m_addForcesShader->setIVec2("gridSize", glm::ivec2(nx,ny));
     
-    glDispatchCompute((nx + 15) / 16, (ny+15) / 16, 1);
+    glDispatchCompute((nx + 1) / 16, (ny+1) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
 
 
     m_velocityAdvectionShader->useProgram();
     //setTextures
-    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    
+    glBindImageTexture(0, uInTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R32F);
+    glBindImageTexture(1, vInTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R32F);
+    glBindImageTexture(2, cellTypeTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R8UI);
+    glBindImageTexture(3, uOutTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
+    glBindImageTexture(4, vOutTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
     //
     m_velocityAdvectionShader->setIVec2("gridSize", glm::ivec2(nx,ny));
     m_velocityAdvectionShader->setFloat("dt", dt);
     m_velocityAdvectionShader->setFloat("dx", dx);
         
-    glDispatchCompute((nx + 15) / 16, (ny+15) / 16, 1);
+    glDispatchCompute((nx + 1) / 16, (ny+1) / 16, 1);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
+
+    m_divergenceShader->useProgram();
+
+    glBindImageTexture(0, uInTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R32F);
+    glBindImageTexture(1, vInTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R32F);
+    glBindImageTexture(2, cellTypeTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R8UI);
+    glBindImageTexture(3, divergenceTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
+
+    m_divergenceShader->setIVec2("gridSize", glm::ivec2(nx,ny));
+    m_divergenceShader->setFloat("dt", dt);
+    m_divergenceShader->setFloat("dx", dx);
+        
+    glDispatchCompute((nx) / 16, (ny) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
 
     m_jacobiPSolverShader->useProgram();
@@ -64,15 +85,23 @@ void Grid2D::run()
     //
     m_jacobiPSolverShader->setIVec2("gridSize", glm::ivec2(nx,ny));
     m_jacobiPSolverShader->setFloat("dx", dx);
+    glBindImageTexture(1, divergenceTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R32F);
+    glBindImageTexture(2, cellTypeTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R8UI);
     for(int i=0; i<pressureIterations; ++i)
-    {
-        glDispatchCompute((nx + 15) / 16, (ny+15) / 16, 1);
+    {        
+        glBindImageTexture(0, pressureInTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R32F);
+        glBindImageTexture(3, pressureOutTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
+        glDispatchCompute((nx) / 16, (ny) / 16, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
+        std::swap(pressureInTex, pressureOutTex);
     }
 
     m_pressureProjectionShader->useProgram();
     //setTextures
-    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    glBindImageTexture(0, uInTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    glBindImageTexture(1, vInTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    glBindImageTexture(2, cellTypeTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R8UI);
+    glBindImageTexture(3, pressureOutTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R32F);
     //
     m_pressureProjectionShader->setIVec2("gridSize", glm::ivec2(nx,ny));
     m_pressureProjectionShader->setFloat("dt", dt);
@@ -82,14 +111,14 @@ void Grid2D::run()
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
 
 
-    m_boundaryShader->useProgram();
-    //setTextures
-    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
-    //
-    m_boundaryShader->setIVec2("gridSize", glm::ivec2(nx,ny));
-
-    glDispatchCompute((nx + 15) / 16, (ny+15) / 16, 1);
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
+    //m_boundaryShader->useProgram();
+    ////setTextures
+    //glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+    ////
+    //m_boundaryShader->setIVec2("gridSize", glm::ivec2(nx,ny));
+//
+    //glDispatchCompute((nx + 15) / 16, (ny+15) / 16, 1);
+    //glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
 
     glEndQuery(GL_TIME_ELAPSED);
     
