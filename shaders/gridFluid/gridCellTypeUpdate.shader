@@ -7,7 +7,7 @@ layout(r8ui, binding = 0) uniform uimage2D grid;
 uniform ivec2 gridSize;
 uniform vec2 gridMin;
 uniform vec2 gridMax;
-
+uniform uint numOfParticles;
 struct Particle {
     vec2 position;
 };
@@ -24,6 +24,7 @@ const uint SOLID = 2u;
 void main()
 {
     uint id = gl_GlobalInvocationID.x;
+    if(id >= numOfParticles) return;
     vec2 pos = particles[id].position;
 
     vec2 uv = (pos - gridMin) / (gridMax - gridMin);

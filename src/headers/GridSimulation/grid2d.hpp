@@ -24,6 +24,7 @@ private:
 	const GLubyte AIR = 1u;
 	const GLubyte SOLID = 2u;
 	uint32_t initFluidX = 0, initFluidY=0;
+	uint8_t pressureIterations = 40;
 	uint32_t initFluidWidth=256, initFluidHeight=256;
 	uint32_t nx = 512, ny=512;
 	float dx = 0.5;
