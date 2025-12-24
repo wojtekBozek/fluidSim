@@ -1,7 +1,7 @@
 #version 430
 layout(local_size_x=16, local_size_y=16) in;
 layout(r32f, binding=0) uniform image2D vTex;
-layout(r32f, binding = 1) uniform writeonly image2D vOut;
+//layout(r32f, binding = 1) uniform writeonly image2D vOut;
 uniform float vAccelerations;
 uniform float dt;
 uniform ivec2 gridSize;
@@ -15,5 +15,5 @@ void main()
     float val = imageLoad(vTex, id).r;
 
     val += vAccelerations*dt;
-    imageStore(vOut, id, vec4(val));
+    imageStore(vTex, id, vec4(val));
 }

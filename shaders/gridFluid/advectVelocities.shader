@@ -5,10 +5,10 @@
 layout(local_size_x=16, local_size_y=16) in;
 layout(binding = 0) uniform sampler2D uTex;
 layout(binding = 1) uniform sampler2D vTex;
-layout(binding = 3) uniform usampler2D cellType;
+layout(binding = 2) uniform usampler2D cellType;
 
-layout(r32f, binding = 4) uniform writeonly image2D uOut;
-layout(r32f, binding = 5) uniform writeonly image2D vOut;
+layout(r32f, binding = 3) uniform writeonly image2D uOut;
+layout(r32f, binding = 4) uniform writeonly image2D vOut;
 
 uniform ivec2 gridSize;
 uniform float dt;
