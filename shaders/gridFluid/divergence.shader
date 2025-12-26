@@ -12,7 +12,7 @@ layout(binding = 3, r32f) uniform writeonly image2D divergence;
 uniform float dx; 
 uniform ivec2 gridSize;
 uniform float dt;
-
+uniform float overrelaxation = 1.9;
 float U(int i, int j) {return texelFetch(uTex, ivec2(i, j), 0).r;}
 float V(int i, int j) {return texelFetch(vTex, ivec2(i, j), 0).r;}
 
@@ -49,7 +49,7 @@ void main()
     bool bottomSolid = (j-1 >= 0 && texelFetch(cellType, ivec2(i,j-1),0).r == SOLID);
     vB = bottomSolid ? 0.0 : V(i,j);
 
-    float div = (uR - uL  + vT - vB) / dx;
+    float div = overrelaxation*(uR - uL  + vT - vB) / dx;
     imageStore(divergence, id, vec4(div));
 }
 
