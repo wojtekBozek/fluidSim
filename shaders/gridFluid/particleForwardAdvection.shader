@@ -4,14 +4,13 @@ layout(local_size_x = 256) in;
 
 layout(binding = 0) uniform usampler2D cellType;
 
-uniform ivec2 gridSize;
 
 struct Particle {
     vec2 position;
 };
 
 layout(std430, binding = 1) buffer Particles {
-    Particle particles[];
+    vec2 particles[];
 };
 
 
@@ -19,9 +18,11 @@ layout(binding = 2) uniform sampler2D uTex;
 layout(binding = 3) uniform sampler2D vTex;
 
 
+uniform ivec2 gridSize;
 uniform float dt;
 uniform float dx;
 uniform uint numOfParticles;
+
 const int Nx = gridSize.x;
 const int Ny = gridSize.y;
 
@@ -175,7 +176,7 @@ vec2 forwardPosition(vec2 position, vec2 velocity)
 {
     vec2 newPosition = position + dt*velocity;
     newPosition = clampPosition(newPosition);
-    ivec2 newCell = ivec2(newPosition);
+    ivec2 newCell = ivec2(newPosition.x/dx, newPosition.y/dx);
     if(texelFetch(cellType, newCell, 0).r == SOLID)
     {
         newPosition = position;
@@ -188,9 +189,8 @@ void main()
     uint id = gl_GlobalInvocationID.x;
     if(id > numOfParticles) return;
 
-    Particle particle = particles[id];
-    vec2 position = particle.position;
+    vec2 position = particles[id];
     vec2 velocity = vec2(sampleU(position), sampleV(position));
     vec2 newPosition = forwardPosition(position, velocity);
-    particles[id].position = newPosition;
+    particles[id] = newPosition;
 }

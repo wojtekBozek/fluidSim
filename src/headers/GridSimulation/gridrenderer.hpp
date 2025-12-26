@@ -10,6 +10,7 @@ public:
 		shaderProgram->useProgram();
 		glActiveTexture(GL_TEXTURE0);
 		glBindTexture(GL_TEXTURE_2D, gridSimulation->getTypeCell());
+
 		shaderProgram->setInt("tex", 0);
 		glBindVertexArray(quadVAO);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -24,6 +25,7 @@ public:
 
 		quadVAO = createQuadVAO();
 		glDisable(GL_PROGRAM_POINT_SIZE);
+		glDisable(GL_CULL_FACE);
     	glDisable(GL_DEPTH_TEST);
     	glDisable(GL_BLEND);
 	}
