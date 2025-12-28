@@ -27,38 +27,37 @@ void main()
     int i = id.x;
     int j = id.y;
 
-    float pressureL, pressureR, pressureT, pressureB;
+    //float pressureL, pressureR, pressureT, pressureB;
+//
+    //float pressureC = texelFetch(pressureIn, id, 0).r;
+    if(typeAt(i,j) != FLUID) {imageStore(pressureOut, id, vec4(0.0)); return;}
+    //pressureL = (i-1 < 0 || typeAt(i-1,j) == SOLID) ? pressureC : P(i-1, j);  
+    //pressureR = (i+1 >= gridSize.x || typeAt(i+1,j) == SOLID) ? pressureC : P(i+1, j);  
+    //pressureB = (j-1 < 0 || typeAt(i,j-1) == SOLID) ? pressureC : P(i, j-1);  
+    //pressureT = (j+1 >= gridSize.y || typeAt(i,j+1) == SOLID) ? pressureC : P(i, j+1);  
+//
+    //float div = texelFetch(divergence, ivec2(i,j),0).r;
+    //float newPressure = (pressureL + pressureR + pressureB + pressureT - dx*dx*div) * 0.25;
 
-    float pressureC = texelFetch(pressureIn, id, 0).r;
+    float sum = 0.0;
+    int count = 0;
 
-    int s = 0;
-    if(i+1 < gridSize.x )
-    {
-        if(typeAt(i+1,j) == FLUID) s++; 
-    }
-    if(j+1 < gridSize.y )
-    {
-        if(typeAt(i,j+1) == FLUID) s++; 
-    }
-    if(i-1 >= 0 )
-    {
-        if(typeAt(i-1,j) == FLUID) s++; 
-    }
-    if(j-1 >= 0 )
-    {
-        if(typeAt(i,j-1) == FLUID) s++; 
-    }
-    pressureL = (i-1 < 0 || typeAt(i-1,j) == SOLID) ? pressureC : P(i-1, j);  
-    pressureR = (i+1 >= gridSize.x || typeAt(i+1,j) == SOLID) ? pressureC : P(i+1, j);  
-    pressureB = (j-1 < 0 || typeAt(i,j-1) == SOLID) ? pressureC : P(i, j-1);  
-    pressureT = (j+1 >= gridSize.y || typeAt(i,j+1) == SOLID) ? pressureC : P(i, j+1);  
+    // Left
+    if (typeAt(i-1,j) != SOLID) { sum += P(i-1,j); count++; }
+    // Right
+    if (typeAt(i+1,j) != SOLID) { sum += P(i+1,j); count++; }
+    // Bottom
+    if (typeAt(i,j-1) != SOLID) { sum += P(i,j-1); count++; }
+    // Top
+    if (typeAt(i,j+1) != SOLID) { sum += P(i,j+1); count++; }
 
-    float div = texelFetch(divergence, ivec2(i,j),0).r;
-    float newPressure = (pressureL + pressureR + pressureB + pressureT - dx*dx*div) * 0.25;
+    float div = texelFetch(divergence, id, 0).r;
 
-    //if(s>0)
-    //{
-    //    newPressure += div/s*density*dx/dt;
-    //}
+    // Free-surface Poisson update
+    float newPressure = (sum - dx*dx*div) / float(max(count,1));
+
+    // Optional but recommended
+    newPressure = max(newPressure, 0.0);
+
     imageStore(pressureOut, id, vec4(newPressure));
 }
