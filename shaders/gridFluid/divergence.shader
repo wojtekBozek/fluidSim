@@ -27,7 +27,7 @@ void main()
 
 
     uint type = texelFetch(cellType, id, 0).r;
-    if(type == SOLID)
+    if(type != FLUID)
     {
         imageStore(divergence, id, vec4(0.0));
         return;

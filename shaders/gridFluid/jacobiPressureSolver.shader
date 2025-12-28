@@ -11,7 +11,7 @@ layout(binding = 3, r32f) uniform writeonly image2D pressureOut;
 uniform float dx;
 uniform float dt;
 uniform ivec2 gridSize;
-uniform float density; 
+//uniform float density; 
 const uint FLUID = 0u;
 const uint AIR = 1u;
 const uint SOLID = 2u;
@@ -48,17 +48,17 @@ void main()
     {
         if(typeAt(i,j-1) == FLUID) s++; 
     }
-    //pressureL = (i-1 < 0 || typeAt(i-1,j) == SOLID) ? pressureC : P(i-1, j);  
-    //pressureR = (i+1 >= gridSize.x || typeAt(i+1,j) == SOLID) ? pressureC : P(i+1, j);  
-    //pressureB = (j-1 < 0 || typeAt(i,j-1) == SOLID) ? pressureC : P(i, j-1);  
-    //pressureT = (j+1 >= gridSize.y || typeAt(i,j+1) == SOLID) ? pressureC : P(i, j+1);  
+    pressureL = (i-1 < 0 || typeAt(i-1,j) == SOLID) ? pressureC : P(i-1, j);  
+    pressureR = (i+1 >= gridSize.x || typeAt(i+1,j) == SOLID) ? pressureC : P(i+1, j);  
+    pressureB = (j-1 < 0 || typeAt(i,j-1) == SOLID) ? pressureC : P(i, j-1);  
+    pressureT = (j+1 >= gridSize.y || typeAt(i,j+1) == SOLID) ? pressureC : P(i, j+1);  
 
     float div = texelFetch(divergence, ivec2(i,j),0).r;
-    float newPressure = pressureC ;//(pressureL + pressureR + pressureB + pressureT - dx*dx*div) * 0.25;
+    float newPressure = (pressureL + pressureR + pressureB + pressureT - dx*dx*div) * 0.25;
 
-    if(s>0)
-    {
-        newPressure += div/s*density*dx/dt;
-    }
+    //if(s>0)
+    //{
+    //    newPressure += div/s*density*dx/dt;
+    //}
     imageStore(pressureOut, id, vec4(newPressure));
 }
