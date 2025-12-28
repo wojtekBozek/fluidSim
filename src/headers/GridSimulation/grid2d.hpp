@@ -28,7 +28,7 @@ private:
 	uint32_t initFluidWidth=256, initFluidHeight=256;
 	uint32_t nx = 512, ny=512;
 	float dx = 0.5f;
-	float dt = 0.1f;
+	float dt = 0.005f;
 	GLuint uInTex, uOutTex, vInTex, vOutTex;
 	GLuint pressureInTex, pressureOutTex;
 	GLuint divergenceTex;

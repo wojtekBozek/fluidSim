@@ -2,6 +2,8 @@
 layout(local_size_x = 16, local_size_y = 16) in;
 
 layout(binding = 0, r32ui) uniform uimage2D cellType;
+layout(binding = 1, r32f) uniform image2D divergence;
+layout(binding = 2, r32f) uniform image2D pressure;
 
 uniform ivec2 gridSize;
 
@@ -17,5 +19,7 @@ void main() {
 
     if (!isSolid) {
         imageStore(cellType, id, uvec4(AIR));
+        imageStore(divergence, id, uvec4(0.0));
+        imageStore(pressure, id, uvec4(0.0));
     }
 }
