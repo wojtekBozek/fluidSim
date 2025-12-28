@@ -15,9 +15,10 @@ void main()
 {
     ivec2 id = ivec2(gl_GlobalInvocationID.xy);
 
-    if(id.x >= gridSize.x || id.y >= gridSize.y) return;
+    if(id.x >= gridSize.x  || id.y >= gridSize.y + 1) return;
+    
+    //if(texelFetch(cellType, id, 0).r != FLUID) return; 
 
-    if(texelFetch(cellType, id, 0).r != FLUID) return; 
     float val = imageLoad(vTex, id).r;
 
     val += vAccelerations*dt;

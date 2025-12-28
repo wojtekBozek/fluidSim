@@ -211,27 +211,39 @@ void main()
     if(id.x >= gridSize.x || id.y >= gridSize.y) return ;
     uint type = texelFetch(cellType, id, 0).r;
 
-    if(type == SOLID)
-    {
-        return;
-    }
+    //if(type == SOLID)
+    //{
+    //    return;
+    //}
     int i = id.x;
     int j = id.y;
 
     if(i < gridSize.x + 1 && j < gridSize.y)
     {
-        vec2 positionU = vec2(i*dx+0.5*dx, j*dx);
-        vec2 velocityOnU = vec2(texelFetch(uTex, ivec2(i,j), 0).r, interpolateVonUFace(i,j));
-        vec2 backtracedPosition = backTracePositionRK2(positionU, velocityOnU);
-        float u = sampleU(backtracedPosition);
-        imageStore(uOut, id, vec4(u));
+        uint ltype = (i - 1 < 0 || i-1>= gridSize.x) ? SOLID : texelFetch(cellType, ivec2(i-1,j), 0).r;
+        uint rtype = (i  < 0 || i >= gridSize.x) ? SOLID : texelFetch(cellType, ivec2(i,j), 0).r;
+        //if(!(ltype == AIR && rtype == AIR) && !(ltype == AIR && rtype == SOLID) && !(ltype == SOLID && rtype == AIR) )
+        if(ltype == FLUID || rtype == FLUID)// && !(ltype == AIR && rtype == SOLID) && !(ltype == SOLID && rtype == AIR) )
+        {
+            vec2 positionU = vec2(i*dx+0.5*dx, j*dx);
+            vec2 velocityOnU = vec2(texelFetch(uTex, ivec2(i,j), 0).r, interpolateVonUFace(i,j));
+            vec2 backtracedPosition = backTracePositionRK2(positionU, velocityOnU);
+            float u = sampleU(backtracedPosition);
+            imageStore(uOut, id, vec4(u));
+        }
     }
     if(i < gridSize.x && j < gridSize.y + 1)
     {
-        vec2 positionV = vec2(i*dx, j*dx+0.5*dx);
-        vec2 velocityOnV = vec2(interpolateUonVFace(i,j), texelFetch(vTex, ivec2(i,j), 0).r);
-        vec2 backtracedPosition = backTracePositionRK2(positionV, velocityOnV);
-        float v = sampleV(backtracedPosition);
-        imageStore(vOut, id, vec4(v));
+        uint btype = (j-1 < 0 || j-1 >= gridSize.y) ? SOLID : texelFetch(cellType, ivec2(i,j-1), 0).r;
+        uint ttype = (j< 0 || j>= gridSize.y) ? SOLID : texelFetch(cellType, ivec2(i,j), 0).r;
+        //if(!(btype == AIR && ttype == AIR) && !(btype == AIR && ttype == SOLID) && !(btype == SOLID && ttype == AIR) )
+        if(btype == FLUID || ttype == FLUID)
+        {
+            vec2 positionV = vec2(i*dx, j*dx+0.5*dx);
+            vec2 velocityOnV = vec2(interpolateUonVFace(i,j), texelFetch(vTex, ivec2(i,j), 0).r);
+            vec2 backtracedPosition = backTracePositionRK2(positionV, velocityOnV);
+            float v = sampleV(backtracedPosition);
+            imageStore(vOut, id, vec4(v));
+        }
     }
 }

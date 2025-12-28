@@ -24,11 +24,11 @@ private:
 	const GLubyte AIR = 1u;
 	const GLubyte SOLID = 2u;
 	uint32_t initFluidX = 0, initFluidY=0;
-	uint8_t pressureIterations = 40;
-	uint32_t initFluidWidth=256, initFluidHeight=256;
-	uint32_t nx = 512, ny=512;
-	float dx = 0.5f;
-	float dt = 0.005f;
+	uint8_t pressureIterations = 256;
+	uint32_t initFluidWidth=200, initFluidHeight=200;
+	uint32_t nx = 256, ny=256;
+	float dx = 0.05f;
+	float dt = 0.0005f;
 	GLuint uInTex, uOutTex, vInTex, vOutTex;
 	GLuint pressureInTex, pressureOutTex;
 	GLuint divergenceTex;
