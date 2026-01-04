@@ -19,7 +19,7 @@ public:
 
 	const std::vector<glm::vec2>& getParticles() const;
 private:
-
+	GLuint floatSSBO, floatSSBO2;
 	const GLubyte FLUID = 0u;
 	const GLubyte AIR = 1u;
 	const GLubyte SOLID = 2u;
@@ -28,7 +28,7 @@ private:
 	uint32_t initFluidWidth=200, initFluidHeight=200;
 	uint32_t nx = 256, ny=256;
 	float dx = 0.05f;
-	float dt = 0.0005f;
+	float dt = 0.01f;
 	GLuint uInTex, uOutTex, vInTex, vOutTex;
 	GLuint pressureInTex, pressureOutTex;
 	GLuint divergenceTex;
@@ -47,4 +47,8 @@ private:
 	std::unique_ptr<ShaderProgram> m_particleAdvectionShader;
 	std::unique_ptr<ShaderProgram> m_cellUpdateShader;
 	std::unique_ptr<ShaderProgram> m_addForcesShader;
+	std::unique_ptr<ShaderProgram> m_maxVelocityShader;
+	std::unique_ptr<ShaderProgram> m_extrapolateVelocityShader;
+
+	float time = 0.0f;
 };

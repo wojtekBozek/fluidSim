@@ -167,7 +167,7 @@ float sampleU(vec2 position)
 vec2 clampPosition(vec2 position)
 {
     vec2 minPos = vec2(0.5 * dx);
-    vec2 maxPos = vec2((gridSize.x - 1.5) * dx, (gridSize.y - 1.5) * dx);
+    vec2 maxPos = vec2((gridSize.x - 0.5) * dx, (gridSize.y - 0.5) * dx);
 
     position = clamp(position, minPos, maxPos);
     return position;
