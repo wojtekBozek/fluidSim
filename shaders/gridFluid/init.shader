@@ -31,17 +31,17 @@ void main() {
     ivec2 id = ivec2(gl_GlobalInvocationID.xy);
     if(id.x < gridSize.x+1 && id.y < gridSize.y)
     {
-        imageStore(uTex, id, vec4(0.0,0,0,0));
+        imageStore(uTex, id, vec4(0.0));
     }
 
     if(id.x < gridSize.x && id.y < gridSize.y+1)
     {
-        imageStore(vTex, id, vec4(0.0,0,0,0));
+        imageStore(vTex, id, vec4(0.0));
     }
     if (id.x >= gridSize.x || id.y >= gridSize.y) return;
 
-    imageStore(pressure, id, vec4(0.0,0,0,0));
-    imageStore(divergence, id, vec4(0.0,0,0,0));
+    imageStore(pressure, id, vec4(0.0));
+    imageStore(divergence, id, vec4(0.0));
     bool isFluid = 
         id.x < gridSize.x * width &&
         id.y < gridSize.y * height;

@@ -17,7 +17,7 @@ const uint AIR = 1u;
 const uint SOLID = 2u;
 
 float P(int i, int j) {return texelFetch(pressureIn, ivec2(i, j), 0).r;}
-uint typeAt(int i, int j){return texelFetch(cellType, ivec2(i, j), 0).r;}
+uint typeAt(int i, int j){if(i<0 || i>= gridSize.x || j <0 || j>= gridSize.y) return SOLID; return texelFetch(cellType, ivec2(i, j), 0).r;}
 
 void main()
 {
@@ -56,7 +56,6 @@ void main()
     // Free-surface Poisson update
     float newPressure = (sum - dx*dx*div) / float(max(count,1));
 
-    // Optional but recommended
     newPressure = max(newPressure, 0.0);
 
     imageStore(pressureOut, id, vec4(newPressure));
