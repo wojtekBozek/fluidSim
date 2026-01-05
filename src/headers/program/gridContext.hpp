@@ -15,4 +15,5 @@ private:
 	std::shared_ptr<BaseUI> simulationUI;
 	std::shared_ptr<Grid2D> simulation;
 	std::shared_ptr<GridRenderer> renderer;
+	std::shared_ptr<ContextState> state;
 };

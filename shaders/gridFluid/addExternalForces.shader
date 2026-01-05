@@ -17,7 +17,7 @@ void main()
 
     if(id.x >= gridSize.x  || id.y >= gridSize.y + 1) return;
     
-    //if(texelFetch(cellType, id, 0).r != FLUID) return; 
+    if(texelFetch(cellType, id, 0).r != FLUID && texelFetch(cellType, ivec2(id.x, id.y-1), 0).r != FLUID) {return;}
 
     float val = imageLoad(vTex, id).r;
 

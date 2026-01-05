@@ -2,16 +2,28 @@
 #include "baseUI.hpp"
 #include "baseGrid.hpp"
 #include "grid2d.hpp"
+#include "gridrenderer.hpp"
+#include "SPHContextState.hpp"
 class GridSimulationUI : public BaseUI
 {
 public:
 	//SPHsimulationUI() = default;
-	GridSimulationUI(std::shared_ptr<BaseGrid> simulation, GLFWwindow* window, std::shared_ptr<ProgramState> state) : BaseUI(window, state)
+	GridSimulationUI(std::shared_ptr<ContextState> context, std::shared_ptr<GridRenderer> renderer, std::shared_ptr<BaseGrid> simulation, GLFWwindow* window, std::shared_ptr<ProgramState> state) : BaseUI(window, state)
 	{
+		refContext = context;
+		refRenderer = renderer;
 		refSimulation = simulation;
 	}
 	void showUI() override;
 private:
 	void returnToMenuButton();
+	void startSimulation();
+	void vVelocityShader();
+	void uVelocityShader();
+	void divergenceShader();
+	void pressureShader();
+	void visualShader();
 	std::shared_ptr<BaseGrid> refSimulation;
+	std::shared_ptr<GridRenderer> refRenderer;
+	std::shared_ptr<ContextState> refContext;
 };
