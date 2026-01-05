@@ -19,7 +19,8 @@ void main() {
 
     if (!isSolid) {
         imageStore(cellType, id, uvec4(AIR));
-        imageStore(divergence, id, uvec4(0.0));
-        imageStore(pressure, id, uvec4(0.0));
     }
+    
+    imageStore(divergence, id, uvec4(0.0));
+    imageStore(pressure, id, uvec4(0.0));
 }

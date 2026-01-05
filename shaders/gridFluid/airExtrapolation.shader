@@ -13,9 +13,7 @@ layout(r32f, binding = 4) uniform writeonly image2D vOut;
 uniform ivec2 gridSize;
 uniform float dt;
 uniform float dx;
-uniform uint borderSize = 1;
-
-
+uniform int borderSize = 3;
 
 const uint FLUID = 0u;
 const uint AIR = 1u;
@@ -24,7 +22,7 @@ const uint SOLID = 2u;
 uint typeAt(int i, int j)
 {
     if(i < 0 || i >= gridSize.x || j<0 || j>=gridSize.y) return SOLID;
-    return texelFetch(cellType, id, 0).r;
+    return texelFetch(cellType, ivec2(i,j), 0).r;
 }
 
 
@@ -35,8 +33,16 @@ void main()
     int i = id.x;
     int j = id.y;
     uint type = typeAt(i,j);
-    if(type != AIR) return;
-
+    uint leftType = typeAt(i-1,j);
+    uint bottomType = typeAt(i,j-1);
+    if(type != AIR)
+    {
+        float extV = texelFetch(vTex, ivec2(i,j),0).r;
+        float extU = texelFetch(uTex, ivec2(i, j),0).r;
+        imageStore(vOut, ivec2(i,j),vec4(extV));
+        imageStore(uOut, ivec2(i,j),vec4(extU));
+        return;
+    }
     int real_ii = borderSize+1;
     int real_jj = borderSize+1;
 
@@ -46,16 +52,28 @@ void main()
         {
             if(typeAt(ii, jj) == FLUID)
             {
-                real_ii = min(ii, real_ii);
-                real_jj = min(jj, real_jj);
+                if(pow(ii,2) + pow(jj,2) < pow(real_ii,2) + pow(real_jj,2))
+                {
+                    real_ii = ii;
+                    real_jj = jj;
+                }
             }
         }
     }
 
-    if(real_ii > borderSize) return;
+    if(abs(real_ii) > borderSize) return;
     float extV = texelFetch(vTex, ivec2(i+real_ii,j+real_jj+1),0).r;
     float extU = texelFetch(uTex, ivec2(i+real_ii+1, j+real_jj),0).r;
+    if(bottomType != AIR)
+    {
+        extV = texelFetch(vTex, ivec2(i,j),0).r;
+    }
 
-    imageStore(vOut, ivec2(i+real_ii,j+real_jj+1),extV);
-    imageStore(uOut, ivec2(i+real_ii+1,j+real_jj),extU);
+    if(leftType != AIR)
+    {
+        extU = texelFetch(uTex, ivec2(i, j),0).r;
+    }
+
+    imageStore(vOut, ivec2(i,j),vec4(extV));
+    imageStore(uOut, ivec2(i,j),vec4(extU));
 }

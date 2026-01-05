@@ -209,7 +209,7 @@ void main()
 {
     ivec2 id = ivec2(gl_GlobalInvocationID.xy);
     if(id.x >= gridSize.x || id.y >= gridSize.y) return ;
-    uint type = texelFetch(cellType, id, 0).r;
+    //uint type = texelFetch(cellType, id, 0).r;
 
     //if(type == SOLID)
     //{
@@ -230,6 +230,8 @@ void main()
             float u = sampleU(backtracedPosition);
             imageStore(uOut, id, vec4(u));
         }
+        else
+            imageStore(uOut, id, vec4(0.0));
     }
     if(i < gridSize.x && j < gridSize.y + 1)
     {
@@ -243,5 +245,7 @@ void main()
             float v = sampleV(backtracedPosition);
             imageStore(vOut, id, vec4(v));
         }
+        else
+            imageStore(vOut, id, vec4(0.0));
     }
 }

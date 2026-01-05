@@ -16,15 +16,19 @@ public:
 	void setShaders();
 
 	GLuint getTypeCell() { return cellTypeTex; }
+	GLuint getuTex() { return uInTex; }
+	GLuint getvTex() { return vInTex; }
+	GLuint getDivergenceTex() { return divergenceTex; }
+	GLuint getPressureTex() { return pressureInTex; }
 
 	const std::vector<glm::vec2>& getParticles() const;
 private:
 	GLuint floatSSBO, floatSSBO2;
-	const GLubyte FLUID = 0u;
-	const GLubyte AIR = 1u;
-	const GLubyte SOLID = 2u;
+	const GLuint FLUID = 0u;
+	const GLuint AIR = 1u;
+	const GLuint SOLID = 2u;
 	uint32_t initFluidX = 0, initFluidY=0;
-	uint8_t pressureIterations = 256;
+	uint8_t pressureIterations = 40;
 	uint32_t initFluidWidth=200, initFluidHeight=200;
 	uint32_t nx = 256, ny=256;
 	float dx = 0.05f;
