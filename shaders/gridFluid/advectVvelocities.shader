@@ -187,14 +187,23 @@ float sampleU(vec2 position)
     return interpolateUinGrid(clampU(position));
 }
 
+vec2 clampPosition(vec2 position)
+{
+    vec2 minPos = vec2(0.0);
+    vec2 maxPos = vec2(gridSize.x * dx, gridSize.y* dx);
+
+    position = clamp(position, minPos, maxPos);
+    return position;
+}
+
 vec2 backTracePositionRK2(vec2 position, vec2 velocity)
 {
     vec2 halfPos = position - dt*velocity/2.0;
-    halfPos = clampV(halfPos);
+    halfPos = clampPosition(halfPos);
     vec2 halfVelocity = vec2(sampleU(halfPos), sampleV(halfPos));
 
     vec2 backtracedPosition = position - dt*halfVelocity;
-    backtracedPosition = clampV(backtracedPosition);
+    backtracedPosition = clampPosition(backtracedPosition);
     return backtracedPosition;
 }
 

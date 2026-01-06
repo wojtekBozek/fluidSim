@@ -18,6 +18,7 @@ void GridSimulationUI::showUI()
 	divergenceShader();
 	pressureShader();
 	visualShader();
+	particleShader();
 	returnToMenuButton();
 	timeStepTime();
 	frameRate();
@@ -89,6 +90,14 @@ void GridSimulationUI::visualShader()
 	if (ImGui::Button("TypeView"))
 	{
 		refRenderer->setDefaultView();
+	}
+}
+
+void GridSimulationUI::particleShader()
+{
+	if (ImGui::Button("PasrticleView"))
+	{
+		refRenderer->setParticleView();
 	}
 }
 
