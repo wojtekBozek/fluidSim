@@ -49,7 +49,7 @@ void main()
     bool bottomSolid = (j-1 < 0 || (j-1 >= 0 && texelFetch(cellType, ivec2(i,j-1),0).r == SOLID));
     vB = bottomSolid ? 0.0 : V(i,j);
 
-    float div = overrelaxation*(uR - uL  + vT - vB) / dx;
+    float div = (uR - uL + vT - vB) / dx;
     imageStore(divergence, id, vec4(div));
 }
 
