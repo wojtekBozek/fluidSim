@@ -16,8 +16,11 @@ uniform float dx;
 
 const int Nx = gridSize.x; 
 const int Ny = gridSize.y;
-// functions for interpolating values of missing velocity component (v for velocity on u face and u for velocity on v face) from neighboring perpendicular faces 
-// we assume that i and j check for border faces have been dealt on earlier as update of velocity on those faces is not needed since it will still b zero by bc.
+
+const uint FLUID = 0u;
+const uint AIR = 1u;
+const uint SOLID = 2u;
+
 float interpolateUonVFace(int i, int j)
 {
     int i0 = clamp(i,     0, Nx);
@@ -51,10 +54,6 @@ int checkCellType(ivec2 c)
 {
     return int(texelFetch(cellType, c, 0).r);
 }
-
-const uint FLUID = 0u;
-const uint AIR = 1u;
-const uint SOLID = 2u;
 
 bool uBlocked(int i, int j)
 {
@@ -106,26 +105,26 @@ float interpolateUinGrid(vec2 position)
 
     float value = 0.0;
     float sumW = 0.0;
-    if(!uBlocked(i,j))
-    {
+    //if(!uBlocked(i,j))
+    //{
         value += texelFetch(uTex, ivec2(i,j),0).r * w00 * w10;
         sumW += w00 * w10;
-    }
-    if(!uBlocked(i,j+1))
-    {
+    //}
+    //if(!uBlocked(i,j+1))
+    //{
         value += texelFetch(uTex, ivec2(i,j+1),0).r * w00 * w11;
         sumW += w00 * w11;
-    }
-    if(!uBlocked(i+1,j+1))
-    {
+    //}
+    //if(!uBlocked(i+1,j+1))
+    //{
         value += texelFetch(uTex, ivec2(i+1,j+1),0).r * w01 * w11;
         sumW += w01 * w11;
-    }
-    if(!uBlocked(i+1,j))
-    {
+    //}
+    //if(!uBlocked(i+1,j))
+    //{
         value += texelFetch(uTex, ivec2(i+1,j),0).r * w01 * w10;
         sumW += w01 * w10;
-    }
+    //}
 
     return (sumW > 0.0) ? value/sumW : 0.0;
 }
@@ -151,26 +150,26 @@ float interpolateVinGrid(vec2 position)
 
     float value = 0.0;
     float sumW = 0.0;
-    if(!vBlocked(i,j))
-    {
+    //if(!vBlocked(i,j))
+    //{
         value += texelFetch(vTex, ivec2(i,j),0).r * w00 * w10;
         sumW += w00 * w10;
-    }
-    if(!vBlocked(i,j+1))
-    {
+    //}
+    //if(!vBlocked(i,j+1))
+    //{
         value += texelFetch(vTex, ivec2(i,j+1),0).r * w00 * w11;
         sumW += w00 * w11;
-    }
-    if(!vBlocked(i+1,j+1))
-    {
+    //}
+    //if(!vBlocked(i+1,j+1))
+    //{
         value += texelFetch(vTex, ivec2(i+1,j+1),0).r * w01 * w11;
         sumW += w01 * w11;
-    }
-    if(!vBlocked(i+1,j))
-    {
+    //}
+    //if(!vBlocked(i+1,j))
+    //{
         value += texelFetch(vTex, ivec2(i+1,j),0).r * w01 * w10;
         sumW += w01 * w10;
-    }
+    //}
 
     return (sumW > 0.0) ? value/sumW : 0.0;
 }
@@ -209,12 +208,6 @@ void main()
 {
     ivec2 id = ivec2(gl_GlobalInvocationID.xy);
     if(id.x >= gridSize.x || id.y >= gridSize.y) return ;
-    //uint type = texelFetch(cellType, id, 0).r;
-
-    //if(type == SOLID)
-    //{
-    //    return;
-    //}
     int i = id.x;
     int j = id.y;
 

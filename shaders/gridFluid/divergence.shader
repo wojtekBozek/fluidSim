@@ -12,13 +12,31 @@ layout(binding = 3, r32f) uniform writeonly image2D divergence;
 uniform float dx; 
 uniform ivec2 gridSize;
 uniform float dt;
-uniform float overrelaxation = 1.9;
 float U(int i, int j) {return texelFetch(uTex, ivec2(i, j), 0).r;}
 float V(int i, int j) {return texelFetch(vTex, ivec2(i, j), 0).r;}
 
 const uint FLUID = 0u;
 const uint AIR = 1u;
 const uint SOLID = 2u;
+
+int checkCellType(ivec2 c)
+{
+    return int(texelFetch(cellType, c, 0).r);
+}
+
+bool uBlocked(int i, int j)
+{
+    if(0 == i || i >= gridSize.x) return true;
+    return checkCellType(ivec2(i-1, j)) == SOLID ||
+           checkCellType(ivec2(i,   j)) == SOLID;
+}
+
+bool vBlocked(int i, int j)
+{
+    if(0 == j || j >= gridSize.y) return true;
+    return checkCellType(ivec2(i, j-1)) == SOLID ||
+           checkCellType(ivec2(i, j  )) == SOLID;
+}
 
 void main()
 {
@@ -35,19 +53,10 @@ void main()
     int i = id.x;
     int j = id.y;
 
-    float uR, uL, vT, vB;
-
-    bool rightSolid = ( i+1 > gridSize.x || (i+1 < gridSize.x && texelFetch(cellType, ivec2(i+1,j),0).r == SOLID));
-    uR = rightSolid ? 0.0 : U(i+1,j);
-
-    bool leftSolid = (i-1 < 0 || (i-1 >= 0 && texelFetch(cellType, ivec2(i-1,j),0).r == SOLID));
-    uL = leftSolid ? 0.0 : U(i,j);
-
-    bool topSolid = (j+1 >= gridSize.y || (j+1 < gridSize.y && texelFetch(cellType, ivec2(i,j+1),0).r == SOLID));
-    vT = topSolid ? 0.0 : V(i,j+1);
-
-    bool bottomSolid = (j-1 < 0 || (j-1 >= 0 && texelFetch(cellType, ivec2(i,j-1),0).r == SOLID));
-    vB = bottomSolid ? 0.0 : V(i,j);
+    float uR = uBlocked(i+1, j) ? 0.0 : U(i+1, j);
+    float uL = uBlocked(i,   j) ? 0.0 : U(i,   j);
+    float vT = vBlocked(i, j+1) ? 0.0 : V(i, j+1);
+    float vB = vBlocked(i, j  ) ? 0.0 : V(i, j  );
 
     float div = (uR - uL + vT - vB) / dx;
     imageStore(divergence, id, vec4(div));

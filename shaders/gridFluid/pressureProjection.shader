@@ -35,13 +35,17 @@ void main()
         {
             u = 0.0;
         }
-        else //if(leftType == FLUID && rightType == FLUID)
+        else if(leftType == FLUID || rightType == FLUID)
         {
             float pressureL = (leftType == FLUID) ? texelFetch(pressure, ivec2(i-1,j), 0).r : 0.0;
             float pressureR = (rightType == FLUID) ? texelFetch(pressure, ivec2(i,j), 0).r : 0.0;
 
             float gradPressure = (pressureR - pressureL)/ dx;
             u -= dt * gradPressure;
+        }
+        else
+        {
+            u = 0.0;
         }
         imageStore(uTex, id, vec4(u));
     }
@@ -61,7 +65,7 @@ void main()
         {
             v = 0.0;
         }
-        else //if(bottomType == FLUID && topType == FLUID)
+        else if(bottomType == FLUID || topType == FLUID)
         {
             float pressureB = (bottomType == FLUID) ? texelFetch(pressure, ivec2(i, j-1), 0).r : 0.0;
             float pressureT = (topType == FLUID) ? texelFetch(pressure, ivec2(i,j), 0).r : 0.0;
@@ -69,6 +73,9 @@ void main()
             float gradPressure = (pressureT - pressureB)/ dx;
             v -= dt * gradPressure;
         }  
+        else{
+            v = 0.0;
+        }
         imageStore(vTex, id, vec4(v));
     }
 }

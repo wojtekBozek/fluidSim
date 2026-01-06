@@ -2,7 +2,6 @@
 layout(local_size_x=16, local_size_y=16) in;
 layout(r32f, binding=0) uniform image2D vTex;
 layout(binding=1) uniform usampler2D cellType;
-//layout(r32f, binding = 1) uniform writeonly image2D vOut;
 uniform float vAccelerations;
 uniform float dt;
 uniform ivec2 gridSize;
@@ -17,8 +16,20 @@ void main()
 
     if(id.x >= gridSize.x  || id.y >= gridSize.y + 1) return;
     
-    if(texelFetch(cellType, id, 0).r != FLUID || texelFetch(cellType, ivec2(id.x, id.y-1), 0).r != FLUID) {imageStore(vTex, id, vec4(0.0));return;}
+    uint ttype = (id.y < gridSize.y) ? texelFetch(cellType, ivec2(id.x, id.y), 0).r : SOLID;
+    uint btype = (id.y > 0)          ? texelFetch(cellType, ivec2(id.x, id.y-1), 0).r : SOLID;
 
+    if(ttype != FLUID && btype != FLUID)
+    {
+        imageStore(vTex, id, vec4(0.0));
+        return;
+    }
+
+    if (ttype == SOLID || btype == SOLID)
+    {
+        imageStore(vTex, id, vec4(0.0));
+        return;
+    }
     float val = imageLoad(vTex, id).r;
 
     val += vAccelerations*dt;

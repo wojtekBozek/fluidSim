@@ -13,7 +13,7 @@ layout(r32f, binding = 4) uniform writeonly image2D vOut;
 uniform ivec2 gridSize;
 uniform float dt;
 uniform float dx;
-uniform int borderSize = 3;
+uniform int borderSize = 5;
 
 const uint FLUID = 0u;
 const uint AIR = 1u;

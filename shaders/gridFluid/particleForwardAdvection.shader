@@ -87,23 +87,23 @@ float interpolateUinGrid(vec2 position)
     float sumW = 0.0;
     if(!uBlocked(i,j))
     {
-        value += texelFetch(uTex, ivec2(i,j),0).r * w00 * w10;
-        sumW += w00 * w10;
+      value += texelFetch(uTex, ivec2(i,j),0).r * w00 * w10;
+      sumW += w00 * w10;
     }
     if(!uBlocked(i,j+1))
     {
-        value += texelFetch(uTex, ivec2(i,j+1),0).r * w00 * w11;
-        sumW += w00 * w11;
+      value += texelFetch(uTex, ivec2(i,j+1),0).r * w00 * w11;
+      sumW += w00 * w11;
     }
     if(!uBlocked(i+1,j+1))
     {
-        value += texelFetch(uTex, ivec2(i+1,j+1),0).r * w01 * w11;
-        sumW += w01 * w11;
+      value += texelFetch(uTex, ivec2(i+1,j+1),0).r * w01 * w11;
+      sumW += w01 * w11;
     }
     if(!uBlocked(i+1,j))
     {
-        value += texelFetch(uTex, ivec2(i+1,j),0).r * w01 * w10;
-        sumW += w01 * w10;
+      value += texelFetch(uTex, ivec2(i+1,j),0).r * w01 * w10;
+      sumW += w01 * w10;
     }
 
     return (sumW > 0.0) ? value/sumW : 0.0;
@@ -132,23 +132,23 @@ float interpolateVinGrid(vec2 position)
     float sumW = 0.0;
     if(!vBlocked(i,j))
     {
-        value += texelFetch(vTex, ivec2(i,j),0).r * w00 * w10;
-        sumW += w00 * w10;
+      value += texelFetch(vTex, ivec2(i,j),0).r * w00 * w10;
+      sumW += w00 * w10;
     }
     if(!vBlocked(i,j+1))
     {
-        value += texelFetch(vTex, ivec2(i,j+1),0).r * w00 * w11;
-        sumW += w00 * w11;
+      value += texelFetch(vTex, ivec2(i,j+1),0).r * w00 * w11;
+      sumW += w00 * w11;
     }
     if(!vBlocked(i+1,j+1))
     {
-        value += texelFetch(vTex, ivec2(i+1,j+1),0).r * w01 * w11;
-        sumW += w01 * w11;
+      value += texelFetch(vTex, ivec2(i+1,j+1),0).r * w01 * w11;
+      sumW += w01 * w11;
     }
     if(!vBlocked(i+1,j))
     {
-        value += texelFetch(vTex, ivec2(i+1,j),0).r * w01 * w10;
-        sumW += w01 * w10;
+      value += texelFetch(vTex, ivec2(i+1,j),0).r * w01 * w10;
+      sumW += w01 * w10;
     }
 
     return (sumW > 0.0) ? value/sumW : 0.0;
@@ -166,8 +166,8 @@ float sampleU(vec2 position)
 
 vec2 clampPosition(vec2 position)
 {
-    vec2 minPos = vec2(0.5 * dx);
-    vec2 maxPos = vec2((gridSize.x - 0.5) * dx, (gridSize.y - 0.5) * dx);
+    vec2 minPos = vec2(0.0);
+    vec2 maxPos = vec2(gridSize.x * dx, gridSize.y * dx);
 
     position = clamp(position, minPos, maxPos);
     return position;
@@ -177,7 +177,9 @@ vec2 forwardPosition(vec2 position, vec2 velocity)
     vec2 newPosition = position + dt*velocity;
     newPosition = clampPosition(newPosition);
     ivec2 newCell = ivec2(newPosition.x/dx, newPosition.y/dx);
-    if(texelFetch(cellType, newCell, 0).r == SOLID)
+    if(newCell.x < 0 || newCell.x >= gridSize.x 
+        || newCell.y < 0 || newCell.y >= gridSize.y 
+        ||texelFetch(cellType, newCell, 0).r == SOLID)
     {
         newPosition = position;
     }
@@ -187,7 +189,7 @@ vec2 forwardPosition(vec2 position, vec2 velocity)
 void main()
 {
     uint id = gl_GlobalInvocationID.x;
-    if(id > numOfParticles) return;
+    if(id >= numOfParticles) return;
 
     vec2 position = particles[id];
     vec2 velocity = vec2(sampleU(position), sampleV(position));

@@ -33,7 +33,7 @@ private:
 	uint32_t initFluidWidth=200, initFluidHeight=200;
 	uint32_t nx = 256, ny=256;
 	float dx = 0.5f;
-	float dt = 0.01f;
+	float dt = 0.001f;
 	uint8_t particlesPerCell = 4;
 	GLuint uInTex, uOutTex, vInTex, vOutTex;
 	GLuint pressureInTex, pressureOutTex;
@@ -45,16 +45,19 @@ private:
 	GLuint64 m_computeTime;
 
 	std::unique_ptr<ShaderProgram> m_clearFluidShader;
-	std::unique_ptr<ShaderProgram> m_velocityAdvectionShader;
+	std::unique_ptr<ShaderProgram> m_velocityVAdvectionShader;
+	std::unique_ptr<ShaderProgram> m_velocityUAdvectionShader;
 	std::unique_ptr<ShaderProgram> m_divergenceShader;
 	std::unique_ptr<ShaderProgram> m_jacobiPSolverShader;
-	std::unique_ptr<ShaderProgram> m_pressureProjectionShader;
+	std::unique_ptr<ShaderProgram> m_pressureProjectionUShader;
+	std::unique_ptr<ShaderProgram> m_pressureProjectionVShader;
 	std::unique_ptr<ShaderProgram> m_boundaryShader;
 	std::unique_ptr<ShaderProgram> m_particleAdvectionShader;
 	std::unique_ptr<ShaderProgram> m_cellUpdateShader;
 	std::unique_ptr<ShaderProgram> m_addForcesShader;
 	std::unique_ptr<ShaderProgram> m_maxVelocityShader;
-	std::unique_ptr<ShaderProgram> m_extrapolateVelocityShader;
+	std::unique_ptr<ShaderProgram> m_extrapolateUVelocityShader;
+	std::unique_ptr<ShaderProgram> m_extrapolateVVelocityShader;
 
 	float time = 0.0f;
 };
