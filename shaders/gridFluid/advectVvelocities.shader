@@ -1,40 +1,30 @@
-#version 430 
+//This shader advects velocities on the grid faces 
 
-layout(local_size_x = 256) in;
+#version 430
 
-layout(binding = 0) uniform usampler2D cellType;
+layout(local_size_x=16, local_size_y=16) in;
+layout(binding = 0) uniform sampler2D uTex;
+layout(binding = 1) uniform sampler2D vTex;
+layout(binding = 2) uniform usampler2D cellType;
 
-
-struct Particle {
-    vec2 position;
-};
-
-layout(std430, binding = 1) buffer Particles {
-    vec2 particles[];
-};
-
-
-layout(binding = 2) uniform sampler2D uTex;
-layout(binding = 3) uniform sampler2D vTex;
-
+layout(r32f, binding = 3) uniform writeonly image2D vOut;
 
 uniform ivec2 gridSize;
 uniform float dt;
 uniform float dx;
-uniform uint numOfParticles;
 
-const int Nx = gridSize.x;
+const int Nx = gridSize.x; 
 const int Ny = gridSize.y;
+
+const uint FLUID = 0u;
+const uint AIR = 1u;
+const uint SOLID = 2u;
 
 
 int checkCellType(ivec2 c)
 {
     return int(texelFetch(cellType, c, 0).r);
 }
-
-const uint FLUID = 0u;
-const uint AIR = 1u;
-const uint SOLID = 2u;
 
 bool uBlocked(int i, int j)
 {
@@ -50,6 +40,38 @@ bool vBlocked(int i, int j)
            checkCellType(ivec2(i, j  )) == SOLID;
 }
 
+float interpolateUonVFace(int i, int j)
+{
+    int i0 = clamp(i,     0, Nx);
+    int i1 = clamp(i + 1, 0, Nx);
+
+    int j0 = clamp(j - 1, 0, Ny - 1);
+    int j1 = clamp(j,     0, Ny - 1);
+
+    float value = 0.0;
+    float div = 0.0;
+    if(!uBlocked(i0,j1))
+    {
+      value += texelFetch(uTex, ivec2(i0,j1),0).r;
+      div += 1.0;
+    }
+    if(!uBlocked(i0,j0))
+    {
+       value += texelFetch(uTex, ivec2(i0,j0),0).r;
+       div += 1.0;
+    }
+    if(!uBlocked(i1,j1))
+    {
+      value += texelFetch(uTex, ivec2(i1,j1),0).r;
+      div += 1.0;
+    }
+    if(!uBlocked(i1, j0))
+    {
+      value += texelFetch(uTex, ivec2(i1,j0),0).r;
+      div += 1.0;
+    }
+    return (div>0.0) ? value/div : 0.0;
+}
 
 vec2 clampU(vec2 p)
 {
@@ -64,6 +86,7 @@ vec2 clampV(vec2 p)
         vec2(0.5*dx, 0.0),
         vec2((gridSize.x-0.5)*dx, gridSize.y*dx));
 }
+
 
 float interpolateUinGrid(vec2 position)
 { 
@@ -164,35 +187,34 @@ float sampleU(vec2 position)
     return interpolateUinGrid(clampU(position));
 }
 
-vec2 clampPosition(vec2 position)
+vec2 backTracePositionRK2(vec2 position, vec2 velocity)
 {
-    vec2 minPos = vec2(0.0);
-    vec2 maxPos = vec2(gridSize.x * dx, gridSize.y * dx);
+    vec2 halfPos = position - dt*velocity/2.0;
+    halfPos = clampV(halfPos);
+    vec2 halfVelocity = vec2(sampleU(halfPos), sampleV(halfPos));
 
-    position = clamp(position, minPos, maxPos);
-    return position;
-}
-vec2 forwardPosition(vec2 position, vec2 velocity)
-{
-    vec2 newPosition = position + dt*velocity;
-    newPosition = clampPosition(newPosition);
-    ivec2 newCell = ivec2(newPosition.x/dx, newPosition.y/dx);
-    if(newCell.x < 0 || newCell.x >= gridSize.x 
-        || newCell.y < 0 || newCell.y >= gridSize.y 
-        ||texelFetch(cellType, newCell, 0).r == SOLID)
-    {
-        newPosition = position;
-    }
-    return newPosition;
+    vec2 backtracedPosition = position - dt*halfVelocity;
+    backtracedPosition = clampV(backtracedPosition);
+    return backtracedPosition;
 }
 
 void main()
 {
-    uint id = gl_GlobalInvocationID.x;
-    if(id >= numOfParticles) return;
+    ivec2 id = ivec2(gl_GlobalInvocationID.xy);
+    if(id.x >= gridSize.x || id.y >= gridSize.y+1) return ;
+    int i = id.x;
+    int j = id.y;
 
-    vec2 position = particles[id];
-    vec2 velocity = vec2(sampleU(position), sampleV(position));
-    vec2 newPosition = forwardPosition(position, velocity);
-    particles[id] = newPosition;
+    uint btype = (j-1 < 0 || j-1 >= gridSize.y) ? SOLID : texelFetch(cellType, ivec2(i,j-1), 0).r;
+    uint ttype = (j< 0 || j>= gridSize.y) ? SOLID : texelFetch(cellType, ivec2(i,j), 0).r;
+    if(btype == FLUID || ttype == FLUID)
+    {
+        vec2 positionV = vec2(i*dx+0.5*dx, j*dx);
+        vec2 velocityOnV = vec2(interpolateUonVFace(i,j), texelFetch(vTex, ivec2(i,j), 0).r);
+        vec2 backtracedPosition = backTracePositionRK2(positionV, velocityOnV);
+        float v = sampleV(backtracedPosition);
+        imageStore(vOut, id, vec4(v));
+    }
+    else
+        imageStore(vOut, id, vec4(0.0));
 }

@@ -1,14 +1,12 @@
-//This shader advects velocities on the grid faces 
+//This shader extrapolate velocities to the air faces 
 
 #version 430
 
 layout(local_size_x=16, local_size_y=16) in;
 layout(binding = 0) uniform sampler2D uTex;
-layout(binding = 1) uniform sampler2D vTex;
-layout(binding = 2) uniform usampler2D cellType;
+layout(binding = 1) uniform usampler2D cellType;
 
-layout(r32f, binding = 3) uniform writeonly image2D uOut;
-layout(r32f, binding = 4) uniform writeonly image2D vOut;
+layout(r32f, binding = 2) uniform writeonly image2D uOut;
 
 uniform ivec2 gridSize;
 uniform float dt;
@@ -19,27 +17,40 @@ const uint FLUID = 0u;
 const uint AIR = 1u;
 const uint SOLID = 2u;
 
+int checkCellType(ivec2 c)
+{
+    return int(texelFetch(cellType, c, 0).r);
+}
+
 uint typeAt(int i, int j)
 {
     if(i < 0 || i >= gridSize.x || j<0 || j>=gridSize.y) return SOLID;
     return texelFetch(cellType, ivec2(i,j), 0).r;
 }
 
+bool isAirOnlyUFace(int i, int j)
+{
+    if(i <= 0 || i >= gridSize.x) return false;
+    return checkCellType(ivec2(i-1, j)) == AIR &&
+           checkCellType(ivec2(i,   j)) == AIR;
+}
+
+bool isFluidAirUFace(int i, int j)
+{
+    if(j <= 0 || j >= gridSize.y || i <= 0 || i >=gridSize.x) return false;
+    return ((checkCellType(ivec2(i-1, j)) == FLUID && checkCellType(ivec2(i, j)) == AIR) 
+    || (checkCellType(ivec2(i-1, j)) == AIR && checkCellType(ivec2(i, j)) == FLUID));
+}
 
 void main()
 {
     ivec2 id = ivec2(gl_GlobalInvocationID.xy);
-    if(id.x >= gridSize.x || id.y >= gridSize.y) return;
+    if(id.x >= gridSize.x + 1 || id.y >= gridSize.y) return;
     int i = id.x;
     int j = id.y;
-    uint type = typeAt(i,j);
-    uint leftType = typeAt(i-1,j);
-    uint bottomType = typeAt(i,j-1);
-    if(type != AIR)
+    if(!isAirOnlyUFace(i,j))
     {
-        float extV = texelFetch(vTex, ivec2(i,j),0).r;
         float extU = texelFetch(uTex, ivec2(i, j),0).r;
-        imageStore(vOut, ivec2(i,j),vec4(extV));
         imageStore(uOut, ivec2(i,j),vec4(extU));
         return;
     }
@@ -50,7 +61,7 @@ void main()
     {
         for(int jj = -borderSize; jj <= borderSize; jj++)
         {
-            if(typeAt(ii, jj) == FLUID)
+            if(isFluidAirUFace(i + ii, j + jj))
             {
                 if(pow(ii,2) + pow(jj,2) < pow(real_ii,2) + pow(real_jj,2))
                 {
@@ -61,21 +72,8 @@ void main()
         }
     }
 
-    if(abs(real_ii) > borderSize) return;
-    if(real_ii < 0) real_ii++; 
-    if(real_jj < 0) real_jj++; 
-    float extV = texelFetch(vTex, ivec2(i+real_ii,j+real_jj),0).r;
+    if(abs(real_ii) > borderSize) { imageStore(uOut, ivec2(i,j),vec4(0.0));return;}
+
     float extU = texelFetch(uTex, ivec2(i+real_ii, j+real_jj),0).r;
-    if(bottomType != AIR)
-    {
-        extV = texelFetch(vTex, ivec2(i,j),0).r;
-    }
-
-    if(leftType != AIR)
-    {
-        extU = texelFetch(uTex, ivec2(i, j),0).r;
-    }
-
-    imageStore(vOut, ivec2(i,j),vec4(extV));
     imageStore(uOut, ivec2(i,j),vec4(extU));
 }
