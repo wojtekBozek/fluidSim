@@ -1,6 +1,9 @@
 #pragma once
 #include "renderer.hpp"
 #include "grid2d.hpp"
+#include "orthographicCamera.hpp"
+#include "perspectiveCamera.hpp"
+
 class  GridRenderer : public BaseRenderer
 {
 public:
@@ -20,7 +23,11 @@ public:
 			glBindTexture(GL_TEXTURE_2D, gridSimulation->getDivergenceTex());
 		if(activeProgram == pressureProgram)
 			glBindTexture(GL_TEXTURE_2D, gridSimulation->getPressureTex());
-
+		if(activeProgram == particleProgram)
+		{
+			renderParticles(camera);
+			return;
+		}
 		shaderProgram->setInt("tex", 0);
 		glBindVertexArray(quadVAO);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
@@ -52,12 +59,48 @@ public:
 		pressureProgram->addShader(GL_FRAGMENT_SHADER, "shaders/gridFluid/debugShaders/pressureGradient.shader");
 		pressureProgram->linkProgram();
 
+		particleProgram = std::make_shared<ShaderProgram>();
+		particleProgram->addShader(GL_VERTEX_SHADER, "shaders/gridFluid/debugShaders/particleVertex.shader");
+		particleProgram->addShader(GL_FRAGMENT_SHADER, "shaders/gridFluid/debugShaders/particleFragment.shader");
+		particleProgram->linkProgram();
+
 		activeProgram = shaderProgram;
 		quadVAO = createQuadVAO();
-		glDisable(GL_PROGRAM_POINT_SIZE);
-		glDisable(GL_CULL_FACE);
-    	glDisable(GL_DEPTH_TEST);
-    	glDisable(GL_BLEND);
+		createParticleVAO();
+		//glDisable(GL_PROGRAM_POINT_SIZE);
+		//glDisable(GL_CULL_FACE);
+    	//glDisable(GL_DEPTH_TEST);
+    	//glDisable(GL_BLEND);
+	}
+
+
+	void renderParticles(std::shared_ptr<rendering::Camera> camera)
+	{
+		particleProgram->useProgram();
+		
+    	glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, gridSimulation->getParticleBuffer());
+    	glm::mat4 viewMatrix = camera->getView();
+    	glm::mat4 projMatrix = camera->getProjection();
+    	particleProgram->setMat4("view", viewMatrix);
+    	particleProgram->setMat4("proj", projMatrix);
+    	particleProgram->setFloat("viewportHeight", camera->getWindowHeight());
+    	particleProgram->setUint("numOfParticles", gridSimulation->getNumOfParticles());
+    	if(camera->getCameraType() == rendering::CameraType::perspective)
+    	{
+    	    particleProgram->setBool("perspectiveProjection", true);
+    	    particleProgram->setFloat("fovy", static_cast<rendering::PerspectiveCamera*>(camera.get())->getFOV()/180.0f*3.1415); 
+    	}
+    	else
+    	{
+    	    particleProgram->setBool("perspectiveProjection", false);
+    	    particleProgram->setFloat("top", static_cast<rendering::OrthographicCamera*>(camera.get())->getTop());
+    	    particleProgram->setFloat("bottom", static_cast<rendering::OrthographicCamera*>(camera.get())->getBottom());
+    	}
+    	particleProgram->setVec3("color", glm::vec3(0.0, 0.3, 0.8));
+    	particleProgram->setFloat("particleRadius", gridSimulation->getDx());
+    	glBindVertexArray(particleVAO);
+    	glDrawArraysInstanced(GL_POINTS, 0, 1, gridSimulation->getNumOfParticles());
+    	glBindVertexArray(0);
 	}
 
 	GLuint createQuadVAO()
@@ -84,11 +127,49 @@ public:
 		return vao;
 	}
 
+	void createParticleVAO()
+	{
+		GLuint dummyVBO;
+    	float dummy = 0.0f;
+
+    	glGenBuffers(1, &dummyVBO);
+    	glBindBuffer(GL_ARRAY_BUFFER, dummyVBO);
+    	glBufferData(GL_ARRAY_BUFFER, sizeof(float), &dummy, GL_STATIC_DRAW);
+
+    	glGenVertexArrays(1, &particleVAO);
+    	glBindVertexArray(particleVAO);
+    	glEnableVertexAttribArray(0);
+    	glVertexAttribPointer(
+    	    0,              // location
+    	    1,              // size
+    	    GL_FLOAT,
+    	    GL_FALSE,
+    	    sizeof(float),
+    	    (void*)0
+    	);
+    	glBindVertexArray(0);
+
+    	glEnable(GL_PROGRAM_POINT_SIZE);
+    	glEnable(GL_DEPTH_TEST);
+    	glDepthFunc(GL_LESS);  // Default: passes if incoming depth < stored depth
+    	glEnable(GL_BLEND);
+    	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
+
 	void setUVelTexActive(){activeProgram = uVelocityProgram;}
 	void setVVelTexActive(){activeProgram = vVelocityProgram;}
 	void setdivergenceTexActive(){activeProgram = divergenceProgram;}
 	void setPressureTexActive(){activeProgram = pressureProgram;}
 	void setDefaultView(){activeProgram = shaderProgram;}
+	void setParticleView()
+	{
+		activeProgram = particleProgram;
+		//glEnable(GL_PROGRAM_POINT_SIZE);
+    	//glEnable(GL_DEPTH_TEST);
+    	//glDepthFunc(GL_LESS);  // Default: passes if incoming depth < stored depth
+    	//glEnable(GL_BLEND);
+    	//glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+	}
 private:
 	std::shared_ptr<ShaderProgram> activeProgram;
 	std::shared_ptr<ShaderProgram> shaderProgram;
@@ -96,8 +177,10 @@ private:
 	std::shared_ptr<ShaderProgram> vVelocityProgram;
 	std::shared_ptr<ShaderProgram> divergenceProgram;
 	std::shared_ptr<ShaderProgram> pressureProgram;
+	std::shared_ptr<ShaderProgram> particleProgram;
 	std::shared_ptr<Grid2D> gridSimulation;
 
+	GLuint particleVAO = 0;
 	GLuint quadVAO = 0;
 	GLuint quadVBO = 0;
 };

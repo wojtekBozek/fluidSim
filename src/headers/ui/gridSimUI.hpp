@@ -23,6 +23,7 @@ private:
 	void divergenceShader();
 	void pressureShader();
 	void visualShader();
+	void particleShader();
 	void timeStepTime();
 	void frameRate();
 	void resetSimulation();
