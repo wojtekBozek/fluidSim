@@ -99,7 +99,7 @@ public:
     	particleProgram->setVec3("color", glm::vec3(0.0, 0.3, 0.8));
     	particleProgram->setFloat("particleRadius", gridSimulation->getDx());
     	glBindVertexArray(particleVAO);
-    	glDrawArraysInstanced(GL_POINTS, 0, 1, gridSimulation->getNumOfParticles());
+    	glDrawArraysInstanced(GL_POINTS, 0, 1, gridSimulation->getNumOfParticles()/float(gridSimulation->getParticlesPerCell()));
     	glBindVertexArray(0);
 	}
 
