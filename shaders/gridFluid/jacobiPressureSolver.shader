@@ -42,7 +42,7 @@ void main()
     int count = 0;
 //
     // Left
-    if (typeAt(i-1,j) != SOLID) { sum += P(i-1,j); count++; }
+    if (typeAt(i-1,j) != SOLID) { sum += P(i-1,j); count++; }  
     // Right
     if (typeAt(i+1,j) != SOLID) { sum += P(i+1,j); count++; }
     // Bottom
@@ -55,7 +55,7 @@ void main()
     // Free-surface Poisson update
     float newPressure = (sum - dx*dx*div) / float(max(count,1));
 
-    //newPressure = max(newPressure, 0.0);
+    newPressure = max(newPressure, 0.0);
 
     imageStore(pressureOut, id, vec4(newPressure));
 }

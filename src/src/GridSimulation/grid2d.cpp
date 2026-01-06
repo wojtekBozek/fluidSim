@@ -265,7 +265,12 @@ void Grid2D::initilizeGrid()
             if (x >= initFluidX && x < initFluidX + initFluidWidth && y >= initFluidY && y < initFluidY + initFluidHeight)
             {
                 type[y * nx + x] = FLUID;
-                particles.push_back(glm::vec2(0.5 * dx + x * dx, 0.5 * dx + y * dx));
+                for(int p = 0; p<particlesPerCell; p++)
+                {
+                    float randX = float(std::rand())/float(RAND_MAX);
+                    float randY = float(std::rand())/float(RAND_MAX);
+                    particles.push_back(glm::vec2(randX * dx + x * dx, randY * dx + y * dx));
+                }
             }
             else
             {
@@ -405,4 +410,19 @@ void Grid2D::setShaders()
     m_extrapolateVelocityShader = std::make_unique<ShaderProgram>();
     m_extrapolateVelocityShader->addShader(GL_COMPUTE_SHADER, "shaders/gridFluid/airExtrapolation.shader");
     m_extrapolateVelocityShader->linkProgram();
+}
+
+void Grid2D::restart()
+{
+    glDeleteTextures(1, &uInTex); 
+    glDeleteTextures(1, &vInTex); 
+    glDeleteTextures(1, &uOutTex); 
+    glDeleteTextures(1, &vOutTex); 
+    glDeleteTextures(1, &divergenceTex); 
+    glDeleteTextures(1, &pressureInTex); 
+    glDeleteTextures(1, &pressureOutTex); 
+    glDeleteTextures(1, &cellTypeTex); 
+    particles.clear();
+    setTextures();
+    initilizeGrid();
 }

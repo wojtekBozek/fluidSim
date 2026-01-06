@@ -12,12 +12,15 @@ void GridSimulationUI::showUI()
 	ImGui::NewFrame();
 	ImGui::Begin("SPH-Simulation");
 	startSimulation();
+	resetSimulation();
 	vVelocityShader();
 	uVelocityShader();
 	divergenceShader();
 	pressureShader();
 	visualShader();
 	returnToMenuButton();
+	timeStepTime();
+	frameRate();
 	ImGui::End();
 	ImGui::Render();
 	ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -86,5 +89,26 @@ void GridSimulationUI::visualShader()
 	if (ImGui::Button("TypeView"))
 	{
 		refRenderer->setDefaultView();
+	}
+}
+
+void GridSimulationUI::timeStepTime()
+{
+	ImGui::Value("ComputeTime [ns]", refSimulation->getComputeTime(), "%.001f");
+
+}
+
+void GridSimulationUI::frameRate()
+{
+	float fr = 1.0f / (static_cast<float>(refSimulation->getComputeTime())/1000000000.000f);
+
+	ImGui::Value("FrameRate", fr, "%.001f");
+}
+
+void GridSimulationUI::resetSimulation()
+{
+	if (ImGui::Button("Reset"))
+	{
+		refSimulation->restart();
 	}
 }

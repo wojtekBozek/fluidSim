@@ -62,8 +62,10 @@ void main()
     }
 
     if(abs(real_ii) > borderSize) return;
-    float extV = texelFetch(vTex, ivec2(i+real_ii,j+real_jj+1),0).r;
-    float extU = texelFetch(uTex, ivec2(i+real_ii+1, j+real_jj),0).r;
+    if(real_ii < 0) real_ii++; 
+    if(real_jj < 0) real_jj++; 
+    float extV = texelFetch(vTex, ivec2(i+real_ii,j+real_jj),0).r;
+    float extU = texelFetch(uTex, ivec2(i+real_ii, j+real_jj),0).r;
     if(bottomType != AIR)
     {
         extV = texelFetch(vTex, ivec2(i,j),0).r;

@@ -8,7 +8,7 @@ class GridSimulationUI : public BaseUI
 {
 public:
 	//SPHsimulationUI() = default;
-	GridSimulationUI(std::shared_ptr<ContextState> context, std::shared_ptr<GridRenderer> renderer, std::shared_ptr<BaseGrid> simulation, GLFWwindow* window, std::shared_ptr<ProgramState> state) : BaseUI(window, state)
+	GridSimulationUI(std::shared_ptr<ContextState> context, std::shared_ptr<GridRenderer> renderer, std::shared_ptr<Grid2D> simulation, GLFWwindow* window, std::shared_ptr<ProgramState> state) : BaseUI(window, state)
 	{
 		refContext = context;
 		refRenderer = renderer;
@@ -23,7 +23,10 @@ private:
 	void divergenceShader();
 	void pressureShader();
 	void visualShader();
-	std::shared_ptr<BaseGrid> refSimulation;
+	void timeStepTime();
+	void frameRate();
+	void resetSimulation();
+	std::shared_ptr<Grid2D> refSimulation;
 	std::shared_ptr<GridRenderer> refRenderer;
 	std::shared_ptr<ContextState> refContext;
 };

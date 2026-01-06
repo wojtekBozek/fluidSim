@@ -14,12 +14,13 @@ public:
 
 	void setTextures();
 	void setShaders();
-
+	void restart();
 	GLuint getTypeCell() { return cellTypeTex; }
 	GLuint getuTex() { return uInTex; }
 	GLuint getvTex() { return vInTex; }
 	GLuint getDivergenceTex() { return divergenceTex; }
 	GLuint getPressureTex() { return pressureInTex; }
+	GLuint64 getComputeTime() {return m_computeTime;}
 
 	const std::vector<glm::vec2>& getParticles() const;
 private:
@@ -31,8 +32,9 @@ private:
 	uint8_t pressureIterations = 40;
 	uint32_t initFluidWidth=200, initFluidHeight=200;
 	uint32_t nx = 256, ny=256;
-	float dx = 0.05f;
+	float dx = 0.5f;
 	float dt = 0.01f;
+	uint8_t particlesPerCell = 4;
 	GLuint uInTex, uOutTex, vInTex, vOutTex;
 	GLuint pressureInTex, pressureOutTex;
 	GLuint divergenceTex;
