@@ -304,19 +304,7 @@ const std::vector<glm::vec2>& Grid2D::getParticles() const
 
 void Grid2D::initilizeGrid()
 {
-    /*
-    m_initShader->useProgram();
-
-    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R8UI);
-    glBindImageTexture(1, uInTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
-    glBindImageTexture(2, vInTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
-    glBindImageTexture(3, pressureInTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
-    glBindImageTexture(4, divergenceTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
-
-    m_initShader->setInt2("gridSize", nx, ny);
-    glDispatchCompute((nx+15) / 16, (ny + 15) / 16, 1);
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);*/
-    uint32_t sqr = sqrt(particlesPerCell);
+    uint32_t sqr = ceil(sqrt(particlesPerCell));
     std::vector<GLuint> type(nx * ny, 0);
     for (uint32_t y = 0; y < ny; ++y)
     {

@@ -32,12 +32,12 @@ private:
 	const GLuint FLUID = 0u;
 	const GLuint AIR = 1u;
 	const GLuint SOLID = 2u;
-	uint32_t initFluidX = 30, initFluidY=30;
-	uint32_t pressureIterations = 100;
-	uint32_t initFluidWidth=200, initFluidHeight=200;
+	uint32_t initFluidX = 5, initFluidY=5;
+	uint32_t pressureIterations = 200;
+	uint32_t initFluidWidth=nx-12, initFluidHeight=200;
 	uint32_t nx = 256, ny=256;
 	float dx = 0.05f;
-	float dt = 0.001f;
+	float dt = 0.0005f;
 	uint8_t particlesPerCell = 16;
 	GLuint uInTex, uOutTex, vInTex, vOutTex;
 	GLuint pressureInTex, pressureOutTex;

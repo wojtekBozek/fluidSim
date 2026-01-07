@@ -11,7 +11,7 @@ layout(r32f, binding = 2) uniform writeonly image2D vOut;
 uniform ivec2 gridSize;
 uniform float dt;
 uniform float dx;
-uniform int borderSize = 1;
+uniform int borderSize = 4;
 
 const uint FLUID = 0u;
 const uint AIR = 1u;
@@ -68,14 +68,14 @@ void main()
                     real_ii = ii;
                     real_jj = jj;
                 }
-                else if(pow(ii,2) + pow(jj,2) == pow(real_ii,2) + pow(real_jj,2))
-                {
-                    if(abs(jj) < abs(real_jj))
-                    {
-                        real_ii = ii;
-                        real_jj = jj;
-                    }
-                }
+                //else if(pow(ii,2) + pow(jj,2) == pow(real_ii,2) + pow(real_jj,2))
+                //{
+                //    if(abs(jj) < abs(real_jj))
+                //    {
+                //        real_ii = ii;
+                //        real_jj = jj;
+                //    }
+                //}
             }
         }
     }
