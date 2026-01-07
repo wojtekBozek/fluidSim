@@ -97,9 +97,9 @@ public:
     	    particleProgram->setFloat("bottom", static_cast<rendering::OrthographicCamera*>(camera.get())->getBottom());
     	}
     	particleProgram->setVec3("color", glm::vec3(0.0, 0.3, 0.8));
-    	particleProgram->setFloat("particleRadius", gridSimulation->getDx());
+    	particleProgram->setFloat("particleRadius", gridSimulation->getDx()/float(sqrt(gridSimulation->getParticlesPerCell())));
     	glBindVertexArray(particleVAO);
-    	glDrawArraysInstanced(GL_POINTS, 0, 1, gridSimulation->getNumOfParticles()/float(gridSimulation->getParticlesPerCell()));
+    	glDrawArraysInstanced(GL_POINTS, 0, 1, gridSimulation->getNumOfParticles());
     	glBindVertexArray(0);
 	}
 

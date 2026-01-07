@@ -23,7 +23,7 @@ public:
 	GLuint getPressureTex() { return pressureInTex; }
 	GLuint64 getComputeTime() {return m_computeTime;}
 	GLuint64 getParticleBuffer() {return m_particleBuffer;}
-	uint8_t getParticlesPerCell() {return m_partPerCell;}
+	uint8_t getParticlesPerCell() {return particlesPerCell;}
 	float getDx() {return dx;}
 
 	const std::vector<glm::vec2>& getParticles() const;
@@ -32,14 +32,13 @@ private:
 	const GLuint FLUID = 0u;
 	const GLuint AIR = 1u;
 	const GLuint SOLID = 2u;
-	uint32_t initFluidX = 0, initFluidY=0;
-	uint8_t pressureIterations = 40;
-	uint32_t initFluidWidth=50, initFluidHeight=80;
-	uint32_t nx = 128, ny=128;
-	uint8_t m_partPerCell = 4;
+	uint32_t initFluidX = 30, initFluidY=30;
+	uint32_t pressureIterations = 100;
+	uint32_t initFluidWidth=200, initFluidHeight=200;
+	uint32_t nx = 256, ny=256;
 	float dx = 0.05f;
-	float dt = 0.0001f;
-	uint8_t particlesPerCell = 4;
+	float dt = 0.001f;
+	uint8_t particlesPerCell = 16;
 	GLuint uInTex, uOutTex, vInTex, vOutTex;
 	GLuint pressureInTex, pressureOutTex;
 	GLuint divergenceTex;

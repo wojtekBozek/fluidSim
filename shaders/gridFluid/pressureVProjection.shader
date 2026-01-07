@@ -9,6 +9,7 @@ layout(binding = 2) uniform usampler2D cellType;
 uniform float dt;
 uniform float dx;
 uniform ivec2 gridSize;
+uniform float density = 997.0;
 
 
 const uint FLUID = 0u;
