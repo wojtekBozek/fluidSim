@@ -10,7 +10,7 @@ layout(binding = 3, r32f) uniform writeonly image2D pressureOut;
 
 uniform float dx;
 uniform ivec2 gridSize;
-uniform float overrelaxation = 0.9;
+uniform float overrelaxation = 1.0;
 
 const uint FLUID = 0u;
 const uint AIR = 1u;
@@ -42,7 +42,7 @@ void main()
     if (typeAt(i,j+1) == FLUID) { sum += P(i,j+1); count++; } else if(typeAt(i,j+1) == SOLID) { sum += P(i,j); count++; }  
     float div = texelFetch(divergence, id, 0).r;
     // Free-surface Poisson update
-    float newPressure = (sum - dx*dx*div) / float(max(count,1));
+    float newPressure = (sum - dx*dx*div) / (float(max(count,1)));
     float oldPressure = P(i,j);
     newPressure = mix(oldPressure, newPressure, overrelaxation);
 

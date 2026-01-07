@@ -100,8 +100,9 @@ void Grid2D::run()
     
     glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+    /*
     
-    /**/
+    */
     m_extrapolateUVelocityShader->useProgram();
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, cellTypeTex);
@@ -113,7 +114,7 @@ void Grid2D::run()
     m_extrapolateUVelocityShader->setFloat("dx", dx);
     glDispatchCompute(((nx+1) + 15) / 16, (ny+15) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-
+    
     m_extrapolateVVelocityShader->useProgram();
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, cellTypeTex);
@@ -125,7 +126,7 @@ void Grid2D::run()
     m_extrapolateVVelocityShader->setFloat("dx", dx);
     glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);    
-
+    
     
     std::swap(uInTex, uOutTex);
     std::swap(vInTex, vOutTex);
@@ -167,7 +168,8 @@ void Grid2D::run()
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
         std::swap(pressureInTex, pressureOutTex);
     }
-        
+    //for(int i = 0; i< 50; i++)  
+    //{  
     m_pressureProjectionUShader->useProgram();
     glBindImageTexture(0, uOutTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
     glActiveTexture(GL_TEXTURE1);
@@ -190,9 +192,9 @@ void Grid2D::run()
     m_pressureProjectionVShader->setIVec2("gridSize", glm::ivec2(nx,ny));
     m_pressureProjectionVShader->setFloat("dt", dt);
     m_pressureProjectionVShader->setFloat("dx", dx);
-    
     glDispatchCompute(((nx+1) + 15) / 16, (ny+15) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+    //}
     m_extrapolateUVelocityShader->useProgram();
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, cellTypeTex);
@@ -314,13 +316,13 @@ void Grid2D::initilizeGrid()
     m_initShader->setInt2("gridSize", nx, ny);
     glDispatchCompute((nx+15) / 16, (ny + 15) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);*/
-    
+    uint32_t sqr = sqrt(particlesPerCell);
     std::vector<GLuint> type(nx * ny, 0);
     for (uint32_t y = 0; y < ny; ++y)
     {
         for (uint32_t x = 0; x < nx; ++x)
         {
-            if(0 == x || 0 == y || nx-1 == x || ny-1 == y)
+            if(5 > x || 5> y || nx-5 <= x || ny-5 <= y)
             {
                 type[y * nx + x] = SOLID;
                 continue;
@@ -328,11 +330,12 @@ void Grid2D::initilizeGrid()
             if (x >= initFluidX && x < initFluidX + initFluidWidth && y >= initFluidY && y < initFluidY + initFluidHeight)
             {
                 type[y * nx + x] = FLUID;
+
                 for(int p = 0; p<particlesPerCell; p++)
                 {
-                    float randX = float(std::rand())/float(RAND_MAX);
-                    float randY = float(std::rand())/float(RAND_MAX);
-                    particles.push_back(glm::vec2(randX * dx + x * dx, randY * dx + y * dx));
+                    float randX = p%sqr;//float(std::rand())/float(RAND_MAX);
+                    float randY = p/sqr;//float(std::rand())/float(RAND_MAX);
+                    particles.push_back(glm::vec2(randX/float(sqr) * dx + x * dx + dx, randY/float(sqr) * dx + y * dx + dx));
                 }
             }
             else
