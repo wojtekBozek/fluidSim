@@ -292,7 +292,7 @@ void Grid2D::setDimensions(uint32_t x, uint32_t y)
     ny = y;
 }
 
-void Grid2D::setCellSize(double x)
+void Grid2D::setCellSize(float x)
 {
     dx = x;
 }
@@ -304,7 +304,7 @@ const std::vector<glm::vec2>& Grid2D::getParticles() const
 
 void Grid2D::initilizeGrid()
 {
-    uint32_t sqr = ceil(sqrt(particlesPerCell));
+    uint32_t sqr = sqrt(particlesPerCell);
     std::vector<GLuint> type(nx * ny, 0);
     for (uint32_t y = 0; y < ny; ++y)
     {
