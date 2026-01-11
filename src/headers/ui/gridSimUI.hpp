@@ -16,6 +16,16 @@ public:
 	}
 	void showUI() override;
 private:
+	void setTimeStep();
+	void setSimDim();
+	void setFluidDim();
+	void setFluidPos();
+	void setPressureIterations();
+	void setCellSize();
+	void setBorderSize();
+
+	void confirmChanges();
+
 	void returnToMenuButton();
 	void startSimulation();
 	void vVelocityShader();

@@ -58,7 +58,7 @@ void SPHsimulationUI::fluidStiffYcoeffTextInput()
 {
 	float PrevValue = refSimulation->getFluid().stiffnesY;
 	uiValues.y = PrevValue;
-	ImGui::InputFloat("StiffnessY", &uiValues.y, 1.0f, 15.0f, "%.1f");
+	ImGui::InputFloat("StiffnessY", &uiValues.y, 1.0f, 15.0f, "%.3f");
 
 	if (uiValues.y != PrevValue)
 	{
@@ -70,7 +70,7 @@ void SPHsimulationUI::fluidDensityTextInput()
 {
 	float PrevValue = refSimulation->getFluid().fluidDensity;
 	uiValues.density = PrevValue;
-	ImGui::InputFloat("Density", &uiValues.density, 0.0f, 10000000.0f, "%.0001f");
+	ImGui::InputFloat("Density", &uiValues.density, 0.0f, 10000000.0f, "%.4f");
 
 	if (uiValues.density != PrevValue)
 	{
@@ -108,10 +108,10 @@ void SPHsimulationUI::fluidVolumeTextInputs()
 {
 	glm::vec3 PrevValue = refSimulation->getFluidDomain().size;
 	uiValues.fluidInitSize = PrevValue;
-	ImGui::InputFloat("SimFluidSizeX", &uiValues.fluidInitSize.x, 0.0f, 10000000.0f, "%.0001f");
-	ImGui::InputFloat("SimFluidSizeY", &uiValues.fluidInitSize.y, 0.0f, 10000000.0f, "%.0001f");
+	ImGui::InputFloat("SimFluidSizeX", &uiValues.fluidInitSize.x, 0.0f, 10000000.0f, "%.4f");
+	ImGui::InputFloat("SimFluidSizeY", &uiValues.fluidInitSize.y, 0.0f, 10000000.0f, "%.4f");
 	if(refSimulation->getSimulationDimension() == SimDim::DIMENSION_3)
-		ImGui::InputFloat("SimFluidSizeZ", &uiValues.fluidInitSize.z, 0.0f, 10000000.0f, "%.0001f");
+		ImGui::InputFloat("SimFluidSizeZ", &uiValues.fluidInitSize.z, 0.0f, 10000000.0f, "%.4f");
 
 	//if (uiValues.fluidInitSize != PrevValue)
 	//{
@@ -123,10 +123,10 @@ void SPHsimulationUI::fluidPositionTextInputs()
 {
 	glm::vec3 PrevValue = refSimulation->getFluidDomain().posittion;
 	uiValues.fluidInitPos = PrevValue;
-	ImGui::InputFloat("fluidInitPosX", &uiValues.fluidInitPos.x, -10000000.0f, 10000000.0f, "%.0001f");
-	ImGui::InputFloat("fluidInitPosY", &uiValues.fluidInitPos.y, -10000000.0f, 10000000.0f, "%.0001f");
+	ImGui::InputFloat("fluidInitPosX", &uiValues.fluidInitPos.x, -10000000.0f, 10000000.0f, "%.4f");
+	ImGui::InputFloat("fluidInitPosY", &uiValues.fluidInitPos.y, -10000000.0f, 10000000.0f, "%.4f");
 	if (refSimulation->getSimulationDimension() == SimDim::DIMENSION_3)
-		ImGui::InputFloat("fluidInitPosZ", &uiValues.fluidInitPos.z, -10000000.0f, 10000000.0f, "%.0001f");
+		ImGui::InputFloat("fluidInitPosZ", &uiValues.fluidInitPos.z, -10000000.0f, 10000000.0f, "%.4f");
 
 	//if (uiValues.fluidInitPos != PrevValue)
 	//{
@@ -138,10 +138,10 @@ void SPHsimulationUI::simulationVolumeTextInputs()
 {
 	glm::vec3 PrevValue = refSimulation->getSimulationDomain().size;
 	uiValues.simDomainSize = PrevValue;
-	ImGui::InputFloat("SimDomainSizeX", &uiValues.simDomainSize.x, 0.0f, 10000000.0f, "%.0001f");
-	ImGui::InputFloat("SimDomainSizeY", &uiValues.simDomainSize.y, 0.0f, 10000000.0f, "%.0001f");
+	ImGui::InputFloat("SimDomainSizeX", &uiValues.simDomainSize.x, 0.0f, 10000000.0f, "%.4f");
+	ImGui::InputFloat("SimDomainSizeY", &uiValues.simDomainSize.y, 0.0f, 10000000.0f, "%.4f");
 	if (refSimulation->getSimulationDimension() == SimDim::DIMENSION_3)
-		ImGui::InputFloat("SimDomainSizeZ", &uiValues.simDomainSize.z, 0.0f, 10000000.0f, "%.0001f");
+		ImGui::InputFloat("SimDomainSizeZ", &uiValues.simDomainSize.z, 0.0f, 10000000.0f, "%.4f");
 
 	//if (uiValues.simDomainSize != PrevValue)
 	//{
@@ -195,12 +195,12 @@ void SPHsimulationUI::numOfParticlesTextInfo()
 
 void SPHsimulationUI::volumeTextInfo()
 {
-	ImGui::Value("FluidVolume", refSimulation->getFluid().volume, "%.001f");
+	ImGui::Value("FluidVolume", refSimulation->getFluid().volume, "%.3f");
 }
 
 void SPHsimulationUI::nsComputationTextInfo()
 {
-	ImGui::Value("ComputeTime [ns]", refSimulation->getComputeTime(), "%.001f");
+	ImGui::Value("ComputeTime [ns]", refSimulation->getComputeTime(), "%.3f");
 }
 
 void SPHsimulationUI::frameRateTextInfo()
