@@ -87,7 +87,7 @@ void Grid2D::GaussSiedelSolver()
         m_gaussSiedelDivergenceShader->setIVec2("gridSize", glm::ivec2(nx,ny));
         m_gaussSiedelDivergenceShader->setFloat("dt", dt);
         m_gaussSiedelDivergenceShader->setFloat("dx", dx);
-        m_gaussSiedelDivergenceShader->setFloat("overrelaxation", 1.0f);
+        m_gaussSiedelDivergenceShader->setFloat("overrelaxation", 1.9f);
         
         glDispatchCompute((nx+15) / 16, (ny+15) / 16, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
@@ -254,7 +254,6 @@ void Grid2D::run()
     
     glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-    /*
     
     
     m_extrapolateUVelocityShader->useProgram();
@@ -284,6 +283,7 @@ void Grid2D::run()
     
     std::swap(uInTex, uOutTex);
     std::swap(vInTex, vOutTex);
+    /*
     */
     
     GaussSiedelSolver();
