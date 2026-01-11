@@ -39,6 +39,8 @@ public:
 
 	const std::vector<glm::vec2>& getParticles() const;
 private:
+	void JacobiSolver();
+	void GaussSiedelSolver();
 	GLuint floatSSBO, floatSSBO2;
 	const GLuint FLUID = 0u;
 	const GLuint AIR = 1u;
@@ -74,6 +76,12 @@ private:
 	std::unique_ptr<ShaderProgram> m_maxVelocityShader;
 	std::unique_ptr<ShaderProgram> m_extrapolateUVelocityShader;
 	std::unique_ptr<ShaderProgram> m_extrapolateVVelocityShader;
+
+	std::unique_ptr<ShaderProgram> m_gaussSiedelDivergenceShader;
+	std::unique_ptr<ShaderProgram> m_redUVelocityShader;
+	std::unique_ptr<ShaderProgram> m_redVVelocityShader;
+	std::unique_ptr<ShaderProgram> m_blackUVelocityShader;
+	std::unique_ptr<ShaderProgram> m_blackVVelocityShader;
 
 	float time = 0.0f;
 };
