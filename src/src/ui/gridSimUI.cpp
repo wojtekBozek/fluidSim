@@ -118,7 +118,7 @@ void GridSimulationUI::setBorderSize()
 	ImGui::InputInt("Border size [in cells]", &size, 1, std::min(refSimulation->getFluidSize().x,refSimulation->getFluidSize().y));
 	if(ref != size)
 	{
-		refSimulation->setPressureIterations(size);
+		refSimulation->setBorderSize(size);
 	}
 }
 
