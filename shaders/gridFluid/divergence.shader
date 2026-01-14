@@ -58,7 +58,7 @@ void main()
     float vT = vBlocked(i, j+1) ? 0.0 : V(i, j+1);
     float vB = vBlocked(i, j  ) ? 0.0 : V(i, j  );
 
-    float div = (uR - uL + vT - vB)*0.5/dx;
+    float div = (uR - uL + vT - vB);
     imageStore(divergence, id, vec4(div));
 }
 

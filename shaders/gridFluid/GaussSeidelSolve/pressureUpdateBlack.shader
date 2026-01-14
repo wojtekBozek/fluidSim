@@ -12,7 +12,7 @@ uniform float dx;
 uniform float dt;
 uniform float dens;
 uniform ivec2 gridSize;
-uniform float overrelaxation = 1.0;
+uniform float overrelaxation = 1.5;
 
 const uint FLUID = 0u;
 const uint AIR = 1u;
@@ -28,6 +28,8 @@ void main()
 
     int i = id.x;
     int j = id.y;
+
+    if((i%2 == 0 && j%2 == 0) || (i%2 == 1 && j%2 == 1)) {imageStore(pressureOut, id, vec4(P(i,j))); return;}
 
     if(typeAt(i,j) != FLUID) {imageStore(pressureOut, id, vec4(0.0)); return;}
 
@@ -46,7 +48,7 @@ void main()
     // Free-surface Poisson update
     float newPressure = (sum - dens*dx*div/dt) / (float(max(count,1)));
     float oldPressure = P(i,j);
-    //newPressure = mix(oldPressure, newPressure, overrelaxation);
-    newPressure = oldPressure + (newPressure-oldPressure)*overrelaxation;
+    newPressure = oldPressure+(newPressure-oldPressure);
+
     imageStore(pressureOut, id, vec4(newPressure));
 }

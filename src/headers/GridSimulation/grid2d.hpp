@@ -41,6 +41,7 @@ public:
 private:
 	void JacobiSolver();
 	void GaussSiedelSolver();
+	void GaussSiedelPressureSolver();
 	GLuint floatSSBO, floatSSBO2;
 	const GLuint FLUID = 0u;
 	const GLuint AIR = 1u;
@@ -51,7 +52,7 @@ private:
 	uint32_t initFluidWidth=200, initFluidHeight=200;
 	uint32_t nx = 256, ny=256;
 	float dx = 0.05f;
-	float dt = 0.0005f;
+	float dt = 0.0025f;
 	uint8_t particlesPerCell = 16;
 	GLuint uInTex, uOutTex, vInTex, vOutTex;
 	GLuint pressureInTex, pressureOutTex;
@@ -67,6 +68,8 @@ private:
 	std::unique_ptr<ShaderProgram> m_velocityUAdvectionShader;
 	std::unique_ptr<ShaderProgram> m_divergenceShader;
 	std::unique_ptr<ShaderProgram> m_jacobiPSolverShader;
+	std::unique_ptr<ShaderProgram> m_gsRedPSolverShader;
+	std::unique_ptr<ShaderProgram> m_gsBlackPSolverShader;
 	std::unique_ptr<ShaderProgram> m_pressureProjectionUShader;
 	std::unique_ptr<ShaderProgram> m_pressureProjectionVShader;
 	std::unique_ptr<ShaderProgram> m_boundaryShader;

@@ -22,5 +22,5 @@ void main() {
     }
     
     imageStore(divergence, id, uvec4(0.0));
-    //imageStore(pressure, id, uvec4(0.0));
+    imageStore(pressure, id, uvec4(0.0));
 }

@@ -8,10 +8,12 @@ layout(binding = 1) uniform sampler2D vTex;
 layout(binding = 2) uniform usampler2D cellType;
 
 layout(binding = 3, r32f) uniform writeonly image2D divergence;
+//layout(binding = 4, r32f) uniform image2D pressure;
 
 uniform float dx; 
 uniform ivec2 gridSize;
 uniform float dt;
+uniform float density;
 uniform float overrelaxation;
 float U(int i, int j) {return texelFetch(uTex, ivec2(i, j), 0).r;}
 float V(int i, int j) {return texelFetch(vTex, ivec2(i, j), 0).r;}
@@ -49,6 +51,7 @@ void main()
     if(type != FLUID)
     {
         imageStore(divergence, id, vec4(0.0));
+        //imageStore(pressure, id, vec4(0.0));
         return;
     }
     int i = id.x;
@@ -59,7 +62,15 @@ void main()
     float vT = vBlocked(i, j+1) ? 0.0 : V(i, j+1);
     float vB = vBlocked(i, j  ) ? 0.0 : V(i, j  );
 
-    float div = overrelaxation*(uR - uL + vT - vB);
-    imageStore(divergence, id, vec4(div));
+    int s = 0;
+    if(!uBlocked(i+1, j)) s++;
+    if(!uBlocked(i,   j)) s++;
+    if(!vBlocked(i, j+1)) s++;
+    if(!vBlocked(i, j  )) s++;
+    float div = (uR - uL + vT - vB);
+    //float locPressure = imageLoad(pressure, id).r;
+    //locPressure += (s > 0) ? div/float(s)*density*dx/dt : 0.0;
+    imageStore(divergence, id, vec4(div));   
+    //imageStore(pressure, id, vec4(locPressure));
 }
 
