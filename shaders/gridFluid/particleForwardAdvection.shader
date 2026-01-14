@@ -186,6 +186,30 @@ vec2 forwardPosition(vec2 position, vec2 velocity)
     return newPosition;
 }
 
+vec2 forwardRK2Position(vec2 position, vec2 velocity)
+{
+    vec2 halfPosition = position + dt*0.5*velocity;
+    halfPosition = clampPosition(halfPosition);
+    ivec2 halfCell = ivec2(halfPosition.x/dx, halfPosition.y/dx);
+    if(halfCell.x < 0 || halfCell.x >= gridSize.x 
+        || halfCell.y < 0 || halfCell.y >= gridSize.y 
+        ||texelFetch(cellType, halfCell, 0).r == SOLID)
+    {
+        halfPosition = position;
+    }
+
+    vec2 halfVelocity = vec2(sampleU(halfPosition), sampleV(halfPosition));
+    vec2 newPosition = position + dt*halfVelocity;
+    ivec2 newCell = ivec2(newPosition.x/dx, newPosition.y/dx);
+    if(newCell.x < 0 || newCell.x >= gridSize.x 
+        || newCell.y < 0 || newCell.y >= gridSize.y 
+        ||texelFetch(cellType, newCell, 0).r == SOLID)
+    {
+        newPosition = position;
+    }
+    return newPosition;
+}
+
 void main()
 {
     uint id = gl_GlobalInvocationID.x;
@@ -193,6 +217,6 @@ void main()
 
     vec2 position = particles[id];
     vec2 velocity = vec2(sampleU(position), sampleV(position));
-    vec2 newPosition = forwardPosition(position, velocity);
+    vec2 newPosition = forwardRK2Position(position, velocity);
     particles[id] = newPosition;
 }
