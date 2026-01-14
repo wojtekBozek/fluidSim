@@ -9,6 +9,8 @@ layout(binding = 2) uniform usampler2D cellType;
 layout(binding = 3, r32f) uniform writeonly image2D pressureOut;
 
 uniform float dx;
+uniform float dt;
+uniform float dens;
 uniform ivec2 gridSize;
 uniform float overrelaxation = 1.0;
 
@@ -33,18 +35,18 @@ void main()
     int count = 0;
 //
     // Left
-    if (typeAt(i-1,j) == FLUID) { sum += P(i-1,j); count++; } else if(typeAt(i-1,j) == SOLID) { sum += P(i,j); count++; }  
-    // Right
-    if (typeAt(i+1,j) == FLUID) { sum += P(i+1,j); count++; } else if(typeAt(i+1,j) == SOLID) { sum += P(i,j); count++; }  
-    // Bottom
-    if (typeAt(i,j-1) == FLUID) { sum += P(i,j-1); count++; } else if(typeAt(i,j-1) == SOLID) { sum += P(i,j); count++; }  
-    // Top
-    if (typeAt(i,j+1) == FLUID) { sum += P(i,j+1); count++; } else if(typeAt(i,j+1) == SOLID) { sum += P(i,j); count++; }  
+    if (typeAt(i-1,j) == FLUID) { sum += P(i-1,j); count++; } else if(typeAt(i-1,j) == AIR) { sum += 0.0; count++; }  
+    // Right////
+    if (typeAt(i+1,j) == FLUID) { sum += P(i+1,j); count++; } else if(typeAt(i+1,j) == AIR) { sum += 0.0; count++; }  
+    // Bottom////
+    if (typeAt(i,j-1) == FLUID) { sum += P(i,j-1); count++; } else if(typeAt(i,j-1) == AIR) { sum += 0.0; count++; }  
+    // Top////
+    if (typeAt(i,j+1) == FLUID) { sum += P(i,j+1); count++; } else if(typeAt(i,j+1) == AIR) { sum += 0.0; count++; }  
     float div = texelFetch(divergence, id, 0).r;
     // Free-surface Poisson update
-    float newPressure = (sum - dx*dx*div) / (float(max(count,1)));
+    float newPressure = (sum - dens*dx*div/dt) / (float(max(count,1)));
     float oldPressure = P(i,j);
-    newPressure = mix(oldPressure, newPressure, overrelaxation);
-
+    //newPressure = mix(oldPressure, newPressure, overrelaxation);
+    newPressure = oldPressure + (newPressure-oldPressure)*overrelaxation;
     imageStore(pressureOut, id, vec4(newPressure));
 }
