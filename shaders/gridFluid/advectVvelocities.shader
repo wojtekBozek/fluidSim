@@ -73,21 +73,6 @@ float interpolateUonVFace(int i, int j)
     return (div>0.0) ? value/div : 0.0;
 }
 
-vec2 clampU(vec2 p)
-{
-    return clamp(p,
-        vec2(0.0, 0.5*dx),
-        vec2(gridSize.x*dx, (gridSize.y-0.5)*dx));
-}
-
-vec2 clampV(vec2 p)
-{
-    return clamp(p,
-        vec2(0.5*dx, 0.0),
-        vec2((gridSize.x-0.5)*dx, gridSize.y*dx));
-}
-
-
 float interpolateUinGrid(vec2 position)
 { 
     int i = int(position.x/dx);
@@ -101,6 +86,11 @@ float interpolateUinGrid(vec2 position)
         downDistance += dx/2.0;
     }
 
+    int i0 = clamp(i,     0, Nx);
+    int i1 = clamp(i + 1, 0, Nx);
+
+    int j0 = clamp(j, 0, Ny - 1);
+    int j1 = clamp(j+1,     0, Ny - 1);
     float w00 = 1.0 - backDistance/dx; 
     float w01 = backDistance/dx; 
     float w10 = 1.0 - downDistance/dx; 
@@ -108,24 +98,24 @@ float interpolateUinGrid(vec2 position)
 
     float value = 0.0;
     float sumW = 0.0;
-    if(!uBlocked(i,j))
+    if(!uBlocked(i0,j0))
     {
-      value += texelFetch(uTex, ivec2(i,j),0).r * w00 * w10;
+      value += texelFetch(uTex, ivec2(i0,j0),0).r * w00 * w10;
       sumW += w00 * w10;
     }
-    if(!uBlocked(i,j+1))
+    if(!uBlocked(i0,j1))
     {
-      value += texelFetch(uTex, ivec2(i,j+1),0).r * w00 * w11;
+      value += texelFetch(uTex, ivec2(i0,j1),0).r * w00 * w11;
       sumW += w00 * w11;
     }
-    if(!uBlocked(i+1,j+1))
+    if(!uBlocked(i1,j1))
     {
-      value += texelFetch(uTex, ivec2(i+1,j+1),0).r * w01 * w11;
+      value += texelFetch(uTex, ivec2(i1,j1),0).r * w01 * w11;
       sumW += w01 * w11;
     }
-    if(!uBlocked(i+1,j))
+    if(!uBlocked(i1,j0))
     {
-      value += texelFetch(uTex, ivec2(i+1,j),0).r * w01 * w10;
+      value += texelFetch(uTex, ivec2(i1,j0),0).r * w01 * w10;
       sumW += w01 * w10;
     }
 
@@ -145,7 +135,11 @@ float interpolateVinGrid(vec2 position)
         i--;
         backDistance += dx/2.0;
     }
+    int i0 = clamp(i,     0, Nx);
+    int i1 = clamp(i + 1, 0, Nx);
 
+    int j0 = clamp(j, 0, Ny - 1);
+    int j1 = clamp(j+1,     0, Ny - 1);
     float w00 = 1.0 - backDistance/dx; 
     float w01 = backDistance/dx; 
     float w10 = 1.0 - downDistance/dx; 
@@ -153,24 +147,24 @@ float interpolateVinGrid(vec2 position)
 
     float value = 0.0;
     float sumW = 0.0;
-    if(!vBlocked(i,j))
+    if(!vBlocked(i0,j0))
     {
-      value += texelFetch(vTex, ivec2(i,j),0).r * w00 * w10;
+      value += texelFetch(vTex, ivec2(i0,j0),0).r * w00 * w10;
       sumW += w00 * w10;
     }
-    if(!vBlocked(i,j+1))
+    if(!vBlocked(i0,j1))
     {
-      value += texelFetch(vTex, ivec2(i,j+1),0).r * w00 * w11;
+      value += texelFetch(vTex, ivec2(i0,j1),0).r * w00 * w11;
       sumW += w00 * w11;
     }
-    if(!vBlocked(i+1,j+1))
+    if(!vBlocked(i1,j1))
     {
-      value += texelFetch(vTex, ivec2(i+1,j+1),0).r * w01 * w11;
+      value += texelFetch(vTex, ivec2(i1,j1),0).r * w01 * w11;
       sumW += w01 * w11;
     }
-    if(!vBlocked(i+1,j))
+    if(!vBlocked(i1,j0))
     {
-      value += texelFetch(vTex, ivec2(i+1,j),0).r * w01 * w10;
+      value += texelFetch(vTex, ivec2(i1,j0),0).r * w01 * w10;
       sumW += w01 * w10;
     }
 
@@ -179,12 +173,12 @@ float interpolateVinGrid(vec2 position)
 
 float sampleV(vec2 position)
 {
-    return interpolateVinGrid(clampV(position));
+    return interpolateVinGrid(position);
 }
 
 float sampleU(vec2 position)
 {
-    return interpolateUinGrid(clampU(position));
+    return interpolateUinGrid(position);
 }
 
 vec2 clampPosition(vec2 position)
