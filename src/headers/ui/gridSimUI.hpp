@@ -25,7 +25,9 @@ private:
 	void setBorderSize();
 
 	void setSolver();
+	void setPressurePolicy();
 	void setOverrelaxation();
+	void setNumOfParticlesPerCell();
 
 	void confirmChanges();
 

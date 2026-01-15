@@ -310,6 +310,7 @@ void Grid2D::run()
     glBindImageTexture(1, divergenceTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
     glBindImageTexture(2, pressureInTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
     m_clearFluidShader->setIVec2("gridSize", glm::ivec2(nx,ny));
+    m_clearFluidShader->setBool("zeroPressure", zeroPressure);
     glDispatchCompute((nx+15) / 16, (ny+15) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
     

@@ -21,12 +21,14 @@ void GridSimulationUI::showUI()
 	particleShader();
 
 	setOverrelaxation();
+	setPressurePolicy();
 	setSolver();
 	setTimeStep();
 	setSimDim();
 	setFluidDim();
 	setFluidPos();
 	setPressureIterations();
+	setNumOfParticlesPerCell();
 	setCellSize();
 	setBorderSize();
 	confirmChanges();
@@ -149,6 +151,19 @@ void GridSimulationUI::setSolver()
 	}
 }
 
+void GridSimulationUI::setPressurePolicy()
+{
+	bool solver = refSimulation->getPressurePolicy();
+	const bool ref = solver;
+	const char* labels[] = {"Keep pressure as initial guess", "Zero Pressure as initial guess", };
+
+	ImGui::Combo("Pressure policy", (int*)&solver, labels, IM_ARRAYSIZE(labels));
+	if(ref != solver)
+	{
+		refSimulation->setPressureZero(solver);
+	}
+}
+
 void GridSimulationUI::setOverrelaxation()
 {
 	float overrelaxation =refSimulation->getOverrelaxation();
@@ -162,6 +177,18 @@ void GridSimulationUI::setOverrelaxation()
 	if(ref != overrelaxation)
 	{
 		refSimulation->setOverrelaxation(overrelaxation);
+	}
+}
+
+void GridSimulationUI::setNumOfParticlesPerCell()
+{
+	int num = static_cast<int>(refSimulation->getParticlesPerCell());
+	const int ref = num;
+	ImGui::InputInt("Particles per cell", &num, 1, 1);
+	num = std::clamp(num, 1, 255);
+	if(ref != num)
+	{
+		refSimulation->setParticlesPerCell(num);
 	}
 }
 
