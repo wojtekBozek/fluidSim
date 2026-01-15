@@ -1,5 +1,5 @@
 #include "gridSimUI.hpp"
-
+#include <algorithm>
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
@@ -20,6 +20,8 @@ void GridSimulationUI::showUI()
 	visualShader();
 	particleShader();
 
+	setOverrelaxation();
+	setSolver();
 	setTimeStep();
 	setSimDim();
 	setFluidDim();
@@ -104,7 +106,7 @@ void GridSimulationUI::setCellSize()
 {
 	float dx =refSimulation->getDx();
 	const float ref = dx;
-	ImGui::InputFloat("Cell size [m]", &dx, 0.001, 100.0, "%.4f");
+	ImGui::InputFloat("Cell size [m]", &dx, 0.001, 0.1, "%.4f");
 	if(ref != dx)
 	{
 		refSimulation->setCellSize(dx);
@@ -119,6 +121,35 @@ void GridSimulationUI::setBorderSize()
 	if(ref != size)
 	{
 		refSimulation->setBorderSize(size);
+	}
+}
+
+void GridSimulationUI::setSolver()
+{
+	Grid2D::SOLVER solver = refSimulation->getSolver();
+	const Grid2D::SOLVER ref = solver;
+	const char* labels[] = { "Jacobi Solver", "GS_SOLVER", "GS_SIMPLIFIEDSOLVER" };
+
+	ImGui::Combo("Solver", (int*)&solver, labels, IM_ARRAYSIZE(labels));
+	if(ref != solver)
+	{
+		refSimulation->setSolver(solver);
+	}
+}
+
+void GridSimulationUI::setOverrelaxation()
+{
+	float overrelaxation =refSimulation->getOverrelaxation();
+	const float ref = overrelaxation;
+	const Grid2D::SOLVER refSolver = refSimulation->getSolver();
+	const float maxOverrelaxation = refSolver == Grid2D::SOLVER::JACOBI ? 1.0f : 2.0f;
+	
+	const float minOverrelaxation = refSolver == Grid2D::SOLVER::JACOBI ? 0.0f : 1.0f;
+	ImGui::InputFloat("Overrelaxation [m]", &overrelaxation, 0.1f, 0.1f, "%.2f");
+	std::clamp(overrelaxation, minOverrelaxation, maxOverrelaxation);
+	if(ref != overrelaxation)
+	{
+		refSimulation->setOverrelaxation(overrelaxation);
 	}
 }
 
