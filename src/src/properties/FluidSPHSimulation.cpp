@@ -104,7 +104,7 @@ void FluidSPHSimulation::setFluidAndParticles()
     for(int i=0; i<m_numOfParticles; ++i)
     {
         FluidParticle part = initialParticle;
-        part.position += glm::vec4(glm::vec3(a*particleDiameter, b*particleDiameter, c*particleDiameter),0.0f);
+        part.position += glm::vec4(glm::vec3(a*m_kernelRadius/1.5, b*m_kernelRadius/1.5, c*m_kernelRadius/1.5),0.0f);
         m_particles.push_back(part);
         if(a < xMax)
         {

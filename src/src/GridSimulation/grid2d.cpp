@@ -463,33 +463,33 @@ void Grid2D::run()
    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
     */
 
-    //float maxU, maxV;
-    /*
-    m_maxVelocityShader->useProgram();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, uInTex);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, floatSSBO);
-    glDispatchCompute((nx + 15) / 16, (ny+15) / 16, 1);
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-    uint32_t maxValueUint;
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, floatSSBO);
-    glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(uint32_t), &maxValueUint);
-    maxU = *reinterpret_cast<float*>(&maxValueUint);
-
-    m_maxVelocityShader->useProgram();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, vInTex);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, floatSSBO2);
-    glDispatchCompute((nx + 15) / 16, (ny+15) / 16, 1);
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, floatSSBO2);
-    uint32_t maxValueVint;
-    glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(uint32_t), &maxValueVint);
-    maxV = *reinterpret_cast<float*>(&maxValueVint);
-    */
-    glEndQuery(GL_TIME_ELAPSED);
-    glGetQueryObjectui64v(query, GL_QUERY_RESULT, &m_computeTime);
-    //std::cout << time << " : "<< m_computeTime << "\n";//  << " : " << maxU << " : " << maxV << "\n";
+   /*
+   float maxU, maxV;
+   m_maxVelocityShader->useProgram();
+   glActiveTexture(GL_TEXTURE0);
+   glBindTexture(GL_TEXTURE_2D, uInTex);
+   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, floatSSBO);
+   glDispatchCompute((nx + 15) / 16, (ny+15) / 16, 1);
+   glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+   uint32_t maxValueUint;
+   glBindBuffer(GL_SHADER_STORAGE_BUFFER, floatSSBO);
+   glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(uint32_t), &maxValueUint);
+   maxU = *reinterpret_cast<float*>(&maxValueUint);
+   
+   m_maxVelocityShader->useProgram();
+   glActiveTexture(GL_TEXTURE0);
+   glBindTexture(GL_TEXTURE_2D, vInTex);
+   glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, floatSSBO2);
+   glDispatchCompute((nx + 15) / 16, (ny+15) / 16, 1);
+   glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
+   glBindBuffer(GL_SHADER_STORAGE_BUFFER, floatSSBO2);
+   uint32_t maxValueVint;
+   glGetBufferSubData(GL_SHADER_STORAGE_BUFFER, 0, sizeof(uint32_t), &maxValueVint);
+   maxV = *reinterpret_cast<float*>(&maxValueVint);
+   std::cout << " : " << maxU << " : " << maxV << "\n";
+   */
+   glEndQuery(GL_TIME_ELAPSED);
+   glGetQueryObjectui64v(query, GL_QUERY_RESULT, &m_computeTime);
     temp += m_computeTime;
     time += dt;
     steps++;
