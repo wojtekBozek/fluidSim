@@ -17,6 +17,34 @@ public:
 	void setFluidSize(uint32_t dx, uint32_t dy){initFluidHeight = dy; initFluidWidth = dx;};
 	void initilizeGrid();
 
+
+	enum SOLVER
+	{
+		JACOBI,
+		GS_PRESSURE,
+		GS_DIVERGENCE
+	};
+	void setSolver(SOLVER solver)
+	{
+		m_solver = solver;
+		if(solver == SOLVER::JACOBI)
+		{
+			m_overrelaxation = 0.7f;
+		}
+		else
+		{
+			m_overrelaxation = 1.7f;
+		}
+	}
+
+	void setOverrelaxation(float overrelaxation)
+	{
+		m_overrelaxation = overrelaxation;
+	}
+
+	SOLVER getSolver() {return m_solver;}
+	float getOverrelaxation(){return m_overrelaxation;}
+
 	void setTextures();
 	void setShaders();
 	void restart();
@@ -42,6 +70,8 @@ private:
 	void JacobiSolver();
 	void GaussSiedelSolver();
 	void GaussSiedelPressureSolver();
+	SOLVER m_solver = SOLVER::JACOBI;
+	float m_overrelaxation = 0.7;
 	GLuint floatSSBO, floatSSBO2;
 	const GLuint FLUID = 0u;
 	const GLuint AIR = 1u;

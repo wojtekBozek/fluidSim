@@ -24,6 +24,9 @@ private:
 	void setCellSize();
 	void setBorderSize();
 
+	void setSolver();
+	void setOverrelaxation();
+
 	void confirmChanges();
 
 	void returnToMenuButton();

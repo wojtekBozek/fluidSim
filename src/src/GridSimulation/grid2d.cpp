@@ -396,10 +396,18 @@ void Grid2D::run()
     /**/
     /*
     */
-    //GaussSiedelPressureSolver();
-    //GaussSiedelSolver();
-    JacobiSolver();
-    //}
+    if(m_solver == SOLVER::JACOBI)
+    {
+        JacobiSolver();
+    }
+    else if(m_solver == SOLVER::GS_DIVERGENCE)
+    {
+        GaussSiedelSolver();
+    }
+    else if(m_solver == SOLVER::GS_PRESSURE)
+    {
+        GaussSiedelPressureSolver();
+    }
     m_extrapolateUVelocityShader->useProgram();
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, cellTypeTex);
