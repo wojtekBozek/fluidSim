@@ -59,7 +59,7 @@ void GridSimulationUI::setSimDim()
 	ImGui::InputInt("Simulation size (in cells) [X]", &sizeX, 1, 10);
 	ImGui::InputInt("Simulation size (in cells) [Y]", &sizeY, 1, 10);
 	sizeX = std::clamp(sizeX, 16, 4096);
-	sizeY = std::clamp(sizeX, 16, 4096);
+	sizeY = std::clamp(sizeY, 16, 4096);
 	if(sizeX != refSizeX ||  sizeY != refSizeY)
 	{
 		refSimulation->setDimensions(sizeX, sizeY);
@@ -75,7 +75,7 @@ void GridSimulationUI::setFluidDim()
 	ImGui::InputInt("Fluid size (cells) [X]", &sizeX, 1, 10);
 	ImGui::InputInt("Fluid size (cells) [Y]", &sizeY, 1, 10);
 	sizeX = std::clamp(sizeX, 1, int(refSimulation->getSize().x-refSimulation->getFluidPosition().x));
-	sizeY = std::clamp(sizeX, 1, int(refSimulation->getSize().y-refSimulation->getFluidPosition().y));
+	sizeY = std::clamp(sizeY, 1, int(refSimulation->getSize().y-refSimulation->getFluidPosition().y));
 	if(sizeX != refSizeX ||  sizeY != refSizeY)
 	{
 		refSimulation->setFluidSize(sizeX, sizeY);
@@ -91,7 +91,7 @@ void GridSimulationUI::setFluidPos()
 	ImGui::InputInt("Fluid init cell position [X]", &sizeX, 1, 10);
 	ImGui::InputInt("Fluid init cell position [Y]", &sizeY, 1, 10);
 	sizeX = std::clamp(sizeX, 1, int(refSimulation->getSize().x-refSimulation->getFluidSize().x));
-	sizeY = std::clamp(sizeX, 1, int(refSimulation->getSize().y-refSimulation->getFluidSize().y));
+	sizeY = std::clamp(sizeY, 1, int(refSimulation->getSize().y-refSimulation->getFluidSize().y));
 	if(sizeX != refSizeX ||  sizeY != refSizeY)
 	{
 		refSimulation->setFluidInitPosition(sizeX, sizeY);
