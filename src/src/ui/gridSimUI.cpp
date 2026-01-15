@@ -42,7 +42,8 @@ void GridSimulationUI::showUI()
 void GridSimulationUI::setTimeStep()
 {
 	float value = refSimulation->getTimeStep();
-	ImGui::InputFloat("TimeStep", &value, 0.0001f, 10.0f, "%.5f");
+	ImGui::InputFloat("TimeStep", &value, 0.0001f, 0.01f, "%.5f");
+	value = std::clamp(value, 0.00001f, 10.0f);
 	if(value != refSimulation->getTimeStep())
 	{
 		refSimulation->setTimeStep(value);
@@ -55,8 +56,10 @@ void GridSimulationUI::setSimDim()
 	int sizeY = static_cast<int>(refSimulation->getSize().y);
 	const int refSizeX = sizeX;
 	const int refSizeY = sizeY;
-	ImGui::InputInt("Simulation size (in cells) [X]", &sizeX, 16, 4096);
-	ImGui::InputInt("Simulation size (in cells) [Y]", &sizeY, 16, 4096);
+	ImGui::InputInt("Simulation size (in cells) [X]", &sizeX, 1, 10);
+	ImGui::InputInt("Simulation size (in cells) [Y]", &sizeY, 1, 10);
+	sizeX = std::clamp(sizeX, 16, 4096);
+	sizeY = std::clamp(sizeX, 16, 4096);
 	if(sizeX != refSizeX ||  sizeY != refSizeY)
 	{
 		refSimulation->setDimensions(sizeX, sizeY);
@@ -69,8 +72,10 @@ void GridSimulationUI::setFluidDim()
 	int sizeY = static_cast<int>(refSimulation->getFluidSize().y);
 	const int refSizeX = sizeX;
 	const int refSizeY = sizeY;
-	ImGui::InputInt("Fluid size (cells) [X]", &sizeX, 16, refSimulation->getSize().x-refSimulation->getFluidPosition().x);
-	ImGui::InputInt("Fluid size (cells) [Y]", &sizeY, 16, refSimulation->getSize().y-refSimulation->getFluidPosition().y);
+	ImGui::InputInt("Fluid size (cells) [X]", &sizeX, 1, 10);
+	ImGui::InputInt("Fluid size (cells) [Y]", &sizeY, 1, 10);
+	sizeX = std::clamp(sizeX, 1, int(refSimulation->getSize().x-refSimulation->getFluidPosition().x));
+	sizeY = std::clamp(sizeX, 1, int(refSimulation->getSize().y-refSimulation->getFluidPosition().y));
 	if(sizeX != refSizeX ||  sizeY != refSizeY)
 	{
 		refSimulation->setFluidSize(sizeX, sizeY);
@@ -83,8 +88,10 @@ void GridSimulationUI::setFluidPos()
 	int sizeY = static_cast<int>(refSimulation->getFluidPosition().y);
 	const int refSizeX = sizeX;
 	const int refSizeY = sizeY;
-	ImGui::InputInt("Fluid init cell position [X]", &sizeX, 16, refSimulation->getSize().x-refSimulation->getFluidSize().x);
-	ImGui::InputInt("Fluid init cell position [Y]", &sizeY, 16, refSimulation->getSize().y-refSimulation->getFluidSize().y);
+	ImGui::InputInt("Fluid init cell position [X]", &sizeX, 1, 10);
+	ImGui::InputInt("Fluid init cell position [Y]", &sizeY, 1, 10);
+	sizeX = std::clamp(sizeX, 1, int(refSimulation->getSize().x-refSimulation->getFluidSize().x));
+	sizeY = std::clamp(sizeX, 1, int(refSimulation->getSize().y-refSimulation->getFluidSize().y));
 	if(sizeX != refSizeX ||  sizeY != refSizeY)
 	{
 		refSimulation->setFluidInitPosition(sizeX, sizeY);
@@ -95,7 +102,9 @@ void GridSimulationUI::setPressureIterations()
 {
 	int iterations = static_cast<int>(refSimulation->getPSolverIterations());
 	const int ref = iterations;
-	ImGui::InputInt("Pressure solver iterations", &iterations, 1, 1000);
+	ImGui::InputInt("Pressure solver iterations", &iterations, 1, 10);
+	
+	iterations = std::clamp(iterations, 1, 1000);
 	if(ref != iterations)
 	{
 		refSimulation->setPressureIterations(iterations);
@@ -107,6 +116,8 @@ void GridSimulationUI::setCellSize()
 	float dx =refSimulation->getDx();
 	const float ref = dx;
 	ImGui::InputFloat("Cell size [m]", &dx, 0.001, 0.1, "%.4f");
+	
+	dx = std::clamp(dx, 0.0001f, 100.0f);
 	if(ref != dx)
 	{
 		refSimulation->setCellSize(dx);
@@ -117,7 +128,8 @@ void GridSimulationUI::setBorderSize()
 {
 	int size = static_cast<int>(refSimulation->getBorderSize());
 	const int ref = size;
-	ImGui::InputInt("Border size [in cells]", &size, 1, std::min(refSimulation->getFluidSize().x,refSimulation->getFluidSize().y));
+	ImGui::InputInt("Border size [in cells]", &size, 1, 5);
+	size = std::clamp(size, 1, int(std::min(refSimulation->getFluidSize().x,refSimulation->getFluidSize().y)));
 	if(ref != size)
 	{
 		refSimulation->setBorderSize(size);
@@ -146,7 +158,7 @@ void GridSimulationUI::setOverrelaxation()
 	
 	const float minOverrelaxation = refSolver == Grid2D::SOLVER::JACOBI ? 0.0f : 1.0f;
 	ImGui::InputFloat("Overrelaxation [m]", &overrelaxation, 0.1f, 0.1f, "%.2f");
-	std::clamp(overrelaxation, minOverrelaxation, maxOverrelaxation);
+	overrelaxation = std::clamp(overrelaxation, minOverrelaxation, maxOverrelaxation);
 	if(ref != overrelaxation)
 	{
 		refSimulation->setOverrelaxation(overrelaxation);
