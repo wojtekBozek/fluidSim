@@ -17,6 +17,7 @@ public:
 	void setFluidSize(uint32_t dx, uint32_t dy){initFluidHeight = dy; initFluidWidth = dx;};
 	void initilizeGrid();
 
+	void setParticlesPerCell(uint8_t particles){particlesPerCell = particles;}
 
 	enum SOLVER
 	{
@@ -48,6 +49,8 @@ public:
 	void setTextures();
 	void setShaders();
 	void restart();
+	void setPressureZero(bool value){zeroPressure = value;}
+	bool getPressurePolicy(){return zeroPressure;}
 	uint32_t getNumOfParticles(){return particles.size();}
 	GLuint getTypeCell() { return cellTypeTex; }
 	GLuint getuTex() { return uInTex; }
@@ -89,7 +92,7 @@ private:
 	GLuint divergenceTex;
 	GLuint cellTypeTex;
 	std::vector<glm::vec2> particles;
-
+	bool zeroPressure = false;
 	GLuint m_particleBuffer;
 	GLuint64 m_computeTime;
 
