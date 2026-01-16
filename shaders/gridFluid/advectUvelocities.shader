@@ -43,7 +43,7 @@ bool vBlocked(int i, int j)
 float interpolateVonUFace(int i, int j)
 {
     int i0 = clamp(i-1,     0, Nx-1);
-    int i1 = clamp(i + 1, 0, Nx-1);
+    int i1 = clamp(i , 0, Nx-1);
 
     int j0 = clamp(j, 0, Ny);
     int j1 = clamp(j+1,     0, Ny);
