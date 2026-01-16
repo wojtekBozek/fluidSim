@@ -409,10 +409,10 @@ float sampleW(vec3 position)
     return interpolateWinGrid(position);
 }
 
-vec2 clampPosition(vec2 position)
+vec3 clampPosition(vec3 position)
 {
     vec3 minPos = vec3(0.0);
-    vec3 maxPos = vec2(gridSize.x * dx, gridSize.y* dx, gridSize.z*dx);
+    vec3 maxPos = vec3(gridSize.x * dx, gridSize.y* dx, gridSize.z*dx);
 
     position = clamp(position, minPos, maxPos);
     return position;
