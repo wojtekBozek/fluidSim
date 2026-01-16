@@ -52,13 +52,12 @@ bool wBlocked(int i, int j, int k)
 float interpolateVonUFace(int i, int j, int k)
 {
     int i0 = clamp(i-1, 0, Nx-1);
-    int i1 = clamp(i + 1, 0, Nx-1);
+    int i1 = clamp(i, 0, Nx-1);
 
     int j0 = clamp(j, 0, Ny);
     int j1 = clamp(j+1, 0, Ny);
 
     int k0 = clamp(k, 0, Nz);
-    int k1 = clamp(k+1, 0, Nz);
 
     float value = 0.0;
     float div = 0.0;
