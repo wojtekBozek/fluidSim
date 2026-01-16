@@ -430,7 +430,7 @@ vec3 backTracePositionRK2(vec3 position, vec3 velocity)
 
 void main()
 {
-    ivec3 id = ivec3(gl_GlobalInvocationID.xy);
+    ivec3 id = ivec3(gl_GlobalInvocationID.xyz);
     if(id.x >= gridSize.x || id.y >= gridSize.y || id.z >=gridSize.z+1) return ;
     int i = id.x;
     int j = id.y;
