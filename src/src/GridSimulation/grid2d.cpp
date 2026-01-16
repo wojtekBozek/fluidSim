@@ -15,7 +15,6 @@ void Grid2D::JacobiSolver()
     m_divergenceShader->setIVec2("gridSize", glm::ivec2(nx,ny));
     m_divergenceShader->setFloat("dt", dt);
     m_divergenceShader->setFloat("dx", dx);
-    m_divergenceShader->setFloat("overrelaxation", 1.0f);
     
     glDispatchCompute((nx+15) / 16, (ny+15) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
@@ -25,8 +24,9 @@ void Grid2D::JacobiSolver()
     //
     m_jacobiPSolverShader->setIVec2("gridSize", glm::ivec2(nx,ny));
     m_jacobiPSolverShader->setFloat("dx", dx);
-    m_jacobiPSolverShader->setFloat("dens", 1.0f);
+    m_jacobiPSolverShader->setFloat("dens", m_dens);
     m_jacobiPSolverShader->setFloat("dt", dt);
+    m_jacobiPSolverShader->setFloat("overrelaxation", m_overrelaxation);
     //glBindImageTexture(1, divergenceTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R32F);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, divergenceTex);
@@ -50,6 +50,7 @@ void Grid2D::JacobiSolver()
     m_pressureProjectionUShader->setIVec2("gridSize", glm::ivec2(nx,ny));
     m_pressureProjectionUShader->setFloat("dt", dt);
     m_pressureProjectionUShader->setFloat("dx", dx);
+    m_pressureProjectionUShader->setFloat("dens", m_dens);
     
     glDispatchCompute(((nx+1) + 15) / 16, (ny+15) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
@@ -63,6 +64,7 @@ void Grid2D::JacobiSolver()
     m_pressureProjectionVShader->setIVec2("gridSize", glm::ivec2(nx,ny));
     m_pressureProjectionVShader->setFloat("dt", dt);
     m_pressureProjectionVShader->setFloat("dx", dx);
+    m_pressureProjectionVShader->setFloat("dens", m_dens);
     glDispatchCompute((nx + 15) / 16, (ny+1) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
@@ -102,8 +104,8 @@ void Grid2D::GaussSiedelSolver()
         m_gaussSiedelDivergenceShader->setIVec2("gridSize", glm::ivec2(nx,ny));
         m_gaussSiedelDivergenceShader->setFloat("dt", dt);
         m_gaussSiedelDivergenceShader->setFloat("dx", dx);
-        m_gaussSiedelDivergenceShader->setFloat("density", 997.0);
-        m_gaussSiedelDivergenceShader->setFloat("overrelaxation", 1.7f);
+        m_gaussSiedelDivergenceShader->setFloat("density", m_dens);
+        m_gaussSiedelDivergenceShader->setFloat("overrelaxation", m_overrelaxation);
         
         glDispatchCompute((nx+15) / 16, (ny+15) / 16, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
@@ -208,7 +210,7 @@ void Grid2D::GaussSiedelPressureSolver()
     m_gaussSiedelDivergenceShader->setIVec2("gridSize", glm::ivec2(nx,ny));
     m_gaussSiedelDivergenceShader->setFloat("dt", dt);
     m_gaussSiedelDivergenceShader->setFloat("dx", dx);
-    m_gaussSiedelDivergenceShader->setFloat("overrelaxation", 1.0f);
+    m_gaussSiedelDivergenceShader->setFloat("overrelaxation", m_overrelaxation);
     
     glDispatchCompute((nx+15) / 16, (ny+15) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
@@ -220,7 +222,7 @@ void Grid2D::GaussSiedelPressureSolver()
         //
         m_gsBlackPSolverShader->setIVec2("gridSize", glm::ivec2(nx,ny));
         m_gsBlackPSolverShader->setFloat("dx", dx);
-        m_gsBlackPSolverShader->setFloat("dens", 1.0f);
+        m_gsBlackPSolverShader->setFloat("dens", m_dens);
         m_gsBlackPSolverShader->setFloat("dt", dt);
         //glBindImageTexture(1, divergenceTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R32F);
         glActiveTexture(GL_TEXTURE1);
@@ -239,7 +241,7 @@ void Grid2D::GaussSiedelPressureSolver()
         //
         m_gsRedPSolverShader->setIVec2("gridSize", glm::ivec2(nx,ny));
         m_gsRedPSolverShader->setFloat("dx", dx);
-        m_gsRedPSolverShader->setFloat("dens", 1.0f);
+        m_gsRedPSolverShader->setFloat("dens", m_dens);
         m_gsRedPSolverShader->setFloat("dt", dt);
         //glBindImageTexture(1, divergenceTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R32F);
         glActiveTexture(GL_TEXTURE1);
@@ -263,6 +265,7 @@ void Grid2D::GaussSiedelPressureSolver()
     m_pressureProjectionUShader->setIVec2("gridSize", glm::ivec2(nx,ny));
     m_pressureProjectionUShader->setFloat("dt", dt);
     m_pressureProjectionUShader->setFloat("dx", dx);
+    m_pressureProjectionUShader->setFloat("dens", m_dens);
     
     glDispatchCompute(((nx+1) + 15) / 16, (ny+15) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
@@ -276,6 +279,7 @@ void Grid2D::GaussSiedelPressureSolver()
     m_pressureProjectionVShader->setIVec2("gridSize", glm::ivec2(nx,ny));
     m_pressureProjectionVShader->setFloat("dt", dt);
     m_pressureProjectionVShader->setFloat("dx", dx);
+    m_pressureProjectionVShader->setFloat("dens", m_dens);
     glDispatchCompute((nx + 15) / 16, (ny+1) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 }

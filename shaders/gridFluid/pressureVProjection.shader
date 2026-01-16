@@ -9,7 +9,7 @@ layout(binding = 2) uniform usampler2D cellType;
 uniform float dt;
 uniform float dx;
 uniform ivec2 gridSize;
-uniform float density = 997.0;
+uniform float dens;
 
 
 const uint FLUID = 0u;
@@ -40,7 +40,7 @@ void main()
             float pressureB = (bottomType == FLUID) ? texelFetch(pressure, ivec2(i, j-1), 0).r : 0.0;
             float pressureT = (topType == FLUID) ? texelFetch(pressure, ivec2(i,j), 0).r : 0.0;
 
-            float gradPressure = (pressureT - pressureB)/ dx;
+            float gradPressure = (pressureT - pressureB)/(dx*dens);
             v -= dt * gradPressure;
         }  
         else

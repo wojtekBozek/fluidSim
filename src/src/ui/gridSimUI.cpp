@@ -19,6 +19,7 @@ void GridSimulationUI::showUI()
 	pressureShader();
 	visualShader();
 	particleShader();
+	setDensity();
 
 	setOverrelaxation();
 	setPressurePolicy();
@@ -44,7 +45,7 @@ void GridSimulationUI::showUI()
 void GridSimulationUI::setTimeStep()
 {
 	float value = refSimulation->getTimeStep();
-	ImGui::InputFloat("TimeStep", &value, 0.0001f, 0.01f, "%.5f");
+	ImGui::InputFloat("TimeStep", &value, 0.0001f, 0.01f, "%.4f");
 	value = std::clamp(value, 0.00001f, 10.0f);
 	if(value != refSimulation->getTimeStep())
 	{
@@ -135,6 +136,18 @@ void GridSimulationUI::setBorderSize()
 	if(ref != size)
 	{
 		refSimulation->setBorderSize(size);
+	}
+}
+
+void GridSimulationUI::setDensity()
+{
+	float dens =refSimulation->getDensity();
+	const float ref = dens;
+	ImGui::InputFloat("Density", &dens, 0.1f, 0.1f, "%.2f");
+	dens = std::clamp(dens, 1.0f, 10000.0f);
+	if(ref != dens)
+	{
+		refSimulation->setDensity(dens);
 	}
 }
 

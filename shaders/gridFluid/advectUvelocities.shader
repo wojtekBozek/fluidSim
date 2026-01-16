@@ -157,12 +157,12 @@ float interpolateVinGrid(vec2 position)
       value += texelFetch(vTex, ivec2(i0,j1),0).r * w00 * w11;
       sumW += w00 * w11;
     }
-    if(!vBlocked(i+1,j+1))
+    if(!vBlocked(i1,j1))
     {
       value += texelFetch(vTex, ivec2(i1,j1),0).r * w01 * w11;
       sumW += w01 * w11;
     }
-    if(!vBlocked(i+1,j))
+    if(!vBlocked(i1,j0))
     {
       value += texelFetch(vTex, ivec2(i1,j0),0).r * w01 * w10;
       sumW += w01 * w10;
