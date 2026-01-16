@@ -45,7 +45,6 @@ void main()
         }
         else
         {
-            u = 0.0;
         }
         imageStore(uTex, id, vec4(u));
     }

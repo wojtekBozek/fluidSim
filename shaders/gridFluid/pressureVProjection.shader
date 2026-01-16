@@ -45,7 +45,6 @@ void main()
         }  
         else
         {
-            v = 0.0;
         }
         imageStore(vTex, id, vec4(v));
     }

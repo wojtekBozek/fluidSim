@@ -381,6 +381,7 @@ void Grid2D::run()
     m_extrapolateUVelocityShader->setIVec2("gridSize", glm::ivec2(nx,ny));
     m_extrapolateUVelocityShader->setFloat("dt", dt);
     m_extrapolateUVelocityShader->setFloat("dx", dx);
+    m_extrapolateUVelocityShader->setInt("borderSize", borderSize);
     glDispatchCompute(((nx+1) + 15) / 16, (ny+15) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
     
@@ -393,6 +394,7 @@ void Grid2D::run()
     m_extrapolateVVelocityShader->setIVec2("gridSize", glm::ivec2(nx,ny));
     m_extrapolateVVelocityShader->setFloat("dt", dt);
     m_extrapolateVVelocityShader->setFloat("dx", dx);
+    m_extrapolateVVelocityShader->setInt("borderSize", borderSize);
     glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);    
     
@@ -422,6 +424,7 @@ void Grid2D::run()
     m_extrapolateUVelocityShader->setIVec2("gridSize", glm::ivec2(nx,ny));
     m_extrapolateUVelocityShader->setFloat("dt", dt);
     m_extrapolateUVelocityShader->setFloat("dx", dx);
+    m_extrapolateUVelocityShader->setInt("borderSize", borderSize);
     glDispatchCompute(((nx+1) + 15) / 16, (ny+15) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
     
@@ -434,6 +437,7 @@ void Grid2D::run()
     m_extrapolateVVelocityShader->setIVec2("gridSize", glm::ivec2(nx,ny));
     m_extrapolateVVelocityShader->setFloat("dt", dt);
     m_extrapolateVVelocityShader->setFloat("dx", dx);
+    m_extrapolateVVelocityShader->setInt("borderSize", borderSize);
     glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
