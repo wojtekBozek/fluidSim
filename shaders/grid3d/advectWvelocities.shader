@@ -8,7 +8,7 @@ layout(binding = 1) uniform sampler3D vTex;
 layout(binding = 2) uniform sampler3D wTex;
 layout(binding = 3) uniform usampler3D cellType;
 
-layout(r32f, binding = 4) uniform writeonly image3D vOut;
+layout(r32f, binding = 4) uniform writeonly image3D uOut;
 
 uniform ivec3 gridSize;
 uniform float dt;
@@ -49,71 +49,71 @@ bool wBlocked(int i, int j, int k)
            checkCellType(ivec2(i, j, k-1)) == SOLID;
 }
 
-float interpolateUonVFace(int i, int j, int k)
+float interpolateVonWFace(int i, int j, int k)
 {
     int i0 = clamp(i, 0, Nx-1);
-    int i1 = clamp(i+1, 0, Nx-1);
 
-    int j0 = clamp(j-1, 0, Ny);
-    int j1 = clamp(j, 0, Ny);
+    int j0 = clamp(j, 0, Ny);
+    int j1 = clamp(j+1, 0, Ny);
 
-    int k0 = clamp(k, 0, Nz);
+    int k0 = clamp(k-1, 0, Nz);
+    int k1 = clamp(k, 0, Nz);
 
     float value = 0.0;
     float div = 0.0;
-    if(!uBlocked(i0,j1,k0))
+    if(!vBlocked(i0,j1,k0))
     {
-      value += texelFetch(uTex, ivec3(i0,j1,k0),0).r;
+      value += texelFetch(vTex, ivec3(i0,j1,k0),0).r;
       div += 1.0;
     }
-    if(!uBlocked(i0,j0,k0))
+    if(!vBlocked(i0,j0,k0))
     {
-       value += texelFetch(uTex, ivec3(i0,j0,k0),0).r;
+       value += texelFetch(vTex, ivec3(i0,j0,k0),0).r;
        div += 1.0;
     }
-    if(!uBlocked(i1,j1,k0))
+    if(!vBlocked(i0,j1,k1))
     {
-      value += texelFetch(uTex, ivec3(i1,j1,k0),0).r;
+      value += texelFetch(vTex, ivec3(i0,j1,k1),0).r;
       div += 1.0;
     }
-    if(!uBlocked(i1, j0,k0))
+    if(!vBlocked(i0, j0,k1))
     {
-      value += texelFetch(uTex, ivec3(i1,j0,k0),0).r;
+      value += texelFetch(vTex, ivec3(i0,j0,k1),0).r;
       div += 1.0;
     }
     return (div>0.0) ? value/div : 0.0;
 }
 
-float interpolateWonVFace(int i, int j, int k)
+float interpolateUonWFace(int i, int j, int k)
 {
     int i0 = clamp(i, 0, Nx-1);
+    int i1 = clamp(i + 1, 0, Nx-1);
 
-    int j0 = clamp(j-1, 0, Ny);
-    int j1 = clamp(j, 0, Ny);
+    int j0 = clamp(j, 0, Ny);
 
-    int k0 = clamp(k, 0, Nz);
-    int k1 = clamp(k+1, 0, Nz);
+    int k0 = clamp(k-1, 0, Nz);
+    int k1 = clamp(k, 0, Nz);
 
     float value = 0.0;
     float div = 0.0;
-    if(!wBlocked(i0,j1,k0))
+    if(!vBlocked(i0,j0,k0))
     {
       value += texelFetch(wTex, ivec3(i0,j0,k0),0).r;
       div += 1.0;
     }
-    if(!wBlocked(i0,j0,k0))
+    if(!vBlocked(i0,j0,k0))
     {
        value += texelFetch(wTex, ivec3(i0,j0,k1),0).r;
        div += 1.0;
     }
-    if(!wBlocked(i1,j1,k0))
+    if(!vBlocked(i1,j0,k0))
     {
-      value += texelFetch(wTex, ivec3(i0,j1,k1),0).r;
+      value += texelFetch(wTex, ivec3(i1,j0,k0),0).r;
       div += 1.0;
     }
-    if(!wBlocked(i1, j0,k0))
+    if(!vBlocked(i1, j0,k0))
     {
-      value += texelFetch(wTex, ivec3(i0,j1,k0),0).r;
+      value += texelFetch(wTex, ivec3(i1,j0,k1),0).r;
       div += 1.0;
     }
     return (div>0.0) ? value/div : 0.0;
@@ -431,20 +431,20 @@ vec3 backTracePositionRK2(vec3 position, vec3 velocity)
 void main()
 {
     ivec3 id = ivec3(gl_GlobalInvocationID.xy);
-    if(id.x >= gridSize.x + 1 || id.y >= gridSize.y || id.z >=gridSize.z) return ;
+    if(id.x >= gridSize.x || id.y >= gridSize.y || id.z >=gridSize.z+1) return ;
     int i = id.x;
     int j = id.y;
     int k = id.z;
-    uint ltype = (j - 1 < 0 || j-1>= gridSize.y) ? SOLID : texelFetch(cellType, ivec3(i,j-1,k), 0).r;
-    uint rtype = (j  < 0 || j >= gridSize.y) ? SOLID : texelFetch(cellType, ivec3(i,j,k), 0).r;
+    uint ltype = (k - 1 < 0 || k-1>= gridSize.x) ? SOLID : texelFetch(cellType, ivec3(i,j,k-1), 0).r;
+    uint rtype = (k  < 0 || k >= gridSize.x) ? SOLID : texelFetch(cellType, ivec3(i,j,k), 0).r;
     if(ltype == FLUID || rtype == FLUID)
     {
-        vec3 positionV = vec3(i*dx+0.5*dx, j*dx, k*dx+0.5*dx);
-        vec3 velocityOnV = vec3( interpolateUonVFace(i,j,k), texelFetch(vTex, ivec3(i,j,k), 0).r, interpolateWonUFace(i,j,k));
-        vec3 backtracedPosition = backTracePositionRK2(positionV, velocityOnV);
-        float v = sampleV(backtracedPosition);
-        imageStore(vOut, id, vec4(v));
+        vec3 positionW = vec3(i*dx+0.5*dx, j*dx+0.5*dx, k*dx);
+        vec3 velocityOnW = vec3(interpolateUonWFace(i,j,k), interpolateVonWFace(i,j,k), texelFetch(wTex, ivec3(i,j,k), 0).r);
+        vec3 backtracedPosition = backTracePositionRK2(positionW, velocityOnW);
+        float w = sampleW(backtracedPosition);
+        imageStore(wOut, id, vec4(w));
     }
     else
-        imageStore(vOut, id, vec4(0.0));
+        imageStore(wOut, id, vec4(0.0));
 }
