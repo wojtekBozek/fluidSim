@@ -24,6 +24,8 @@ private:
 	void setCellSize();
 	void setBorderSize();
 
+	
+	void setDensity();
 	void setSolver();
 	void setPressurePolicy();
 	void setOverrelaxation();

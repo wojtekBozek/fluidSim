@@ -68,6 +68,8 @@ public:
 	float getTimeStep() {return dt;}
 	uint32_t getPSolverIterations() {return pressureIterations;}
 
+	void setDensity(float dens){m_dens = dens;}
+	float getDensity(){ return m_dens; };
 	const std::vector<glm::vec2>& getParticles() const;
 private:
 	void JacobiSolver();
@@ -75,6 +77,7 @@ private:
 	void GaussSiedelPressureSolver();
 	SOLVER m_solver = SOLVER::JACOBI;
 	float m_overrelaxation = 0.7;
+	float m_dens = 1.0;
 	GLuint floatSSBO, floatSSBO2;
 	const GLuint FLUID = 0u;
 	const GLuint AIR = 1u;
