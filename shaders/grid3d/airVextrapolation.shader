@@ -81,5 +81,5 @@ void main()
     if(abs(real_jj) > borderSize) { imageStore(vOut, ivec2(i,j),vec4(0.0));return;}
 
     float extV = texelFetch(vTex, ivec3(i+real_ii, j+real_jj, k+real_kk),0).r;
-    imageStore(vOut, ivec2(i,j),vec4(extV));
+    imageStore(vOut, ivec3(i,j, k),vec4(extV));
 }

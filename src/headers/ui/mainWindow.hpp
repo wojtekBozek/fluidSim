@@ -15,6 +15,7 @@ private:
     void chooseSPHSimButton();
     void chooseGRIDSimButton();
     void textureTestButton();
+    void chooseGRID3dSimButton();
     void exitButton();
     //std::shared_ptr<ProgramState> m_state;
     //GLFWwindow *m_window;

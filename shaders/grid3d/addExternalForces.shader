@@ -12,7 +12,7 @@ const uint SOLID = 2u;
 
 void main()
 {
-    ivec2 id = ivec3(gl_GlobalInvocationID.xyz);
+    ivec3 id = ivec3(gl_GlobalInvocationID.xyz);
 
     if(id.x >= gridSize.x  || id.y >= gridSize.y + 1 || id.z > gridSize.z) return;
     
