@@ -16,6 +16,7 @@ void MainWindow::showUI()
         ImGui::Begin("MainMenu");
         chooseSPHSimButton();
         chooseGRIDSimButton(); 
+        chooseGRID3dSimButton();
         textureTestButton();
         exitButton();
         ImGui::End();
@@ -45,6 +46,14 @@ void MainWindow::chooseGRIDSimButton()
     if (ImGui::Button("Grid Simulation"))
     {
         *m_state = ProgramState::GRID_SIM;
+    }
+}
+
+void MainWindow::chooseGRID3dSimButton()
+{
+    if (ImGui::Button("Grid Simulation 3D"))
+    {
+        *m_state = ProgramState::GRID_SIM_3D;
     }
 }
 

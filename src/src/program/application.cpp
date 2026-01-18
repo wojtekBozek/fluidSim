@@ -7,6 +7,7 @@
 #include "perspectiveCamera.hpp"
 #include "orthographicCamera.hpp"
 #include "gridContext.hpp"
+#include "grid3dContext.hpp"
 #include "textureTest.hpp"
 
 constexpr GLint WIDTH = 1200, HEIGHT = 900;
@@ -66,6 +67,7 @@ void MyApp::setupResources()
     contextMap[ProgramState::SPH_SIM] = std::make_shared<SPHSimulationContext>(window, programState);
     contextMap[ProgramState::MAIN_MENU] = std::make_shared<MainWindow>(window, programState);
     contextMap[ProgramState::GRID_SIM] = std::make_shared<GridSimulationContext>(window, programState);
+    contextMap[ProgramState::GRID_SIM_3D] = std::make_shared<Grid3DSimulationContext>(window, programState);
     contextMap[ProgramState::TEXTURE_TEST] = std::make_shared<TextureTestContext>(window, programState);
     activeContext = contextMap[ProgramState::MAIN_MENU];
     lastProgramState = ProgramState::MAIN_MENU;
