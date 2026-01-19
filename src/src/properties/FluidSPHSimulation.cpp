@@ -91,12 +91,15 @@ void FluidSPHSimulation::setFluidAndParticles()
     uint32_t boundaryYmax = m_simulationDomain.size.y / particleDiameter;
     uint32_t boundaryZmax = m_simulationDomain.size.z / particleDiameter;
     uint32_t numOfBoundaryParticles = 2*boundaryXmax + 2*boundaryYmax;
+    
+    m_numOfParticles = xMax*yMax;
     if (m_dimension == SimDim::DIMENSION_3)
     {
         zMax = std::ceil(m_initialDomain.size.z / particleDiameter) - 1;
         numOfBoundaryParticles += 2 * boundaryZmax;
+        
+        m_numOfParticles = xMax*yMax*zMax;
     }
-    
     uint32_t a=0;
     uint32_t b=0;
     uint32_t c=0;
