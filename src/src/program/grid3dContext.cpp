@@ -9,12 +9,12 @@ void Grid3DSimulationContext::processContext(std::shared_ptr<rendering::Camera> 
 void Grid3DSimulationContext::initContext()
 {
 	simulation = std::make_shared<Grid3D>();
+	simulation->setup();
 	renderer = std::make_shared<Grid3dRenderer>();
+	renderer->setupSimulation(simulation);
+	renderer->setupBackend();
 	state = std::make_shared<ContextState>(ContextState::SETUP());
 	simulationUI = std::make_shared<Grid3dSimulationUI>(Grid3dSimulationUI(state, renderer, simulation, m_window, m_state));
-	renderer->setupBackend();
-	simulation->setup();
-	renderer->setupSimulation(simulation);
 }
 
 void Grid3DSimulationContext::showUI()

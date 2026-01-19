@@ -24,9 +24,9 @@ uniform float dt;
 uniform float dx;
 uniform uint numOfParticles;
 
-const int Nx = gridSize.x;
-const int Ny = gridSize.y;
-const int Nz = gridSize.z;
+int Nx() {return gridSize.x;}
+int Ny() {return gridSize.y;}
+int Nz() {return gridSize.z;}
 
 
 const uint FLUID = 0u;
@@ -42,25 +42,26 @@ int checkCellType(ivec3 c)
 bool uBlocked(int i, int j, int k)
 {
     if(0 == i) return true;
-    return checkCellType(ivec2(i-1, j, k)) == SOLID ||
-           checkCellType(ivec2(i,   j, k)) == SOLID;
+    return checkCellType(ivec3(i-1, j, k)) == SOLID ||
+           checkCellType(ivec3(i,   j, k)) == SOLID;
 }
 
 bool vBlocked(int i, int j, int k)
 {
-    if(0 == j) return true;
-    return checkCellType(ivec2(i, j-1, k)) == SOLID ||
-           checkCellType(ivec2(i, j  , k)) == SOLID;
+    return false;
+    if(0 == j || j >= gridSize.y) return true;
+    return checkCellType(ivec3(i, j-1, k)) == SOLID ||
+           checkCellType(ivec3(i, j  , k)) == SOLID;
 }
 
 bool wBlocked(int i, int j, int k)
 {
     if(0 == k) return true;
-    return checkCellType(ivec2(i, j, k)) == SOLID ||
-           checkCellType(ivec2(i, j, k-1)) == SOLID;
+    return checkCellType(ivec3(i, j, k)) == SOLID ||
+           checkCellType(ivec3(i, j, k-1)) == SOLID;
 }
 
-float interpolateWin3dGrid(vec3 position)
+float interpolateWinGrid(vec3 position)
 { 
     int i = int(position.x/dx);
     float backDistance = position.x - i*dx;
@@ -81,19 +82,20 @@ float interpolateWin3dGrid(vec3 position)
         downDistance += dx/2.0;
     }
 
-    int i0 = clamp(i,0, Nx);
-    int i1 = clamp(i + 1, 0, Nx);
+    int i0 = clamp(i,0, Nx()-1);
+    int i1 = clamp(i + 1, 0, Nx()-1);
 
-    int k0 = clamp(k,0, Nz-1);
-    int k1 = clamp(k + 1, 0, Nz-1);
+    int k0 = clamp(k,0, Nz());
+    int k1 = clamp(k + 1, 0, Nz());
 
-    int j0 = clamp(j, 0, Ny-1);
-    int j1 = clamp(j + 1, 0, Ny-1);
+    int j0 = clamp(j, 0, Ny()-1);
+    int j1 = clamp(j + 1, 0, Ny()-1);
 
-    float w00 = 1.0 - downDistance/dx; 
-    float w01 = downDistance/dx; 
-    float w10 = 1.0 - backDistance/dx;
-    float w11 = backDistance/dx; 
+
+    float w00 = 1.0 - backDistance/dx;
+    float w01 = backDistance/dx; 
+    float w10 = 1.0 - downDistance/dx; 
+    float w11 = downDistance/dx; 
     float wX0 = 1.0 - depthDistance/dx; 
     float wX1 = depthDistance/dx; 
           
@@ -114,7 +116,7 @@ float interpolateWin3dGrid(vec3 position)
 
     if(!wBlocked(i1,j1,k0))
     {
-      value0 += texelFetch(wTex, ivec3(i1,j1,k0),0).r * w01 * w11
+      value0 += texelFetch(wTex, ivec3(i1,j1,k0),0).r * w01 * w11;
       sumW0 += w01 * w11;
     }
     if(!wBlocked(i1,j0,k0))
@@ -146,13 +148,13 @@ float interpolateWin3dGrid(vec3 position)
       value1 += texelFetch(wTex, ivec3(i1,j1,k1),0).r * w01 * w11;
       sumW1 += w01 * w11;
     }
-    value0 = sum0 > 0.0 ? value0/sumW0 : 0.0;
-    value1 = sum1 > 0.0 ? value1/sumW1 : 0.0;
+    value0 = sumW0 > 0.0 ? value0/sumW0 : 0.0;
+    value1 = sumW1 > 0.0 ? value1/sumW1 : 0.0;
     float value = wX0*value0 + wX1*value1;
     return value;
 }
 
-float interpolateUin3dGrid(vec3 position)
+float interpolateUinGrid(vec3 position)
 { 
     int i = int(position.x/dx);
     float backDistance = position.x - i*dx;
@@ -173,14 +175,14 @@ float interpolateUin3dGrid(vec3 position)
         depthDistance += dx/2.0;
     }
 
-    int i0 = clamp(i,0, Nx);
-    int i1 = clamp(i + 1, 0, Nx);
+    int i0 = clamp(i,0, Nx());
+    int i1 = clamp(i + 1, 0, Nx());
 
-    int k0 = clamp(k,0, Nz-1);
-    int k1 = clamp(k + 1, 0, Nz-1);
+    int k0 = clamp(k,0, Nz()-1);
+    int k1 = clamp(k + 1, 0, Nz()-1);
 
-    int j0 = clamp(j, 0, Ny-1);
-    int j1 = clamp(j + 1, 0, Ny-1);
+    int j0 = clamp(j, 0, Ny()-1);
+    int j1 = clamp(j + 1, 0, Ny()-1);
 
     float wX0 = 1.0 - backDistance/dx;
     float wX1 = backDistance/dx; 
@@ -237,53 +239,41 @@ float interpolateUin3dGrid(vec3 position)
       value1 += texelFetch(uTex, ivec3(i1,j1,k1),0).r * w01 * w11;
       sumW1 += w01 * w11;
     }
-    value0 = sum0 > 0.0 ? value0/sumW0 : 0.0;
-    value1 = sum1 > 0.0 ? value1/sumW1 : 0.0;
+    value0 = sumW0 > 0.0 ? value0/sumW0 : 0.0;
+    value1 = sumW1 > 0.0 ? value1/sumW1 : 0.0;
     float value = wX0*value0 + wX1*value1;
     return value;
 }
 
-float interpolateVin3dGrid(vec3 position)
+float interpolateVinGrid(vec3 position)
 { 
-    int i = int(position.x/dx);
-    float backDistance = position.x - i*dx;
+    int i = int((position.x-0.5*dx)/dx);
+    float backDistance = position.x -0.5*dx- i*dx;
     int j = int(position.y/dx);
     float downDistance = (position.y - j*dx);
-    int k = int(position.z/dx);
-    float depthDistance = (position.z - k*dx);
+    int k = int((position.z-0.5*dx)/dx);
+    float depthDistance = (position.z-0.5*dx - k*dx);
 
-    if(backDistance < dx/2.0)
-    {
-        i--;
-        backDistance += dx/2.0;
-    }
+    int i0 = clamp(i,0, Nx()-1);
+    int i1 = clamp(i + 1, 0, Nx()-1);
 
-    if(depthDistance < dx/2.0)
-    {
-        k--;
-        depthDistance += dx/2.0;
-    }
+    int k0 = clamp(k,0, Nz()-1);
+    int k1 = clamp(k + 1, 0, Nz()-1);
 
-    int i0 = clamp(i,0, Nx);
-    int i1 = clamp(i + 1, 0, Nx);
-
-    int k0 = clamp(k,0, Nz-1);
-    int k1 = clamp(k + 1, 0, Nz-1);
-
-    int j0 = clamp(j, 0, Ny-1);
-    int j1 = clamp(j + 1, 0, Ny-1);
+    int j0 = clamp(j, 0, Ny());
+    int j1 = clamp(j + 1, 0, Ny());
 
     float wX0 = 1.0 - downDistance/dx; 
     float wX1 = downDistance/dx; 
-    float w00 = 1.0 - backDistance/dx;
-    float w01 = backDistance/dx; 
-    float w10 = 1.0 - depthDistance/dx; 
-    float w11 = depthDistance/dx; 
+    float w01 = 1.0 - backDistance/dx;
+    float w00 = backDistance/dx; 
+    float w11 = 1.0 - depthDistance/dx; 
+    float w10 = depthDistance/dx; 
 
     float value0 = 0.0;
     float sumW0 = 0.0;
     //j0 face
-    if(!VBlocked(i0,j0,k0))
+    if(!vBlocked(i0,j0,k0))
     {
       value0 += texelFetch(vTex, ivec3(i0,j0,k0),0).r * w00 * w10;
       sumW0 += w00 * w10;
@@ -296,12 +286,12 @@ float interpolateVin3dGrid(vec3 position)
 
     if(!vBlocked(i1,j0,k1))
     {
-      value0 += texelFetch(vTex, ivec3(i1,j0,k1),0).r * w01 * w11
+      value0 += texelFetch(vTex, ivec3(i1,j0,k1),0).r * w01 * w11;
       sumW0 += w01 * w11;
     }
     if(!vBlocked(i1,j0,k0))
     {
-      value0 += texelFetch(vTex, ivec3(i1,j0,k0),0).r * w11 * w10;
+      value0 += texelFetch(vTex, ivec3(i1,j0,k0),0).r * w01 * w10;
       sumW0 += w01 * w10;
     }
 
@@ -313,23 +303,23 @@ float interpolateVin3dGrid(vec3 position)
       value1 += texelFetch(vTex, ivec3(i0,j1,k0),0).r * w00 * w10;
       sumW1 += w00 * w10;
     }
-    if(!vBlocked(i0,j1,k0))
+    if(!vBlocked(i0,j1,k1))
     {
-      value1 += texelFetch(vTex, ivec3(i0,j1,k0),0).r * w00 * w10;
-      sumW1 += w00 * w10;
-    }
-    if(!vBlocked(i1,j1,k1))
-    {
-      value1 += texelFetch(vTex, ivec3(i1,j1,k1),0).r * w01 * w10;
-      sumW1 += w01 * w10;
+      value1 += texelFetch(vTex, ivec3(i0,j1,k1),0).r * w00 * w11;
+      sumW1 += w00 * w11;
     }
     if(!vBlocked(i1,j1,k1))
     {
       value1 += texelFetch(vTex, ivec3(i1,j1,k1),0).r * w01 * w11;
       sumW1 += w01 * w11;
     }
-    value0 = sum0 > 0.0 ? value0/sumW0 : 0.0;
-    value1 = sum1 > 0.0 ? value1/sumW1 : 0.0;
+    if(!vBlocked(i1,j1,k0))
+    {
+      value1 += texelFetch(vTex, ivec3(i1,j1,k0),0).r * w01 * w10;
+      sumW1 += w01 * w10;
+    }
+    value0 = (sumW0 > 0.0) ? value0/sumW0 : 0.0;
+    value1 = (sumW1 > 0.0) ? value1/sumW1 : 0.0;
     float value = wX0*value0 + wX1*value1;
     return value;
 }
@@ -360,8 +350,9 @@ vec3 clampPosition(vec3 position)
 vec3 forwardRK2Position(vec3 position, vec3 velocity)
 {
     vec3 halfPosition = position + dt*0.5*velocity;
+    return halfPosition;
     halfPosition = clampPosition(halfPosition);
-    ivec3 halfCell = ivec3(halfPosition.x/dx, halfPosition.y/dx);
+    ivec3 halfCell = ivec3(halfPosition.x/dx, halfPosition.y/dx, halfPosition.z/dx);
     if(halfCell.x < 0 || halfCell.x >= gridSize.x 
         || halfCell.y < 0 || halfCell.y >= gridSize.y 
         || halfCell.z < 0 || halfCell.z >= gridSize.z
@@ -372,10 +363,10 @@ vec3 forwardRK2Position(vec3 position, vec3 velocity)
 
     vec3 halfVelocity = vec3(sampleU(halfPosition), sampleV(halfPosition), sampleW(halfPosition));
     vec3 newPosition = position + dt*halfVelocity;
-    ivec2 newCell = ivec2(newPosition.x/dx, newPosition.y/dx);
+    ivec3 newCell = ivec3(newPosition.x/dx, newPosition.y/dx, newPosition.z/dx);
     if(newCell.x < 0 || newCell.x >= gridSize.x 
         || newCell.y < 0 || newCell.y >= gridSize.y 
-        || newCell.z < 0 || newCell.y >= gridSize.z 
+        || newCell.z < 0 || newCell.z >= gridSize.z 
         ||texelFetch(cellType, newCell, 0).r == SOLID)
     {
         newPosition = position;
@@ -389,7 +380,7 @@ void main()
     if(id >= numOfParticles) return;
 
     vec3 position = particles[id];
-    vec3 velocity = vec2(sampleU(position), sampleV(position), sampleW(position));
-    vec3 newPosition = forwardRK2Position(position, velocity);
+    vec3 velocity = vec3(0.0, sampleV(position), 0.0);//vec3(sampleU(position), sampleV(position), sampleW(position));
+    vec3 newPosition = position+velocity*dt;//forwardRK2Position(position, velocity);
     particles[id] = newPosition;
 }

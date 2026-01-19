@@ -1,5 +1,5 @@
 #version 430
-layout(local_size_x = 16, local_size_y = 16, local_size_z = 16) in;
+layout(local_size_x = 8, local_size_y = 8, local_size_z = 8) in;
 
 layout(binding = 0, r32ui) uniform uimage3D cellType;
 layout(binding = 1, r32f) uniform image3D divergence;

@@ -12,6 +12,11 @@ public:
 	void render(std::shared_ptr<rendering::Camera> camera) override
 	{
 		activeProgram->useProgram();
+		if(activeProgram == particleProgram)
+		{
+			renderParticles(camera);
+			return;
+		}
 		glActiveTexture(GL_TEXTURE0);
 		if(activeProgram == shaderProgram)
 			glBindTexture(GL_TEXTURE_3D, gridSimulation->getTypeCell());
@@ -23,17 +28,13 @@ public:
 			glBindTexture(GL_TEXTURE_3D, gridSimulation->getDivergenceTex());
 		if(activeProgram == pressureProgram)
 			glBindTexture(GL_TEXTURE_3D, gridSimulation->getPressureTex());
-		if(activeProgram == particleProgram)
-		{
-			renderParticles(camera);
-			return;
-		}
 		shaderProgram->setInt("tex", 0);
 		glBindVertexArray(quadVAO);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	}
 	void setupBackend()
 	{
+		/*
 		shaderProgram = std::make_shared<ShaderProgram>();
 		shaderProgram->addShader(GL_VERTEX_SHADER, "shaders/grid3d/vertex.shader");
 		shaderProgram->addShader(GL_FRAGMENT_SHADER, "shaders/grid3d/fragment.shader");
@@ -58,7 +59,7 @@ public:
 		pressureProgram->addShader(GL_VERTEX_SHADER, "shaders/grid3d/vertex.shader");
 		pressureProgram->addShader(GL_FRAGMENT_SHADER, "shaders/grid3d/debugShaders/pressureGradient.shader");
 		pressureProgram->linkProgram();
-
+		*/
 		particleProgram = std::make_shared<ShaderProgram>();
 		particleProgram->addShader(GL_VERTEX_SHADER, "shaders/grid3d/debugShaders/particleVertex.shader");
 		particleProgram->addShader(GL_FRAGMENT_SHADER, "shaders/grid3d/debugShaders/particleFragment.shader");
@@ -97,7 +98,7 @@ public:
     	    particleProgram->setFloat("bottom", static_cast<rendering::OrthographicCamera*>(camera.get())->getBottom());
     	}
     	particleProgram->setVec3("color", glm::vec3(0.0, 0.3, 0.8));
-    	particleProgram->setFloat("particleRadius", gridSimulation->getDx()/float(cbrt(gridSimulation->getParticlesPerCell())));
+    	particleProgram->setFloat("particleRadius", 0.5*gridSimulation->getDx()/float(cbrt(gridSimulation->getParticlesPerCell())));
     	glBindVertexArray(particleVAO);
     	glDrawArraysInstanced(GL_POINTS, 0, 1, gridSimulation->getNumOfParticles());
     	glBindVertexArray(0);
