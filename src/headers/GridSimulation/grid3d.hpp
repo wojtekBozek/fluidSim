@@ -63,13 +63,13 @@ public:
 	uint8_t getParticlesPerCell() {return particlesPerCell;}
 	glm::uvec3 getSize(){return glm::uvec3(nx,ny,nz);}
 	glm::uvec3 getFluidSize() {return glm::uvec3(initFluidWidth, initFluidHeight,initFluidDepth);}
-	glm::uvec3 getFluidPosition() {return glm::uvec3(initFluidX, initFluidY,initFluidDepth);}
+	glm::uvec3 getFluidPosition() {return glm::uvec3(initFluidX, initFluidY,initFluidZ);}
 	float getDx() {return dx;}
 	uint32_t getBorderSize() {return borderSize;}
 	float getTimeStep() {return dt;}
 	uint32_t getPSolverIterations() {return pressureIterations;}
 
-	const std::vector<glm::vec3>& getParticles() const;
+	const std::vector<glm::vec4>& getParticles() const;
 private:
 	void JacobiSolver();
 	void GaussSiedelSolver();
@@ -84,16 +84,16 @@ private:
 	uint32_t initFluidX = 5, initFluidY=5,initFluidZ=5;
 	uint32_t borderSize = 3;
 	uint32_t pressureIterations = 200;
-	uint32_t initFluidWidth=32, initFluidHeight=32, initFluidDepth=32;
+	uint32_t initFluidWidth=1, initFluidHeight=1, initFluidDepth=1;
 	uint32_t nx = 64, ny=64, nz=64;
-	float dx = 0.05f;
+	float dx = 0.5f;
 	float dt = 0.0025f;
-	uint8_t particlesPerCell = 16;
+	uint8_t particlesPerCell = 27;
 	GLuint uInTex, uOutTex, vInTex, vOutTex, wInTex, wOutTex;
 	GLuint pressureInTex, pressureOutTex;
 	GLuint divergenceTex;
 	GLuint cellTypeTex;
-	std::vector<glm::vec3> particles;
+	std::vector<glm::vec4> particles;
 	bool zeroPressure = false;
 	GLuint m_particleBuffer;
 	GLuint64 m_computeTime;

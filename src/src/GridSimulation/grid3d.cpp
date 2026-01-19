@@ -321,30 +321,30 @@ void Grid3D::run()
 
     glBeginQuery(GL_TIME_ELAPSED, query);
     //czyszczenie
+/*
+m_clearFluidShader->useProgram();
+glBindImageTexture(0, cellTypeTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32UI);
+glBindImageTexture(1, divergenceTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32F);
+glBindImageTexture(2, pressureInTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32F);
+m_clearFluidShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
+m_clearFluidShader->setBool("zeroPressure", zeroPressure);
+glDispatchCompute((nx+15) / 16, (ny+15) / 16, (nz+15)/16);
+glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
-    m_clearFluidShader->useProgram();
-    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32UI);
-    glBindImageTexture(1, divergenceTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
-    glBindImageTexture(2, pressureInTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
-    m_clearFluidShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
-    m_clearFluidShader->setBool("zeroPressure", zeroPressure);
-    glDispatchCompute((nx+15) / 16, (ny+15) / 16, (nz+15)/16);
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
-    
-    
-    m_cellUpdateShader->useProgram();
-    glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32UI);    
-    m_cellUpdateShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
-    m_cellUpdateShader->setVec3("gridMin", glm::vec3(0.0f,0.0f,0.0f));
-    m_cellUpdateShader->setVec3("gridMax", glm::vec3(nx*dx,ny*dx,nz*dx));
-    m_cellUpdateShader->setUint("numOfParticles", particles.size());
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_particleBuffer);
-    glDispatchCompute((particles.size() + 255) / 256, 1, 1);
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-    
+m_cellUpdateShader->useProgram();
+glBindImageTexture(0, cellTypeTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32UI);    
+m_cellUpdateShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
+m_cellUpdateShader->setVec3("gridMin", glm::vec3(0.0f,0.0f,0.0f));
+m_cellUpdateShader->setVec3("gridMax", glm::vec3(nx*dx,ny*dx,nz*dx));
+m_cellUpdateShader->setUint("numOfParticles", particles.size());
+glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_particleBuffer);
+glDispatchCompute((particles.size() + 255) / 256, 1, 1);
+glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
-    m_velocityUAdvectionShader->useProgram();
-    glActiveTexture(GL_TEXTURE0);
+*/
+   /*
+   m_velocityUAdvectionShader->useProgram();
+   glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_3D, uInTex);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_3D, vInTex);
@@ -352,14 +352,14 @@ void Grid3D::run()
     glBindTexture(GL_TEXTURE_3D, wInTex);
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_3D, cellTypeTex);
-    glBindImageTexture(4, uOutTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
+    glBindImageTexture(4, uOutTex, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_R32F);
     m_velocityUAdvectionShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
     m_velocityUAdvectionShader->setFloat("dt", dt);
     m_velocityUAdvectionShader->setFloat("dx", dx);
     
     glDispatchCompute(((nx+1) + 15) / 16, (ny+15) / 16, (nz+15)/16);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-
+    
     m_velocityVAdvectionShader->useProgram();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_3D, uInTex);
@@ -369,44 +369,48 @@ void Grid3D::run()
     glBindTexture(GL_TEXTURE_3D, wInTex);
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_3D, cellTypeTex);
-    glBindImageTexture(4, vOutTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
+    glBindImageTexture(4, vOutTex, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_R32F);
     m_velocityVAdvectionShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
     m_velocityVAdvectionShader->setFloat("dt", dt);
     m_velocityVAdvectionShader->setFloat("dx", dx);
     glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, (nz+15)/16);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-
+    
     m_velocityWAdvectionShader->useProgram();
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_3D, uInTex);
     glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_3D, vInTex);
+    glActiveTexture(GL_TEXTURE2);
     glBindTexture(GL_TEXTURE_3D, wInTex);
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_3D, cellTypeTex);
-    glBindImageTexture(4, wOutTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
+    glBindTexture(GL_TEXTURE_3D, cellTypeTex);
+    glBindImageTexture(4, wOutTex, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_R32F);
     m_velocityWAdvectionShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
     m_velocityWAdvectionShader->setFloat("dt", dt);
     m_velocityWAdvectionShader->setFloat("dx", dx);
     glDispatchCompute((nx + 15) / 16, (ny+15) / 16, ((nz+1)+15)/16);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-
+    */
+    
     m_addForcesShader->useProgram();    
-    glBindImageTexture(0, vOutTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_3D, cellTypeTex);
+    glBindImageTexture(0, vInTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32F);
+    //glActiveTexture(GL_TEXTURE1);
+    //glBindTexture(GL_TEXTURE_3D, cellTypeTex);
     m_addForcesShader->setFloat("vAccelerations", -9.8f);
     m_addForcesShader->setFloat("dt", dt);
     m_addForcesShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));    
-    glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, (nz+15)/16);
+    glDispatchCompute((nx + 7) / 8, ((ny+1)+7) / 8, (nz+7)/8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
     
-    /**/
+    /*
     m_extrapolateUVelocityShader->useProgram();
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_3D, cellTypeTex);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_3D, uOutTex);
-    glBindImageTexture(2, uInTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
+    glBindImageTexture(2, uInTex, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_R32F);
     m_extrapolateUVelocityShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
     m_extrapolateUVelocityShader->setFloat("dt", dt);
     m_extrapolateUVelocityShader->setFloat("dx", dx);
@@ -419,7 +423,7 @@ void Grid3D::run()
     glBindTexture(GL_TEXTURE_3D, cellTypeTex);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_3D, vOutTex);
-    glBindImageTexture(2, vInTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
+    glBindImageTexture(2, vInTex, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_R32F);
     m_extrapolateVVelocityShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
     m_extrapolateVVelocityShader->setFloat("dt", dt);
     m_extrapolateVVelocityShader->setFloat("dx", dx);
@@ -431,38 +435,40 @@ void Grid3D::run()
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_3D, cellTypeTex);
     glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_3D, vOutTex);
-    glBindImageTexture(2, wInTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
+    glBindTexture(GL_TEXTURE_3D, wOutTex);
+    glBindImageTexture(2, wInTex, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_R32F);
     m_extrapolateWVelocityShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
     m_extrapolateWVelocityShader->setFloat("dt", dt);
     m_extrapolateWVelocityShader->setFloat("dx", dx);
     m_extrapolateWVelocityShader->setInt("borderSize", borderSize);
     glDispatchCompute((nx + 15) / 16, (ny+15) / 16, (nz+1+15)/16);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-    std::swap(uInTex, uOutTex);
-    std::swap(vInTex, vOutTex);
-    std::swap(wInTex, wOutTex);
+    */
+   //std::swap(uInTex, uOutTex);
+   //std::swap(vInTex, vOutTex);
+   //std::swap(wInTex, wOutTex);
     /**/
     /*
-    */
     if(m_solver == SOLVER::JACOBI)
     {
         JacobiSolver();
     }
     else if(m_solver == SOLVER::GS_DIVERGENCE)
     {
-       //GaussSiedelSolver();
+        //GaussSiedelSolver();
     }
     else if(m_solver == SOLVER::GS_PRESSURE)
     {
         //GaussSiedelPressureSolver();
     }
+    */
+    /*
     m_extrapolateUVelocityShader->useProgram();
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_3D, cellTypeTex);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_3D, uOutTex);
-    glBindImageTexture(2, uInTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
+    glBindImageTexture(2, uInTex, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_R32F);
     m_extrapolateUVelocityShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
     m_extrapolateUVelocityShader->setFloat("dt", dt);
     m_extrapolateUVelocityShader->setFloat("dx", dx);
@@ -475,43 +481,42 @@ void Grid3D::run()
     glBindTexture(GL_TEXTURE_3D, cellTypeTex);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_3D, vOutTex);
-    glBindImageTexture(2, vInTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
+    glBindImageTexture(2, vInTex, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_R32F);
     m_extrapolateVVelocityShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
     m_extrapolateVVelocityShader->setFloat("dt", dt);
     m_extrapolateVVelocityShader->setFloat("dx", dx);
     m_extrapolateVVelocityShader->setInt("borderSize", borderSize);
     glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, (nz+15)/16);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-
+    
     m_extrapolateWVelocityShader->useProgram();
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_3D, cellTypeTex);
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_3D, wOutTex);
-    glBindImageTexture(2, wInTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
+    glBindImageTexture(2, wInTex, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_R32F);
     m_extrapolateWVelocityShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
     m_extrapolateWVelocityShader->setFloat("dt", dt);
     m_extrapolateWVelocityShader->setFloat("dx", dx);
     m_extrapolateWVelocityShader->setInt("borderSize", borderSize);
     glDispatchCompute((nx + 15) / 16, (ny+15) / 16, ((nz+1)+15)/16);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-
+    
+    */
+   
     m_particleAdvectionShader->useProgram();
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_3D, cellTypeTex);
-    glActiveTexture(GL_TEXTURE2);
-    glBindTexture(GL_TEXTURE_3D, uInTex);
-    glActiveTexture(GL_TEXTURE3);
-    glBindTexture(GL_TEXTURE_3D, vInTex);
+    glBindTextureUnit(0, cellTypeTex);
+    glBindTextureUnit(2, uInTex);
+    glBindTextureUnit(3, vOutTex);
+    glBindTextureUnit(4, wInTex);
     m_particleAdvectionShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));    
     m_particleAdvectionShader->setUint("numOfParticles", particles.size());
     m_particleAdvectionShader->setFloat("dt", dt);
     m_particleAdvectionShader->setFloat("dx", dx);
     glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_particleBuffer);
     glDispatchCompute((particles.size() + 255) / 256, 1, 1);
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
-    /*
-    */
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
+    
    /*
    std::swap(uInTex, uOutTex);
    std::swap(vInTex, vOutTex);
@@ -566,16 +571,16 @@ void Grid3D::setup()
     setTextures();
     initilizeGrid();
 
-    glGenBuffers(1, &floatSSBO);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, floatSSBO);
-
-    uint32_t init = 0x80000000;
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(uint32_t), &init, GL_DYNAMIC_COPY);
-    
-    glGenBuffers(1, &floatSSBO2);
-    glBindBuffer(GL_SHADER_STORAGE_BUFFER, floatSSBO2);
-
-    glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(uint32_t), &init, GL_DYNAMIC_COPY);
+    //glGenBuffers(1, &floatSSBO);
+    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, floatSSBO);
+//
+    //uint32_t init = 0x80000000;
+    //glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(uint32_t), &init, GL_DYNAMIC_COPY);
+    //
+    //glGenBuffers(1, &floatSSBO2);
+    //glBindBuffer(GL_SHADER_STORAGE_BUFFER, floatSSBO2);
+//
+    //glBufferData(GL_SHADER_STORAGE_BUFFER, sizeof(uint32_t), &init, GL_DYNAMIC_COPY);
 }
 
 void Grid3D::setDimensions(uint32_t x, uint32_t y, uint32_t z)
@@ -590,7 +595,7 @@ void Grid3D::setCellSize(float x)
     dx = x;
 }
 
-const std::vector<glm::vec3>& Grid3D::getParticles() const
+const std::vector<glm::vec4>& Grid3D::getParticles() const
 {
     return particles;
 }
@@ -598,49 +603,64 @@ const std::vector<glm::vec3>& Grid3D::getParticles() const
 void Grid3D::initilizeGrid()
 {
     std:: cout << "Initializing grid\n";
-    uint32_t sqr = cbrt(particlesPerCell);
-    std::vector<GLuint> type(nx * ny* nz, 0);
-    for (uint32_t y = 0; y < ny; ++y)
+    uint32_t cbr = cbrt(particlesPerCell);
+    std:: cout << cbr << " - spacing\n";
+    std::vector<GLuint> type(nx * ny * nz, AIR);
+    for (uint32_t z = 0; z < nz; ++z)
     {
-        for (uint32_t x = 0; x < nx; ++x)
+        for (uint32_t y = 0; y < ny; ++y)
         {
-            for (uint32_t z = 0; z < nz; ++z)
+            for (uint32_t x = 0; x < nx; ++x)
             {
-                if(5 > x || 5> y || nx-5 <= x || ny-5 <= y || 5> z || nz-5 <= z)
+                uint32_t idx = (z * ny + y) * nx + x;
+                if(1 > x || 1> y || nx-1 <= x || ny-1 <= y || 1> z || nz-1 <= z)
                 {
-                    type[z*ny*nx + y * nx + x] = SOLID;
+                    type[idx] = AIR;
                     continue;
                 }
-                if (x >= initFluidX && x < initFluidX + initFluidWidth && y >= initFluidY && y < initFluidY + initFluidHeight)
+                if ((x >= initFluidX && x < initFluidX + initFluidWidth) && (y >= initFluidY && y < initFluidY + initFluidHeight) && (z >= initFluidZ && z < initFluidZ + initFluidDepth))
                 {
-                    type[z*ny*nx + y * nx + x] = FLUID;
+                    type[idx] = FLUID;
 
                     for(int p = 0; p<particlesPerCell; p++)
                     {
-                        float randX = /*p%sqr;*/float(std::rand())/float(RAND_MAX);
-                        float randY = /*p/sqr;*/float(std::rand())/float(RAND_MAX);
-                        float randZ = /*p/sqr;*/float(std::rand())/float(RAND_MAX);
-                        particles.push_back(glm::vec3(randX/float(sqr) * dx + x * dx + dx, randY/float(sqr) * dx + y * dx + dx, randZ/float(sqr) * dx + z * dx + dx));
+                        float randX = p%cbr;
+                        float randY = (p/cbr)%cbr;
+                        float randZ = p/(cbr*cbr);
+                        particles.push_back(glm::vec4(randX/float(cbr) * dx + x * dx + 0.1*dx, randY/float(cbr) * dx + y * dx + 0.1*dx, randZ/float(cbr) * dx + z * dx+0.1*dx, 1.0));
+                        //std::cout << particles.back().x<<"/" << particles.back().y << "/"<< particles.back().z << "\n";
                     }
                 }
                 else
                 {
-                    type[z*ny*nx + y * nx + x] = AIR;
+                    type[idx] = AIR;
                 }
             }
         }
     }
-    std::cout << "Num of Particles: " << particles.size() << ".\n";
-    glBindTexture(GL_TEXTURE_3D, cellTypeTex);
-    glTexSubImage2D(GL_TEXTURE_3D, 0, 0, 0, nx, ny, GL_RED_INTEGER, GL_UNSIGNED_INT, type.data());
-
-    GLuint bufsize = particles.size() * sizeof(glm::vec2);
+    //particles.clear();
+    //std::cout << "Num of Particles: " << particles.size() << ".\n";
+    //std::cout << sizeof(glm::vec4) << "\n";
+    //particles.push_back({5.0,1.0,1.0,1.0});
+    //particles.push_back({2.0,1.0,1.0,1.0});
+    //particles.push_back({3.0,1.0,1.0,1.0});
+    //particles.push_back({4.0,1.0,1.0,1.0});
+    GLuint bufsize = particles.size() * sizeof(glm::vec4);
+    //static_assert(sizeof(glm::vec4) == 12, "glm::vec3 is padded!");
+    std::cout <<particles.size() << "\n";
+    std::cout << bufsize << "\n";
+    
     if (glIsBuffer(m_particleBuffer) == GL_FALSE)
     {
         glGenBuffers(1, &m_particleBuffer);
     }
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_particleBuffer);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, particles.data(), GL_DYNAMIC_DRAW);
+    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_particleBuffer);
+    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT | GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT);
+    glBindTexture(GL_TEXTURE_3D, cellTypeTex);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx, ny, nz, GL_RED_INTEGER, GL_UNSIGNED_INT, type.data());
 }
 
 void Grid3D::setTextures()
@@ -654,6 +674,8 @@ void Grid3D::setTextures()
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx + 1, ny, nz);
     std::vector<GLfloat> zeros((nx + 1) * ny *nz, 0.0);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx+1, ny, nz, GL_RED, GL_FLOAT, zeros.data());
@@ -665,6 +687,8 @@ void Grid3D::setTextures()
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx + 1, ny, nz);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx + 1, ny, nz, GL_RED, GL_FLOAT, zeros.data());
 
@@ -675,8 +699,10 @@ void Grid3D::setTextures()
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx, ny+1, nz);
-    zeros = std::vector<GLfloat>(nx * (ny + 1) *nz, 0.0);
+    zeros = std::vector<GLfloat>(nx * (ny + 1) *nz, 1.0);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx, ny + 1, nz, GL_RED, GL_FLOAT, zeros.data());
 
     std:: cout << "Vout\n";
@@ -686,9 +712,12 @@ void Grid3D::setTextures()
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx, ny+1, nz);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx, ny + 1, nz, GL_RED, GL_FLOAT, zeros.data());
 
+    
     std:: cout << "Win\n";
     glGenTextures(1, &wInTex);
     glBindTexture(GL_TEXTURE_3D, wInTex);
@@ -696,6 +725,8 @@ void Grid3D::setTextures()
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx, ny, nz+1);
     zeros = std::vector<GLfloat>(nx * ny * (nz+1), 0.0);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx, ny, nz+1, GL_RED, GL_FLOAT, zeros.data());
@@ -707,6 +738,8 @@ void Grid3D::setTextures()
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx, ny, nz+1);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx, ny, nz+1, GL_RED, GL_FLOAT, zeros.data());
 
@@ -716,6 +749,10 @@ void Grid3D::setTextures()
     glBindTexture(GL_TEXTURE_3D, pressureInTex);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx, ny, nz);
     zeros = std::vector<GLfloat>(nx * ny * nz, 0.0);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx, ny, nz, GL_RED, GL_FLOAT, zeros.data());
@@ -726,6 +763,10 @@ void Grid3D::setTextures()
     glBindTexture(GL_TEXTURE_3D, pressureOutTex);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx, ny, nz);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx, ny, nz, GL_RED, GL_FLOAT, zeros.data());
 
@@ -734,6 +775,10 @@ void Grid3D::setTextures()
     glBindTexture(GL_TEXTURE_3D, divergenceTex);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx, ny, nz);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx, ny, nz, GL_RED, GL_FLOAT, zeros.data());
 
@@ -745,6 +790,8 @@ void Grid3D::setTextures()
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
     glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32UI, nx, ny, nz);
     std::vector<GLuint> type(nz * nx * ny, 0);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx, ny, nz, GL_RED_INTEGER, GL_UNSIGNED_INT, type.data());

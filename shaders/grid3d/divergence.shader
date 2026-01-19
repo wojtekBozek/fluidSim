@@ -1,6 +1,6 @@
 #version 430
 
-layout(local_size_x=16, local_size_y=16) in;
+layout(local_size_x=8, local_size_y=8, local_size_z=8) in;
 
 layout(binding = 0) uniform sampler3D uTex;
 layout(binding = 1) uniform sampler3D vTex;
@@ -29,22 +29,22 @@ int checkCellType(ivec3 c)
 bool uBlocked(int i, int j, int k)
 {
     if(0 == i || i >= gridSize.x) return true;
-    return checkCellType(ivec2(i-1, j, k)) == SOLID ||
-           checkCellType(ivec2(i,   j, k)) == SOLID;
+    return checkCellType(ivec3(i-1, j, k)) == SOLID ||
+           checkCellType(ivec3(i,   j, k)) == SOLID;
 }
 
 bool vBlocked(int i, int j, int k)
 {
     if(0 == j || j >= gridSize.y) return true;
-    return checkCellType(ivec2(i, j-1, k)) == SOLID ||
-           checkCellType(ivec2(i, j  , k)) == SOLID;
+    return checkCellType(ivec3(i, j-1, k)) == SOLID ||
+           checkCellType(ivec3(i, j  , k)) == SOLID;
 }
 
 bool wBlocked(int i, int j, int k)
 {
     if(0 == k || k >= gridSize.x) return true;
-    return checkCellType(ivec2(i, j, k-1)) == SOLID ||
-           checkCellType(ivec2(i,   j, k)) == SOLID;
+    return checkCellType(ivec3(i, j, k-1)) == SOLID ||
+           checkCellType(ivec3(i,   j, k)) == SOLID;
 }
 
 void main()
