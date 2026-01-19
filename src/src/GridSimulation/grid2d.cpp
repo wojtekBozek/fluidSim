@@ -558,9 +558,9 @@ void Grid2D::initilizeGrid()
 
                 for(int p = 0; p<particlesPerCell; p++)
                 {
-                    float randX = /*p%sqr;//*/float(std::rand())/float(RAND_MAX);
-                    float randY = /*p/sqr;//*/float(std::rand())/float(RAND_MAX);
-                    particles.push_back(glm::vec2(randX/float(sqr) * dx + x * dx + dx, randY/float(sqr) * dx + y * dx + dx));
+                    float randX = p%sqr;//*/float(std::rand())/float(RAND_MAX);
+                    float randY = p/sqr;//*/float(std::rand())/float(RAND_MAX);
+                    particles.push_back(glm::vec2(randX/float(sqr) * dx + x * dx, randY/float(sqr) * dx + y * dx));
                 }
             }
             else
