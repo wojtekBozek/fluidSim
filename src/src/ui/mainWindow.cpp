@@ -16,7 +16,6 @@ void MainWindow::showUI()
         ImGui::Begin("MainMenu");
         chooseSPHSimButton();
         chooseGRIDSimButton(); 
-        chooseGRID3dSimButton();
         textureTestButton();
         exitButton();
         ImGui::End();
