@@ -1,8 +1,8 @@
 #pragma once
 
-class ParticleInCell 
+class ParticleInCell2D
 {
     public:
     private:
-    
+
 };
