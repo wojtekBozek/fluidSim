@@ -86,6 +86,7 @@ void SPHsimulationUI::dimensionComboBox()
 		{
 			refSimulation->setSimulationDimension(DIMENSION_3);
 			refSimulation->clearSimulation();
+			refSimulation->setInitialSimulationDomain();
 			refSimulation->setSimulationState();
 			refSimulation->setFluidAndParticles();
 			refSimulation->setMemoryLayout();
@@ -97,6 +98,7 @@ void SPHsimulationUI::dimensionComboBox()
 		{
 			refSimulation->setSimulationDimension(DIMENSION_2);
 			refSimulation->clearSimulation();
+			refSimulation->setInitialSimulationDomain();
 			refSimulation->setSimulationState();
 			refSimulation->setFluidAndParticles();
 			refSimulation->setMemoryLayout();
@@ -121,7 +123,7 @@ void SPHsimulationUI::fluidVolumeTextInputs()
 
 void SPHsimulationUI::fluidPositionTextInputs()
 {
-	glm::vec3 PrevValue = refSimulation->getFluidDomain().posittion;
+	glm::vec3 PrevValue = refSimulation->getFluidDomain().position;
 	uiValues.fluidInitPos = PrevValue;
 	ImGui::InputFloat("fluidInitPosX", &uiValues.fluidInitPos.x, -10000000.0f, 10000000.0f, "%.4f");
 	ImGui::InputFloat("fluidInitPosY", &uiValues.fluidInitPos.y, -10000000.0f, 10000000.0f, "%.4f");
@@ -151,7 +153,7 @@ void SPHsimulationUI::simulationVolumeTextInputs()
 
 void SPHsimulationUI::simulationPositionTextInputs()
 {
-	glm::vec3 PrevValue = refSimulation->getSimulationDomain().posittion;
+	glm::vec3 PrevValue = refSimulation->getSimulationDomain().position;
 	uiValues.simDomainPos = PrevValue;
 	ImGui::InputFloat("simDomainPosX", &uiValues.simDomainPos.x, -10000000.0f, 10000000.0f, "%.3f");
 	ImGui::InputFloat("simDomainPosY", &uiValues.simDomainPos.y, -10000000.0f, 10000000.0f, "%.3f");
