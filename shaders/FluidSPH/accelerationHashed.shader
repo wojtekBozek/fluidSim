@@ -225,8 +225,11 @@ vec3 applyDomainForces(vec3 position, FluidParticle particle)
     vec3 leftNormal = vec3(1.0,0.0,0.0);
 
     vec3 domainForces = vec3(0.0,0.0,0.0);
-    domainForces += WallForce(abs(position.z-backSurface),particle.mass)*backNormal;
-    domainForces += WallForce(abs(position.z-frontSurface),particle.mass)*frontNormal;
+    if(DIMENSION == DIMENSION_3)
+    {
+        domainForces += WallForce(abs(position.z-backSurface),particle.mass)*backNormal;
+        domainForces += WallForce(abs(position.z-frontSurface),particle.mass)*frontNormal;
+    }
     domainForces += WallForce(abs(position.y-up),particle.mass)*upNormal;
     domainForces += WallForce(abs(position.y-down),particle.mass)*downNormal;
     domainForces += WallForce(abs(position.x-right),particle.mass)*rightNormal;

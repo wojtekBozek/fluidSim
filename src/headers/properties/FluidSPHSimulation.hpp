@@ -38,7 +38,7 @@ struct alignas(16) FluidParticle : Particle
 /// @brief cell defined with a position of it's back, lower, left vertex and size right up and front
 struct Domain
 {
-    glm::vec3 posittion = {-20,-2,-10};
+    glm::vec3 position = {-20,-2,-10};
     glm::vec3 size = {200,200,200}; // {m,m,m}
 };
 
@@ -114,7 +114,7 @@ public:
 
     const Domain& getSimulationDomain() const { return m_simulationDomain; }
     void setSimuilationDomainSize(glm::vec3 sizeVec) { m_simulationDomain.size = sizeVec; }
-    void setSimulationsDomainPosition(glm::vec3 position) { m_simulationDomain.posittion = position; }
+    void setSimulationsDomainPosition(glm::vec3 position) { m_simulationDomain.position = position; }
 
     const Domain& getFluidDomain() const { return m_initialDomain; }
     void setFluidDomainSize(glm::vec3 sizeVec) 
@@ -131,7 +131,7 @@ public:
             //m_numOfParticles = m_fluid.volume / (std::pow(m_particleRadius, 2) * M_PI);
         }
     }
-    void setFluidDomainPosition(glm::vec3 position) { m_initialDomain.posittion = position; }
+    void setFluidDomainPosition(glm::vec3 position) { m_initialDomain.position = position; }
 
     GLuint64 getComputeTime() const { return m_computeTime; }
     GLuint getParticleBuffer() const {return m_partBuf;}
