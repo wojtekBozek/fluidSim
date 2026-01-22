@@ -42,12 +42,18 @@ void FluidSPHSimulation::setInitialSimulationDomain()
 {
     if (m_dimension == SimDim::DIMENSION_3)
     {
+        m_initialDomain.position = glm::vec3(-2.5 + 4 * m_particleRadius, 0.0 + 4 * m_particleRadius, -1.0 + 0.4 * m_particleRadius);
+
+        m_initialDomain.size = glm::vec3(5.0, 5.0, 2.5);
         m_simulationDomain.position = glm::vec3(-5.0, -2.5, -5.0);
 
         m_simulationDomain.size = glm::vec3(10.0, 10.0, 10.0);
     }
     else if (m_dimension == SimDim::DIMENSION_2)
     {
+        m_initialDomain.position = glm::vec3(-10.0, 0.0, 0.0);
+
+        m_initialDomain.size = glm::vec3(20.0, 10.0, 0.0);
         m_simulationDomain.position = glm::vec3(-15.0, -2.5, 0.0);
         m_simulationDomain.size = glm::vec3(30.0, 20.0, 0.0);
     }
@@ -141,7 +147,7 @@ void FluidSPHSimulation::setFluidAndParticles()
 
     boundaryParticles.reserve(numOfBoundaryParticles);
     initialParticle.position = glm::vec4(m_simulationDomain.position, 1.0f);
-    initialParticle.density = 1000.0/static_cast<float>(numOfBoundaryParticles);
+    //initialParticle.density = 1000.0/static_cast<float>(numOfBoundaryParticles);
     initialParticle.type = particleType::BOUNDARY;
 
     int depth = 1;
@@ -275,7 +281,7 @@ void FluidSPHSimulation::setMemoryLayout()
     m_accelerationComputeShader->setFloat("stiffnessK", 35000);
     m_accelerationComputeShader->setFloat("epsilon", 0.05f);
     m_accelerationComputeShader->setFloat("epsilonBoundary", 0.15f);
-
+    m_accelerationComputeShader->setUint("borderPolicy", m_borderPolicy);
 
     m_movementComputeShader->useProgram();
     m_movementComputeShader->setFloat("timeStep", m_timeStep);

@@ -58,11 +58,15 @@ uniform float stiffnessK = 100.0;//n/m
 uniform float epsilon;
 uniform float epsilonBoundary;
 uniform float cellSize;
+uniform uint borderPolicy;
 
 const float PI = 3.14159265359;
 const uint DIMENSION_1 = 0u;
 const uint DIMENSION_2 = 1u;
 const uint DIMENSION_3 = 2u;
+
+const uint BOUNDARY_SOLID = 0u;
+const uint BOUNDARY_PARTICLES = 1u;
 
 float getAlfa(float kernelRadius, uint dimension)
 {
@@ -142,12 +146,12 @@ void main()
                                 temp += otherParticle.mass*(localPBD2+PressureByDensity2(otherParticle))*kernelGradient;
                                 particle.velocity.xyz += epsilon*otherParticle.mass/otherParticle.density*(otherParticle.velocity.xyz-particle.velocity.xyz)*kernel;  
                             }
-                            //else // boundary
-                            //{
-                            //    temp += particle.mass * otherParticle.mass * fluid.fluidDensity * localPBD2 * kernelGradient;
+                            else if(borderPolicy == BOUNDARY_PARTICLES)// boundary
+                            {
+                                temp += particle.mass * otherParticle.mass * fluid.fluidDensity * localPBD2 * kernelGradient;
 //
-                            //    particle.velocity.xyz += epsilonBoundary * otherParticle.mass / fluid.fluidDensity *(otherParticle.velocity.xyz - particle.velocity.xyz) * kernel;
-                            //}
+                                particle.velocity.xyz += epsilonBoundary * otherParticle.mass / fluid.fluidDensity *(otherParticle.velocity.xyz - particle.velocity.xyz) * kernel;
+                            }
                         }
                         //if(nextNode[currentParticle]!=-1)
                         //{
@@ -159,7 +163,11 @@ void main()
         }
     }
     
-    particle.acceleration.xyz = externalAccelerations - temp + applyDomainForces(particle.position.xyz, particle);
+    particle.acceleration.xyz = externalAccelerations - temp;
+    if(borderPolicy == BOUNDARY_SOLID)
+    {
+        particle.acceleration.xyz += applyDomainForces(particle.position.xyz, particle);
+    }
     particles[fluidParticle_id].acceleration.xyz = particle.acceleration.xyz;
     particles[fluidParticle_id].velocity.xyz = particle.velocity.xyz;
 } 

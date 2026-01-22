@@ -33,6 +33,7 @@ private:
 	void volumeTextInfo();
 	void nsComputationTextInfo();
 	void frameRateTextInfo();
+	void setBorderPolicy();
 
 	void timeStepInput();
 
@@ -49,5 +50,6 @@ private:
 		float k, y, timeStep, density, kernelRadius, visualRadius;
 		glm::vec3 simDomainSize, simDomainPos, fluidInitSize, fluidInitPos;
 		SimDim dimension;
+		BorderPolicy policy;
 	}uiValues;
 };

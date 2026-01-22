@@ -22,6 +22,7 @@ void SPHsimulationUI::showUI()
 		fluidPositionTextInputs();
 		simulationVolumeTextInputs();
 		simulationPositionTextInputs();
+		setBorderPolicy();
 	}
 	sphKernelRadiusSizeInput();
 	visualRadiusSizeInput();
@@ -30,7 +31,6 @@ void SPHsimulationUI::showUI()
 	volumeTextInfo();
 	nsComputationTextInfo();
 	frameRateTextInfo();
-
 	startSimulationButton();
 	restartSimulationButton();
 	stopSimulationButton();
@@ -210,6 +210,19 @@ void SPHsimulationUI::frameRateTextInfo()
 	float fr = 1.0f / (static_cast<float>(refSimulation->getComputeTime())/1000000000.000f);
 
 	ImGui::Value("FrameRate", fr, "%.001f");
+}
+
+void SPHsimulationUI::setBorderPolicy()
+{
+	BorderPolicy policy = refSimulation->getBorderPolicy();
+	uiValues.policy = policy;
+	const char* labels[] = {"Boundary as distance function", "Boundary as particles" };
+
+	ImGui::Combo("Pressure policy", (int*)&uiValues.policy, labels, IM_ARRAYSIZE(labels));
+	if(uiValues.policy != policy)
+	{
+		refSimulation->setBorderPolicy(uiValues.policy);
+	}
 }
 
 void SPHsimulationUI::timeStepInput()
