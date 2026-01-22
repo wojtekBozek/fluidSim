@@ -82,7 +82,7 @@ void main()
     uint fluidParticle_id = gl_GlobalInvocationID.x;
     if(fluidParticle_id >= numOfParticles) return;
     FluidParticle particle = particles[fluidParticle_id];
-    if(particle.type != 0) return;
+    //if(particle.type != 0) return;
     
     float alfa = getAlfa(sphKernelRadius, DIMENSION);
     FluidParticle otherParticle;
@@ -115,7 +115,7 @@ void main()
                     {
                         otherParticle = particles[currentParticle];
                         dist = distance(particle.position.xyz, otherParticle.position.xyz);
-                        if(dist <= 2*sphKernelRadius && otherParticle.type == 0)
+                        if(dist <= 2*sphKernelRadius)
                         {
                             particle.density += otherParticle.mass * CubicSplineKernel(sphKernelRadius, dist, alfa);       
                         }

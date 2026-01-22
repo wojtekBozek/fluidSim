@@ -57,6 +57,11 @@ enum SimDim{
     DIMENSION_3 = 2u
 };
 
+enum BorderPolicy{
+    BOUNDARY_SOLID = 0u,
+    BOUNDARY_PARTICLES = 1u
+};
+
 class FluidSPHSimulation
 {
 public:
@@ -115,6 +120,8 @@ public:
     const Domain& getSimulationDomain() const { return m_simulationDomain; }
     void setSimuilationDomainSize(glm::vec3 sizeVec) { m_simulationDomain.size = sizeVec; }
     void setSimulationsDomainPosition(glm::vec3 position) { m_simulationDomain.position = position; }
+    void setBorderPolicy(BorderPolicy policy) {m_borderPolicy = policy;}
+    BorderPolicy getBorderPolicy() {return m_borderPolicy;}
 
     const Domain& getFluidDomain() const { return m_initialDomain; }
     void setFluidDomainSize(glm::vec3 sizeVec) 
@@ -145,8 +152,10 @@ private:
     GLuint m_hashBuf;
     GLuint m_nextNodeBuf;
 
+    int boundarySize = 3;
     GLuint m_dimension = SimDim::DIMENSION_3;
 
+    BorderPolicy m_borderPolicy = BorderPolicy::BOUNDARY_SOLID;
     std::vector<GLint> m_hashValues;
     std::vector<GLint> m_nextNodes;
     std::unique_ptr<ShaderProgram> m_initHashTableComputeShader;
