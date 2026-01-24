@@ -63,7 +63,7 @@ void main()
         {
             if(isFluidAirUFace(i + ii, j + jj))
             {
-                if(pow(ii,2) + pow(jj,2) < pow(real_ii,2) + pow(real_jj,2))
+                if(ii*ii + jj*jj < real_ii*real_ii + real_jj*real_jj)
                 {
                     real_ii = ii;
                     real_jj = jj;
