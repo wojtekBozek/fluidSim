@@ -10,7 +10,7 @@ void GridSimulationUI::showUI()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	ImGui::Begin("SPH-Simulation");
+	ImGui::Begin("MAC-Simulation");
 	startSimulation();
 	resetSimulation();
 	vVelocityShader();
