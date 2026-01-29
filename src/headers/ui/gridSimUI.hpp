@@ -23,7 +23,7 @@ private:
 	void setPressureIterations();
 	void setCellSize();
 	void setBorderSize();
-
+	void displayCurrentStep();
 	
 	void setDensity();
 	void setSolver();

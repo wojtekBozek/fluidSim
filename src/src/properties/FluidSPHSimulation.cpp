@@ -320,48 +320,50 @@ void FluidSPHSimulation::simulationStep(float timeStep)
     GLuint64 temp = 0;
     uint32_t steps = 0;
     while(temp < 16000000 && steps*m_timeStep < 0.0166){
-    glBeginQuery(GL_TIME_ELAPSED, query);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_hashBuf);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_nextNodeBuf);
-    m_resetHashTableComputeShader->useProgram();
-    glDispatchCompute((m_numOfParticles + invocations-1) / invocations, 1, 1);
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        glBeginQuery(GL_TIME_ELAPSED, query);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_hashBuf);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_nextNodeBuf);
+        m_resetHashTableComputeShader->useProgram();
+        glDispatchCompute((m_numOfParticles + invocations-1) / invocations, 1, 1);
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
 
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_partBuf);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_hashBuf);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_nextNodeBuf);
-    m_initHashTableComputeShader->useProgram();
-    
-    glDispatchCompute((m_numOfParticles + invocations - 1) / invocations, 1, 1);
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_partBuf);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_hashBuf);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_nextNodeBuf);
+        m_initHashTableComputeShader->useProgram();
+        
+        glDispatchCompute((m_numOfParticles + invocations - 1) / invocations, 1, 1);
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_partBuf);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_fluidBuf);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_hashBuf);
-    glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_nextNodeBuf);
-    m_pressureNdensityComputeShader->useProgram();
-    glDispatchCompute((m_numOfParticles + invocations - 1) / invocations, 1, 1);
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_partBuf);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_fluidBuf);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_hashBuf);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 3, m_nextNodeBuf);
+        m_pressureNdensityComputeShader->useProgram();
+        glDispatchCompute((m_numOfParticles + invocations - 1) / invocations, 1, 1);
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-    m_accelerationComputeShader->useProgram();
-    glDispatchCompute((m_numOfParticles + invocations - 1) / invocations, 1, 1);
-    glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        m_accelerationComputeShader->useProgram();
+        glDispatchCompute((m_numOfParticles + invocations - 1) / invocations, 1, 1);
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-    m_movementComputeShader->useProgram();
-    glDispatchCompute((m_numOfParticles + invocations - 1) / invocations, 1, 1);
+        m_movementComputeShader->useProgram();
+        glDispatchCompute((m_numOfParticles + invocations - 1) / invocations, 1, 1);
 
-    glMemoryBarrier(GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
-    glEndQuery(GL_TIME_ELAPSED);
+        glMemoryBarrier(GL_VERTEX_ATTRIB_ARRAY_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
+        glEndQuery(GL_TIME_ELAPSED);
 
-    glGetQueryObjectui64v(query, GL_QUERY_RESULT, &m_computeTime);
-    temp += m_computeTime;
-    steps++;
+        glGetQueryObjectui64v(query, GL_QUERY_RESULT, &m_computeTime);
+        temp += m_computeTime;
+        steps++;
+        m_computationStep++;
     }
 }
 
 void FluidSPHSimulation::clearSimulation()
 {
+    m_computationStep = 0;
     m_particles.clear();
     m_partBUfferCreated = false;
     m_particleBufferSize = 0;

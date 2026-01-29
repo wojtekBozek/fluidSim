@@ -34,6 +34,7 @@ private:
 	void nsComputationTextInfo();
 	void frameRateTextInfo();
 	void setBorderPolicy();
+	void displayStep();
 
 	void timeStepInput();
 

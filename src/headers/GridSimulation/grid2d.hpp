@@ -71,6 +71,7 @@ public:
 	void setDensity(float dens){m_dens = dens;}
 	float getDensity(){ return m_dens; };
 	const std::vector<glm::vec2>& getParticles() const;
+	uint64_t getCurrentStep() {return m_currentStep;}
 private:
 	void JacobiSolver();
 	void GaussSiedelSolver();
@@ -98,6 +99,7 @@ private:
 	bool zeroPressure = false;
 	GLuint m_particleBuffer;
 	GLuint64 m_computeTime;
+	uint64_t m_currentStep = 0;
 
 	std::unique_ptr<ShaderProgram> m_clearFluidShader;
 	std::unique_ptr<ShaderProgram> m_velocityVAdvectionShader;
