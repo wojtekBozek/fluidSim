@@ -324,9 +324,9 @@ void Grid2D::run()
         m_cellUpdateShader->setIVec2("gridSize", glm::ivec2(nx,ny));
         m_cellUpdateShader->setVec2("gridMin", glm::vec2(0.0f,0.0f));
         m_cellUpdateShader->setVec2("gridMax", glm::vec2(nx*dx,ny*dx));
-        m_cellUpdateShader->setUint("numOfParticles", particles.size());
+        m_cellUpdateShader->setUint("numOfParticles", m_numOfParticles);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_particleBuffer);
-        glDispatchCompute((particles.size() + 255) / 256, 1, 1);
+        glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
         
 
@@ -449,11 +449,11 @@ void Grid2D::run()
         glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, vInTex);
         m_particleAdvectionShader->setIVec2("gridSize", glm::ivec2(nx,ny));    
-        m_particleAdvectionShader->setUint("numOfParticles", particles.size());
+        m_particleAdvectionShader->setUint("numOfParticles", m_numOfParticles);
         m_particleAdvectionShader->setFloat("dt", dt);
         m_particleAdvectionShader->setFloat("dx", dx);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_particleBuffer);
-        glDispatchCompute((particles.size() + 255) / 256, 1, 1);
+        glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT | GL_SHADER_STORAGE_BARRIER_BIT);
         /*
         */
@@ -536,13 +536,9 @@ void Grid2D::setCellSize(float x)
     dx = x;
 }
 
-const std::vector<glm::vec2>& Grid2D::getParticles() const
-{
-    return particles;
-}
-
 void Grid2D::initilizeGrid()
 {
+    std::vector<glm::vec2> particles;
     uint32_t sqr = sqrt(particlesPerCell);
     std::vector<GLuint> type(nx * ny, 0);
     for (uint32_t y = 0; y < ny; ++y)
@@ -571,6 +567,7 @@ void Grid2D::initilizeGrid()
             }
         }
     }
+    m_numOfParticles = particles.size();
     std::cout << "Num of Particles: " << particles.size() << ".\n";
     glBindTexture(GL_TEXTURE_2D, cellTypeTex);
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, nx, ny, GL_RED_INTEGER, GL_UNSIGNED_INT, type.data());
@@ -754,8 +751,7 @@ void Grid2D::restart()
     glDeleteTextures(1, &divergenceTex); 
     glDeleteTextures(1, &pressureInTex); 
     glDeleteTextures(1, &pressureOutTex); 
-    glDeleteTextures(1, &cellTypeTex); 
-    particles.clear();
+    glDeleteTextures(1, &cellTypeTex);
     setTextures();
     initilizeGrid();
 }
