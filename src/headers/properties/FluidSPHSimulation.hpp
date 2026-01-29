@@ -146,13 +146,15 @@ public:
     GLuint getSimulationDimension() const { return m_dimension; }
     void setSimulationDimension(float dimension) { m_dimension = dimension; }
     void clearSimulation();
+
+    uint64_t getCurentStep() {return m_computationStep;}
 private:
     GLuint m_partBuf;
     GLuint m_fluidBuf;
     GLuint m_hashBuf;
     GLuint m_nextNodeBuf;
 
-    uint64_t computationStep = 0;
+    uint64_t m_computationStep = 0;
     int boundarySize = 3;
     GLuint m_dimension = SimDim::DIMENSION_3;
 

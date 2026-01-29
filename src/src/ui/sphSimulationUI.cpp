@@ -31,6 +31,7 @@ void SPHsimulationUI::showUI()
 	volumeTextInfo();
 	nsComputationTextInfo();
 	frameRateTextInfo();
+	displayStep();
 	startSimulationButton();
 	restartSimulationButton();
 	stopSimulationButton();
@@ -223,6 +224,11 @@ void SPHsimulationUI::setBorderPolicy()
 	{
 		refSimulation->setBorderPolicy(uiValues.policy);
 	}
+}
+
+void SPHsimulationUI::displayStep()
+{
+	ImGui::Value("CurrentStep", static_cast<unsigned int>(refSimulation->getCurentStep()));
 }
 
 void SPHsimulationUI::timeStepInput()

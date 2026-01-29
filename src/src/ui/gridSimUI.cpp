@@ -36,6 +36,7 @@ void GridSimulationUI::showUI()
 
 	returnToMenuButton();
 	timeStepTime();
+	displayCurrentStep();
 	frameRate();
 	ImGui::End();
 	ImGui::Render();
@@ -137,6 +138,11 @@ void GridSimulationUI::setBorderSize()
 	{
 		refSimulation->setBorderSize(size);
 	}
+}
+
+void GridSimulationUI::displayCurrentStep()
+{
+	ImGui::Value("CurrentStep", static_cast<unsigned int>(refSimulation->getCurrentStep()));
 }
 
 void GridSimulationUI::setDensity()
