@@ -152,6 +152,7 @@ private:
     GLuint m_hashBuf;
     GLuint m_nextNodeBuf;
 
+    uint64_t computationStep = 0;
     int boundarySize = 3;
     GLuint m_dimension = SimDim::DIMENSION_3;
 

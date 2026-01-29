@@ -96,7 +96,7 @@ void MyApp::initialize()
 
     setup::setupGLFW();
 
-    window = glfwCreateWindow(WIDTH, HEIGHT, "First window", NULL, NULL);
+    window = glfwCreateWindow(WIDTH, HEIGHT, "Fluid Simulator", NULL, NULL);
 
     if (!window)
     {
