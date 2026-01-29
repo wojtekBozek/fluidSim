@@ -46,12 +46,12 @@ public:
 	SOLVER getSolver() {return m_solver;}
 	float getOverrelaxation(){return m_overrelaxation;}
 
-	void setTextures();
-	void setShaders();
-	void restart();
+	virtual void setTextures();
+	virtual void setShaders();
+	virtual void restart();
 	void setPressureZero(bool value){zeroPressure = value;}
 	bool getPressurePolicy(){return zeroPressure;}
-	uint32_t getNumOfParticles(){return particles.size();}
+	uint32_t getNumOfParticles(){return m_numOfParticles;}
 	GLuint getTypeCell() { return cellTypeTex; }
 	GLuint getuTex() { return uInTex; }
 	GLuint getvTex() { return vInTex; }
@@ -70,9 +70,8 @@ public:
 
 	void setDensity(float dens){m_dens = dens;}
 	float getDensity(){ return m_dens; };
-	const std::vector<glm::vec2>& getParticles() const;
 	uint64_t getCurrentStep() {return m_currentStep;}
-private:
+protected:
 	void JacobiSolver();
 	void GaussSiedelSolver();
 	void GaussSiedelPressureSolver();
@@ -83,6 +82,7 @@ private:
 	const GLuint FLUID = 0u;
 	const GLuint AIR = 1u;
 	const GLuint SOLID = 2u;
+	uint32_t m_numOfParticles = 0;
 	uint32_t initFluidX = 5, initFluidY=5;
 	uint32_t borderSize = 3;
 	uint32_t pressureIterations = 200;
@@ -95,7 +95,6 @@ private:
 	GLuint pressureInTex, pressureOutTex;
 	GLuint divergenceTex;
 	GLuint cellTypeTex;
-	std::vector<glm::vec2> particles;
 	bool zeroPressure = false;
 	GLuint m_particleBuffer;
 	GLuint64 m_computeTime;
