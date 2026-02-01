@@ -46,7 +46,7 @@ public:
 	SOLVER getSolver() {return m_solver;}
 	float getOverrelaxation(){return m_overrelaxation;}
 
-	virtual void setTextures();
+	void setTextures();
 	virtual void setShaders();
 	virtual void restart();
 	void setPressureZero(bool value){zeroPressure = value;}
