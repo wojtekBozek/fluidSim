@@ -1,14 +1,14 @@
 #pragma once
 #include "renderer.hpp"
-#include "grid2d.hpp"
+#include "mixed.hpp"
 #include "orthographicCamera.hpp"
 #include "perspectiveCamera.hpp"
 
-class  GridRenderer : public BaseRenderer
+class  MixedRenderer : public BaseRenderer
 {
 public:
-	GridRenderer() {}
-	void setupSimulation(std::shared_ptr<Grid2D> grid) { gridSimulation = grid; }
+	MixedRenderer() {}
+	void setupSimulation(std::shared_ptr<ParticleInCell2D> grid) { gridSimulation = grid; }
 	void render(std::shared_ptr<rendering::Camera> camera) override
 	{
 		activeProgram->useProgram();
@@ -60,7 +60,7 @@ public:
 		pressureProgram->linkProgram();
 
 		particleProgram = std::make_shared<ShaderProgram>();
-		particleProgram->addShader(GL_VERTEX_SHADER, "shaders/gridFluid/debugShaders/particleVertex.shader");
+		particleProgram->addShader(GL_VERTEX_SHADER, "shaders/mixed/debug/particleVertex.shader");
 		particleProgram->addShader(GL_FRAGMENT_SHADER, "shaders/gridFluid/debugShaders/particleFragment.shader");
 		particleProgram->linkProgram();
 
@@ -178,7 +178,7 @@ private:
 	std::shared_ptr<ShaderProgram> divergenceProgram;
 	std::shared_ptr<ShaderProgram> pressureProgram;
 	std::shared_ptr<ShaderProgram> particleProgram;
-	std::shared_ptr<Grid2D> gridSimulation;
+	std::shared_ptr<ParticleInCell2D> gridSimulation;
 
 	GLuint particleVAO = 0;
 	GLuint quadVAO = 0;

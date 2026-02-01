@@ -1,5 +1,5 @@
 #pragma once
-#include <GridSimulation/grid2d.hpp>
+#include "grid2d.hpp"
 
 class ParticleInCell2D : public Grid2D
 {
@@ -19,6 +19,10 @@ class ParticleInCell2D : public Grid2D
             glm::vec2 velocity;
         };
 	    std::unique_ptr<ShaderProgram> m_transferVelocityToGridShader;
+	    std::unique_ptr<ShaderProgram> m_uToGridShader;
+	    std::unique_ptr<ShaderProgram> m_vToGridShader;
+        std::unique_ptr<ShaderProgram> m_clearUBuffer;
+	    std::unique_ptr<ShaderProgram> m_clearVBuffer;
 	    std::unique_ptr<ShaderProgram> m_calculateVelocityOfParticles;
-        GLuint weightsUssbo, weightsVssbo, Ussbo, Vssbo;
+        GLuint m_weightsUssbo, m_weightsVssbo, m_Ussbo, m_Vssbo;
 };

@@ -6,6 +6,7 @@ enum class ProgramState
     SPH_SIM,
     GRID_SIM,
     GRID_SIM_3D,
+    MIXED_SIM,
     TEXTURE_TEST
 };
 

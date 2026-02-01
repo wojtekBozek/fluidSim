@@ -1,9 +1,8 @@
-#version 430 
-
+#version 460 core
+#extension GL_NV_shader_atomic_float : enable
 layout(local_size_x = 256) in;
 
 layout(binding = 0) uniform usampler2D cellType;
-
 
 struct Particle {
     vec2 position;
@@ -14,32 +13,29 @@ layout(std430, binding = 1) buffer Particles {
     Particle particles[];
 };
 
-layout(std430, binding = 2) buffer Particles {
+layout(std430, binding = 2) buffer VelocitiesU {
     float velocitiesU[];
 };
 
-layout(std430, binding = 3) buffer Particles {
+layout(std430, binding = 3) buffer VelocitiesV {
     float velocitiesV[];
 };
 
-layout(std430, binding = 4) buffer Particles {
+layout(std430, binding = 4) buffer WeightsU {
     float weightsU[];
 };
 
-layout(std430, binding = 5) buffer Particles {
+layout(std430, binding = 5) buffer WeightsV {
     float weightsV[];
 };
-
-layout(binding = 2) uniform sampler2D uTex;
-
 
 uniform ivec2 gridSize;
 uniform float dt;
 uniform float dx;
 uniform uint numOfParticles;
 
-int Nx(){gridSize.x;}
-int Ny(){gridSize.y;}
+int Nx(){return gridSize.x;}
+int Ny(){return gridSize.y;}
 
 
 int checkCellType(ivec2 c)
@@ -55,14 +51,14 @@ bool uBlocked(int i, int j)
 {
     if(0 == i) return true;
     return checkCellType(ivec2(i-1, j)) == SOLID ||
-           checkCellType(ivec2(i,   j)) == SOLID || (checkCellType(ivec2(i-1, j)) != FLUID && checkCellType(ivec2(i, j)) != FLUID);
+           checkCellType(ivec2(i,   j)) == SOLID;
 }
 
 bool vBlocked(int i, int j)
 {
     if(0 == j) return true;
     return checkCellType(ivec2(i, j-1)) == SOLID ||
-           checkCellType(ivec2(i, j  )) == SOLID || (checkCellType(ivec2(i, j)) != FLUID && checkCellType(ivec2(i, j-1)) != FLUID);
+           checkCellType(ivec2(i, j  )) == SOLID;
 }
 
 void particlesToFacesU(vec2 position, vec2 velocity)
@@ -108,7 +104,7 @@ void particlesToFacesU(vec2 position, vec2 velocity)
     }
 }
 
-void particlesToFacesV(vec2 position)
+void particlesToFacesV(vec2 position, vec2 velocity)
 { 
     int i = int((position.x-0.5*dx)/dx);
     float backDistance = (position.x-0.5*dx) - i*dx;
