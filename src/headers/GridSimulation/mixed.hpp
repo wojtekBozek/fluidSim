@@ -4,13 +4,21 @@
 class ParticleInCell2D : public Grid2D
 {
     public:
+        ParticleInCell2D()
+        {}
         void run() override;
 	    void setup() override;
-        void setTextures() override;
+        void initialize();
         void setShaders() override;
         void restart() override;
     private:
-	    std::unique_ptr<ShaderProgram> m_TransferVelocityToGridShader;
-	    std::unique_ptr<ShaderProgram> m_calculateVelocityOfParticles;
 
+        struct Particle
+        {
+            glm::vec2 position;
+            glm::vec2 velocity;
+        };
+	    std::unique_ptr<ShaderProgram> m_transferVelocityToGridShader;
+	    std::unique_ptr<ShaderProgram> m_calculateVelocityOfParticles;
+        GLuint weightsUssbo, weightsVssbo, Ussbo, Vssbo;
 };

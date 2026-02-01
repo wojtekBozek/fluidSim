@@ -57,11 +57,11 @@ float interpolateUinGrid(vec2 position)
     int j = int((position.y-0.5*dx)/dx);
     float downDistance = ((position.y-0.5*dx) - j*dx);
 
-    int i0 = clamp(i,0, Nx-1);
-    int i1 = clamp(i + 1, 0, Nx-1);
+    int i0 = clamp(i,0, Nx);
+    int i1 = clamp(i + 1, 0, Nx);
 
-    int j0 = clamp(j, 0, Ny);
-    int j1 = clamp(j+1,     0, Ny);
+    int j0 = clamp(j, 0, Ny-1);
+    int j1 = clamp(j+1,     0, Ny-1);
     float w00 = 1.0 - backDistance/dx; 
     float w01 = backDistance/dx; 
     float w10 = 1.0 - downDistance/dx; 
