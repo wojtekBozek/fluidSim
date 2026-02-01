@@ -32,7 +32,7 @@ public:
 		glBindVertexArray(quadVAO);
 		glDrawArrays(GL_TRIANGLE_STRIP, 0, 4);
 	}
-	void setupBackend()
+	virtual void setupBackend()
 	{
 		shaderProgram = std::make_shared<ShaderProgram>();
 		shaderProgram->addShader(GL_VERTEX_SHADER, "shaders/gridFluid/vertex.shader");

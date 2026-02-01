@@ -16,6 +16,8 @@ private:
     void chooseGRIDSimButton();
     void textureTestButton();
     void chooseGRID3dSimButton();
+    
+    void chooseMixedSimButton();
     void exitButton();
     //std::shared_ptr<ProgramState> m_state;
     //GLFWwindow *m_window;

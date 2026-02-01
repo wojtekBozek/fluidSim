@@ -9,6 +9,7 @@
 #include "gridContext.hpp"
 #include "grid3dContext.hpp"
 #include "textureTest.hpp"
+#include "mixedContext.hpp"
 
 constexpr GLint WIDTH = 1200, HEIGHT = 900;
 constexpr int layoutPos = 0;
@@ -69,6 +70,7 @@ void MyApp::setupResources()
     contextMap[ProgramState::GRID_SIM] = std::make_shared<GridSimulationContext>(window, programState);
     contextMap[ProgramState::GRID_SIM_3D] = std::make_shared<Grid3DSimulationContext>(window, programState);
     contextMap[ProgramState::TEXTURE_TEST] = std::make_shared<TextureTestContext>(window, programState);
+    contextMap[ProgramState::MIXED_SIM] = std::make_shared<MixedSimulationContext>(window, programState);
     activeContext = contextMap[ProgramState::MAIN_MENU];
     lastProgramState = ProgramState::MAIN_MENU;
     activeContext->initContext();
@@ -94,7 +96,7 @@ void MyApp::initialize()
         exit(1);
     }
 
-    setup::setupGLFW();
+    setup::setupGLFW(4,6);
 
     window = glfwCreateWindow(WIDTH, HEIGHT, "Fluid Simulator", NULL, NULL);
 
@@ -134,7 +136,8 @@ void MyApp::initialize()
 
     printf("Vendor:   %s\n", glGetString(GL_VENDOR));
     printf("Renderer: %s\n", glGetString(GL_RENDERER));
-    printf("Version:  %s\n", glGetString(GL_VERSION));
+    printf("Version:  %s\n", glGetString(GL_VERSION));   
+    printf("GLSL_VERSION: %s\n", glGetString(GL_SHADING_LANGUAGE_VERSION));
 }
 
 void MyApp::cleanup()

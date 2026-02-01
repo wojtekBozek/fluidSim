@@ -29,12 +29,14 @@ ${CMAKE_SOURCE_DIR}/src/src/properties/FluidRenderer.cpp
 ${CMAKE_SOURCE_DIR}/src/src/ui/mainWindow.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/ui/simulationUI.cpp
 ${CMAKE_SOURCE_DIR}/src/src/ui/gridSimUI.cpp
+${CMAKE_SOURCE_DIR}/src/src/ui/mixedUI.cpp
 ${CMAKE_SOURCE_DIR}/src/src/ui/grid3dsimUI.cpp
 ${CMAKE_SOURCE_DIR}/src/src/program/application.cpp
 ${CMAKE_SOURCE_DIR}/src/src/camera/perspectiveCamera.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/camera/orthographicCamera.cpp 
 ${CMAKE_SOURCE_DIR}/src/src/program/context.cpp
-${CMAKE_SOURCE_DIR}/src/src/ui/sphSimulationUI.cpp "src/src/program/gridContext.cpp" "src/src/GridSimulation/grid3d.cpp" "src/src/program/grid3dContext.cpp" "src/src/GridSimulation/grid2d.cpp"  "src/src/program/textureTest.cpp")
+${CMAKE_SOURCE_DIR}/src/src/program/mixedContext.cpp
+${CMAKE_SOURCE_DIR}/src/src/ui/sphSimulationUI.cpp "src/src/program/gridContext.cpp" "src/src/GridSimulation/mixed.cpp" "src/src/GridSimulation/grid3d.cpp" "src/src/program/grid3dContext.cpp" "src/src/GridSimulation/grid2d.cpp"  "src/src/program/textureTest.cpp")
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
 ${CMAKE_SOURCE_DIR}/src/headers/camera/
