@@ -10,7 +10,7 @@ void MixedSimulationUI::showUI()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	ImGui::Begin("MAC-Simulation");
+	ImGui::Begin("PIC-FLIP Simulation");
 	startSimulation();
 	resetSimulation();
 	vVelocityShader();
