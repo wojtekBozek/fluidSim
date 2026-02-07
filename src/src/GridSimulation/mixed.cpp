@@ -46,33 +46,6 @@ void ParticleInCell2D::run()
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
         
-        m_addForcesShader->useProgram();    
-        glBindImageTexture(0, vOutTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, cellTypeTex);
-        m_addForcesShader->setFloat("vAccelerations", -9.8f);
-        m_addForcesShader->setFloat("dt", dt);
-        m_addForcesShader->setIVec2("gridSize", glm::ivec2(nx,ny));        
-        glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, 1);
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-
-        std::swap(uInTex, uOutTex);
-        std::swap(vInTex, vOutTex);
-        m_calculateVelocityOfParticles->useProgram();
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_particleBuffer);
-        glActiveTexture(GL_TEXTURE0);
-        glBindTexture(GL_TEXTURE_2D, cellTypeTex);
-        glActiveTexture(GL_TEXTURE2);
-        glBindTexture(GL_TEXTURE_2D, uInTex);
-        glActiveTexture(GL_TEXTURE3);
-        glBindTexture(GL_TEXTURE_2D, vInTex);
-        m_calculateVelocityOfParticles->setIVec2("gridSize", glm::ivec2(nx,ny));    
-        m_calculateVelocityOfParticles->setUint("numOfParticles", m_numOfParticles);
-        m_calculateVelocityOfParticles->setFloat("dt", dt);
-        m_calculateVelocityOfParticles->setFloat("dx", dx);
-        glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
-        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-
         m_transferVelocityToGridShader->useProgram();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, cellTypeTex);
@@ -94,7 +67,7 @@ void ParticleInCell2D::run()
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_Ussbo);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_weightsUssbo); 
         glDispatchCompute(((ny*(nx+1)) + 255) / 256, 1, 1);   
-        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
         
         m_vToGridShader->useProgram();
         glBindImageTexture(0, vOutTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
@@ -102,10 +75,18 @@ void ParticleInCell2D::run()
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_Vssbo);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_weightsVssbo);
         glDispatchCompute((((ny+1)*nx) + 255) / 256, 1, 1);
-        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
+        m_addForcesShader->useProgram();    
+        glBindImageTexture(0, vOutTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, cellTypeTex);
+        m_addForcesShader->setFloat("vAccelerations", -9.8f);
+        m_addForcesShader->setFloat("dt", dt);
+        m_addForcesShader->setIVec2("gridSize", glm::ivec2(nx,ny));        
+        glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, 1);
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
         
-        /*
         m_extrapolateUVelocityShader->useProgram();
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, cellTypeTex);
@@ -132,7 +113,7 @@ void ParticleInCell2D::run()
         glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);    
         
-        */
+        
         std::swap(uInTex, uOutTex);
         std::swap(vInTex, vOutTex);
         if(m_solver == SOLVER::JACOBI)
@@ -148,9 +129,12 @@ void ParticleInCell2D::run()
             GaussSiedelPressureSolver();
         }
 
+        //std::swap(uInTex, uOutTex);
+        //std::swap(vInTex, vOutTex);
         
         
         /*
+        */
         m_extrapolateUVelocityShader->useProgram();
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, cellTypeTex);
@@ -176,8 +160,21 @@ void ParticleInCell2D::run()
         m_extrapolateVVelocityShader->setInt("borderSize", borderSize);
         glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-*/
 
+        m_calculateVelocityOfParticles->useProgram();
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_particleBuffer);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, cellTypeTex);
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_2D, uOutTex);
+        glActiveTexture(GL_TEXTURE3);
+        glBindTexture(GL_TEXTURE_2D, vOutTex);
+        m_calculateVelocityOfParticles->setIVec2("gridSize", glm::ivec2(nx,ny));    
+        m_calculateVelocityOfParticles->setUint("numOfParticles", m_numOfParticles);
+        m_calculateVelocityOfParticles->setFloat("dt", dt);
+        m_calculateVelocityOfParticles->setFloat("dx", dx);
+        glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
         
         //m_particleAdvectionShader->useProgram();
         //glActiveTexture(GL_TEXTURE0);
