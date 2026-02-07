@@ -82,26 +82,26 @@ void particlesToFacesU(vec2 position, vec2 velocity)
     if(!uBlocked(i0,j0))
     {
         float sumW = w00 * w10;
-        atomicAdd(velocitiesU[j0*(Nx())+i0], sumW*velocity.x);
-        atomicAdd(weightsU[j0*(Nx())+i0], sumW);
+        atomicAdd(velocitiesU[j0*(Nx()+1)+i0], sumW*velocity.x);
+        atomicAdd(weightsU[j0*(Nx()+1)+i0], sumW);
     }
     if(!uBlocked(i0,j1))
     {
         float sumW = w00 * w11;
-        atomicAdd(velocitiesU[j1*(Nx())+i0], sumW*velocity.x);
-        atomicAdd(weightsU[j1*(Nx())+i0], sumW);
+        atomicAdd(velocitiesU[j1*(Nx()+1)+i0], sumW*velocity.x);
+        atomicAdd(weightsU[j1*(Nx()+1)+i0], sumW);
     }
     if(!uBlocked(i1,j1))
     {
         float sumW = w01 * w11;
-        atomicAdd(velocitiesU[j1*(Nx())+i1], sumW*velocity.x);
-        atomicAdd(weightsU[j1*(Nx())+i1], sumW);
+        atomicAdd(velocitiesU[j1*(Nx()+1)+i1], sumW*velocity.x);
+        atomicAdd(weightsU[j1*(Nx()+1)+i1], sumW);
     }
     if(!uBlocked(i1,j0))
     {
         float sumW = w01 * w10;
-        atomicAdd(velocitiesU[j0*(Nx())+i1], sumW*velocity.x);
-        atomicAdd(weightsU[j0*(Nx())+i1], sumW);
+        atomicAdd(velocitiesU[j0*(Nx()+1)+i1], sumW*velocity.x);
+        atomicAdd(weightsU[j0*(Nx()+1)+i1], sumW);
     }
 }
 
@@ -126,26 +126,26 @@ void particlesToFacesV(vec2 position, vec2 velocity)
     if(!vBlocked(i0,j0))
     {
         float sumW = w00 * w10;
-        atomicAdd(velocitiesV[j0*(Nx()-1)+i0], sumW*velocity.y);
-        atomicAdd(weightsV[j0*(Nx()-1)+i0], sumW);
+        atomicAdd(velocitiesV[j0*(Nx())+i0], sumW*velocity.y);
+        atomicAdd(weightsV[j0*(Nx())+i0], sumW);
     }
     if(!vBlocked(i0,j1))
     {
         float sumW = w00 * w11;
-        atomicAdd(velocitiesV[j1*(Nx()-1)+i0], sumW*velocity.y);
-        atomicAdd(weightsV[j1*(Nx()-1)+i0], sumW);
+        atomicAdd(velocitiesV[j1*(Nx())+i0], sumW*velocity.y);
+        atomicAdd(weightsV[j1*(Nx())+i0], sumW);
     }
     if(!vBlocked(i1,j1))
     {
         float sumW = w01 * w11;
-        atomicAdd(velocitiesV[j1*(Nx()-1)+i1], sumW*velocity.y);
-        atomicAdd(weightsV[j1*(Nx()-1)+i1], sumW);
+        atomicAdd(velocitiesV[j1*(Nx())+i1], sumW*velocity.y);
+        atomicAdd(weightsV[j1*(Nx())+i1], sumW);
     }
     if(!vBlocked(i1,j0))
     {
         float sumW = w01 * w10;
-        atomicAdd(velocitiesV[j0*(Nx()-1)+i1], sumW*velocity.y);
-        atomicAdd(weightsV[j0*(Nx()-1)+i1], sumW);
+        atomicAdd(velocitiesV[j0*(Nx())+i1], sumW*velocity.y);
+        atomicAdd(weightsV[j0*(Nx())+i1], sumW);
     }
 }
 

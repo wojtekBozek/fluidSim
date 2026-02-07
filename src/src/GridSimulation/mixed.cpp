@@ -25,14 +25,14 @@ void ParticleInCell2D::run()
         m_clearUBuffer->setIVec2("gridSize", glm::ivec2(nx,ny));
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_Ussbo);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_weightsUssbo);    
-        glDispatchCompute(((nx*(ny-1)) + 255) / 256, 1, 1);
+        glDispatchCompute(((ny*(nx+1)) + 255) / 256, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
         
         m_clearVBuffer->useProgram();
         m_clearVBuffer->setIVec2("gridSize", glm::ivec2(nx,ny));
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, m_Vssbo);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_weightsVssbo);
-        glDispatchCompute(((ny*(nx-1)) + 255) / 256, 1, 1);
+        glDispatchCompute((((ny+1)*(nx)) + 255) / 256, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
         m_transferVelocityToGridShader->useProgram();
@@ -55,7 +55,7 @@ void ParticleInCell2D::run()
         m_uToGridShader->setIVec2("gridSize", glm::ivec2(nx,ny));
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_Ussbo);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_weightsUssbo); 
-        glDispatchCompute(((nx*(ny-1)) + 255) / 256, 1, 1);   
+        glDispatchCompute(((ny*(nx+1)) + 255) / 256, 1, 1);   
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
         
         m_vToGridShader->useProgram();
@@ -63,7 +63,7 @@ void ParticleInCell2D::run()
         m_vToGridShader->setIVec2("gridSize", glm::ivec2(nx,ny));
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_Vssbo);
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 2, m_weightsVssbo);
-        glDispatchCompute(((ny*(nx-1)) + 255) / 256, 1, 1);
+        glDispatchCompute((((ny+1)*nx) + 255) / 256, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
         m_cellUpdateShader->useProgram();

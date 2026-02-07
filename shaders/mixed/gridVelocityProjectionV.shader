@@ -20,10 +20,10 @@ int Ny(){return gridSize.y;}
 void main()
 {
     uint id = gl_GlobalInvocationID.x;
-    if(id >= Ny()*(Nx()-1)) return;
+    if(id >= (Ny()+1)*(Nx())) return;
 
-    uint j = id/(Nx()-1);
-    uint i = id%(Nx()-1);
+    uint j = id/(Nx());
+    uint i = id%(Nx());
 
     float weight = weightsV[id];
     float vel = velocitiesV[id];
