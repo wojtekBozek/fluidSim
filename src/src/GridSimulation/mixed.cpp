@@ -35,6 +35,16 @@ void ParticleInCell2D::run()
         glDispatchCompute((((ny+1)*(nx)) + 255) / 256, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
+        m_cellUpdateShader->useProgram();
+        glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32UI);    
+        m_cellUpdateShader->setIVec2("gridSize", glm::ivec2(nx,ny));
+        m_cellUpdateShader->setVec2("gridMin", glm::vec2(0.0f,0.0f));
+        m_cellUpdateShader->setVec2("gridMax", glm::vec2(nx*dx,ny*dx));
+        m_cellUpdateShader->setUint("numOfParticles", m_numOfParticles);
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_particleBuffer);
+        glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
+        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+
         m_transferVelocityToGridShader->useProgram();
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, cellTypeTex);
@@ -66,28 +76,8 @@ void ParticleInCell2D::run()
         glDispatchCompute((((ny+1)*nx) + 255) / 256, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-        m_cellUpdateShader->useProgram();
-        glBindImageTexture(0, cellTypeTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32UI);    
-        m_cellUpdateShader->setIVec2("gridSize", glm::ivec2(nx,ny));
-        m_cellUpdateShader->setVec2("gridMin", glm::vec2(0.0f,0.0f));
-        m_cellUpdateShader->setVec2("gridMax", glm::vec2(nx*dx,ny*dx));
-        m_cellUpdateShader->setUint("numOfParticles", m_numOfParticles);
-        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_particleBuffer);
-        glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
-        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-
-        m_addForcesShader->useProgram();    
-        glBindImageTexture(0, vOutTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
-        glActiveTexture(GL_TEXTURE1);
-        glBindTexture(GL_TEXTURE_2D, cellTypeTex);
-        m_addForcesShader->setFloat("vAccelerations", -9.8f);
-        m_addForcesShader->setFloat("dt", dt);
-        m_addForcesShader->setIVec2("gridSize", glm::ivec2(nx,ny));
         
-        glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, 1);
-        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-        
-        /**/
+        /*
         m_extrapolateUVelocityShader->useProgram();
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, cellTypeTex);
@@ -114,9 +104,9 @@ void ParticleInCell2D::run()
         glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);    
         
+        */
         std::swap(uInTex, uOutTex);
         std::swap(vInTex, vOutTex);
-
         if(m_solver == SOLVER::JACOBI)
         {
             JacobiSolver();
@@ -129,6 +119,18 @@ void ParticleInCell2D::run()
         {
             GaussSiedelPressureSolver();
         }
+
+        
+        
+        m_addForcesShader->useProgram();    
+        glBindImageTexture(0, vOutTex, 0, GL_FALSE, 0, GL_READ_WRITE, GL_R32F);
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_2D, cellTypeTex);
+        m_addForcesShader->setFloat("vAccelerations", -9.8f);
+        m_addForcesShader->setFloat("dt", dt);
+        m_addForcesShader->setIVec2("gridSize", glm::ivec2(nx,ny));        
+        glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, 1);
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
         m_extrapolateUVelocityShader->useProgram();
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, cellTypeTex);
@@ -154,6 +156,7 @@ void ParticleInCell2D::run()
         m_extrapolateVVelocityShader->setInt("borderSize", borderSize);
         glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+
 
         m_calculateVelocityOfParticles->useProgram();
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_particleBuffer);
@@ -249,28 +252,28 @@ void ParticleInCell2D::initialize()
     {
         glGenBuffers(1, &m_weightsUssbo);
     }
-    bufsize = (ny-1)*nx * sizeof(float);
+    bufsize = (nx+1)*ny * sizeof(float);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_weightsUssbo);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, nullptr, GL_DYNAMIC_DRAW);
     if (glIsBuffer(m_Ussbo) == GL_FALSE)
     {
         glGenBuffers(1, &m_Ussbo);
     }
-    bufsize = (ny-1)*nx * sizeof(float);
+    bufsize = (nx+1)*ny * sizeof(float);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_Ussbo);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, nullptr, GL_DYNAMIC_DRAW);
     if (glIsBuffer(m_Vssbo) == GL_FALSE)
     {
         glGenBuffers(1, &m_Vssbo);
     }
-    bufsize = ny*(nx-1) * sizeof(float);
+    bufsize = nx*(ny+1) * sizeof(float);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_Vssbo);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, nullptr, GL_DYNAMIC_DRAW);
     if (glIsBuffer(m_weightsVssbo) == GL_FALSE)
     {
         glGenBuffers(1, &m_weightsVssbo);
     }
-    bufsize = ny*(nx-1) * sizeof(float);
+    bufsize = nx*(ny+1) * sizeof(float);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_weightsVssbo);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, nullptr, GL_DYNAMIC_DRAW);
 }
