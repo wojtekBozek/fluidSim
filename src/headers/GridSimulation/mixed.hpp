@@ -12,8 +12,7 @@ class ParticleInCell2D : public Grid2D
         void setShaders() override;
         void restart() override;
     private:
-
-        struct Particle
+        struct alignas(16) Particle
         {
             glm::vec2 position;
             glm::vec2 velocity;
