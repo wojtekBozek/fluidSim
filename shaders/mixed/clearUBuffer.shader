@@ -18,7 +18,7 @@ int Ny(){return gridSize.y;}
 void main()
 {
     uint id = gl_GlobalInvocationID.x;
-    if(id >= (Ny()-1)*Nx()) return;
+    if(id >= (Ny())*(Nx()+1)) return;
 
     weightsU[id] = 0.0;
     velocitiesU[id] = 0.0;

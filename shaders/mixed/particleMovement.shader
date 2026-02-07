@@ -41,14 +41,14 @@ bool uBlocked(int i, int j)
 {
     if(0 == i) return true;
     return checkCellType(ivec2(i-1, j)) == SOLID ||
-           checkCellType(ivec2(i,   j)) == SOLID || (checkCellType(ivec2(i-1, j)) == AIR && checkCellType(ivec2(i,   j)) == AIR);
+           checkCellType(ivec2(i,   j)) == SOLID;
 }
 
 bool vBlocked(int i, int j)
 {
     if(0 == j) return true;
     return checkCellType(ivec2(i, j-1)) == SOLID ||
-           checkCellType(ivec2(i, j  )) == SOLID || (checkCellType(ivec2(i-1, j)) == AIR && checkCellType(ivec2(i,   j)) == AIR);
+           checkCellType(ivec2(i, j  )) == SOLID;
 }
 
 float interpolateUinGrid(vec2 position)
