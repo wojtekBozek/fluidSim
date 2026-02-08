@@ -15,7 +15,7 @@ public:
 	void setBorderSize(uint32_t size){borderSize = size;}
 	void setFluidInitPosition(uint32_t x, uint32_t y){initFluidX = x; initFluidY = y;}
 	void setFluidSize(uint32_t dx, uint32_t dy){initFluidHeight = dy; initFluidWidth = dx;};
-	void initilizeGrid();
+	virtual void initilizeGrid();
 
 	void setParticlesPerCell(uint8_t particles){particlesPerCell = particles;}
 

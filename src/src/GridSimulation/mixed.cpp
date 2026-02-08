@@ -86,7 +86,7 @@ void ParticleInCell2D::run()
         m_addForcesShader->setIVec2("gridSize", glm::ivec2(nx,ny));        
         glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-        
+        /*
         m_extrapolateUVelocityShader->useProgram();
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, cellTypeTex);
@@ -115,7 +115,7 @@ void ParticleInCell2D::run()
         
         
         std::swap(uInTex, uOutTex);
-        std::swap(vInTex, vOutTex);
+        std::swap(vInTex, vOutTex);*/
         if(m_solver == SOLVER::JACOBI)
         {
             JacobiSolver();
@@ -134,7 +134,6 @@ void ParticleInCell2D::run()
         
         
         /*
-        */
         m_extrapolateUVelocityShader->useProgram();
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, cellTypeTex);
@@ -147,7 +146,7 @@ void ParticleInCell2D::run()
         m_extrapolateUVelocityShader->setInt("borderSize", borderSize);
         glDispatchCompute(((nx+1) + 15) / 16, (ny+15) / 16, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-
+        
         m_extrapolateVVelocityShader->useProgram();
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, cellTypeTex);
@@ -160,6 +159,7 @@ void ParticleInCell2D::run()
         m_extrapolateVVelocityShader->setInt("borderSize", borderSize);
         glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, 1);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+        */
 
         m_calculateVelocityOfParticles->useProgram();
         glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_particleBuffer);
@@ -208,7 +208,7 @@ void ParticleInCell2D::setup()
     initilizeGrid();
 }
 
-void ParticleInCell2D::initialize()
+void ParticleInCell2D::initilizeGrid()
 {
     std::vector<Particle> particles;
     uint32_t sqr = sqrt(particlesPerCell);
