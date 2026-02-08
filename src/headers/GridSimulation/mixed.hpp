@@ -8,7 +8,7 @@ class ParticleInCell2D : public Grid2D
         {}
         void run() override;
 	    void setup() override;
-        void initialize();
+        void initilizeGrid() override;
         void setShaders() override;
         void restart() override;
     private:
