@@ -170,7 +170,7 @@ vec2 forwardPosition(vec2 position, vec2 velocity)
     return newPosition;
 }
 
-vec2 forwardRK2Position(vec2 position, vec2 velocity)
+Particle forwardRK2Position(vec2 position, vec2 velocity)
 {
     vec2 halfPosition = position + dt*0.5*velocity;
     halfPosition = clampPosition(halfPosition);
@@ -190,8 +190,9 @@ vec2 forwardRK2Position(vec2 position, vec2 velocity)
         ||texelFetch(cellType, newCell, 0).r == SOLID)
     {
         newPosition = position;
+        halfVelocity = velocity;
     }
-    return newPosition;
+    return Particle(newPosition, halfVelocity);
 }
 
 void main()
@@ -201,15 +202,16 @@ void main()
 
     vec2 position = particles[id].position;
     vec2 velocity = vec2(sampleU(position), sampleV(position));
-    vec2 newPosition = position + velocity*dt;
-    newPosition = clampPosition(newPosition);
-    ivec2 newCell = ivec2(newPosition.x/dx, newPosition.y/dx);
-    if(newCell.x < 0 || newCell.x >= gridSize.x 
-        || newCell.y < 0 || newCell.y >= gridSize.y 
-        ||texelFetch(cellType, newCell, 0).r == SOLID)
-    {
-        newPosition = position;
-    }
-    particles[id].velocity = velocity;
-    particles[id].position = newPosition;
+    //vec2 newPosition = position + velocity*dt;
+    //newPosition = clampPosition(newPosition);
+    //ivec2 newCell = ivec2(newPosition.x/dx, newPosition.y/dx);
+    //if(newCell.x < 0 || newCell.x >= gridSize.x 
+    //    || newCell.y < 0 || newCell.y >= gridSize.y 
+    //    ||texelFetch(cellType, newCell, 0).r == SOLID)
+    //{
+    //    newPosition = position;
+    //}
+    particles[id] = forwardRK2Position(position,velocity);
+    //particles[id].velocity = velocity;
+    //particles[id].position = newPosition;
 }
