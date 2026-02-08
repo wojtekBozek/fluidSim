@@ -63,11 +63,10 @@ bool vBlocked(int i, int j)
 
 void particlesToFacesU(vec2 position, vec2 velocity)
 { 
-    int i = int((position.x-0.5*dx)/dx);
-    float backDistance = (position.x-0.5*dx) - i*dx;
-    
-    int j = int(position.y/dx);
-    float downDistance = position.y - j*dx;
+    int i = int(position.x/dx);
+    float backDistance = position.x - i*dx;
+    int j = int((position.y-0.5*dx)/dx);
+    float downDistance = ((position.y-0.5*dx) - j*dx);
 
     int i0 = clamp(i,0, Nx());
     int i1 = clamp(i + 1, 0, Nx());
@@ -107,11 +106,11 @@ void particlesToFacesU(vec2 position, vec2 velocity)
 
 void particlesToFacesV(vec2 position, vec2 velocity)
 { 
-    int i = int(position.x/dx);
-    float backDistance = position.x - i*dx;
+    int i = int((position.x-0.5*dx)/dx);
+    float backDistance = (position.x-0.5*dx) - i*dx;
     
-    int j = int((position.y-0.5*dx)/dx);
-    float downDistance = ((position.y-0.5*dx) - j*dx);
+    int j = int(position.y/dx);
+    float downDistance = position.y - j*dx;
 
     int i0 = clamp(i,0, Nx()-1);
     int i1 = clamp(i + 1, 0, Nx()-1);
