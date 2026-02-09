@@ -14,10 +14,6 @@ layout(std430, binding = 1) buffer Particles {
     Particle particles[];
 };
 
-layout(std430, binding = 2) buffer OldVelocities {
-    vec2 oldVelocities[];
-};
-
 layout(binding = 2) uniform sampler2D uNewTex;
 layout(binding = 3) uniform sampler2D vNewTex;
 
@@ -179,11 +175,11 @@ vec2 forwardPosition(vec2 position, vec2 velocity)
 
 vec2 computeFlipVelocity(vec2 position, vec2 oldParticleVelocity)
 {
-    vec2 flipVelocity = oldParticleVelocity +  vec2(sampleU(position, uNewTex), sampleV(position, vNewTex)) - vec2(sampleU(position, uOldTex), sampleV(position, vOldTex));
+    vec2 flipVelocity = oldParticleVelocity + vec2(sampleU(position, uNewTex), sampleV(position, vNewTex)) - vec2(sampleU(position, uOldTex), sampleV(position, vOldTex));
     return flipVelocity;
 }
 
-Particle forwardRK2Position(vec2 position, vec2 velocity, vec2 oldParticleVelocity, float alpha)
+vec2 forwardRK2Position(vec2 position, vec2 velocity)
 {
     vec2 halfPosition = position + dt*0.5*velocity;
     halfPosition = clampPosition(halfPosition);
@@ -195,7 +191,7 @@ Particle forwardRK2Position(vec2 position, vec2 velocity, vec2 oldParticleVeloci
         halfPosition = position;
     }
 
-    vec2 halfVelocity = alpha*vec2(sampleU(halfPosition, uNewTex), sampleV(halfPosition, vNewTex))+(1.0-alpha)*computeFlipVelocity(halfPosition, oldParticleVelocity);
+    vec2 halfVelocity = vec2(sampleU(halfPosition, uNewTex), sampleV(halfPosition, vNewTex));
     vec2 newPosition = position + dt*halfVelocity;
     ivec2 newCell = ivec2(newPosition.x/dx, newPosition.y/dx);
     if(newCell.x < 0 || newCell.x >= gridSize.x 
@@ -203,9 +199,8 @@ Particle forwardRK2Position(vec2 position, vec2 velocity, vec2 oldParticleVeloci
         ||texelFetch(cellType, newCell, 0).r == SOLID)
     {
         newPosition = position;
-        halfVelocity = velocity;
     }
-    return Particle(newPosition, halfVelocity);
+    return newPosition;
 }
 
 
@@ -219,18 +214,9 @@ void main()
     vec2 oldVelocity = particles[id].velocity;
     vec2 flipVelocity = computeFlipVelocity(position, oldVelocity);
     vec2 picVelocity = vec2(sampleU(position, uNewTex), sampleV(position, vNewTex));
-    //vec2 newPosition = position + velocity*dt;
-    //newPosition = clampPosition(newPosition);
-    //ivec2 newCell = ivec2(newPosition.x/dx, newPosition.y/dx);
-    //if(newCell.x < 0 || newCell.x >= gridSize.x 
-    //    || newCell.y < 0 || newCell.y >= gridSize.y 
-    //    ||texelFetch(cellType, newCell, 0).r == SOLID)
-    //{
-    //    newPosition = position;
-    //}
     float alpha = clamp(picFlipAlpha, 0.0, 1.0);
-    Particle particle = forwardRK2Position(position,alpha*picVelocity+(1-alpha)*flipVelocity, oldVelocity, alpha);
-    particles[id] = particle;
-    //particles[id].velocity = velocity;
-    //particles[id].position = newPosition;
+
+    vec2 newPosition = forwardRK2Position(position, picVelocity);
+    vec2 velocity = alpha * picVelocity + (1.0-alpha) * flipVelocity;
+    particles[id] = Particle(newPosition, velocity);
 }
