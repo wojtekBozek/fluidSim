@@ -11,12 +11,17 @@ class ParticleInCell2D : public Grid2D
         void initilizeGrid() override;
         void setShaders() override;
         void restart() override;
+        void setCopyTextures();
+        float getPicFlipRatio() const {return picFlipRatio;}
+        void setPicFlipRatio(float ratio) {picFlipRatio = ratio;}
     private:
         struct alignas(16) Particle
         {
             glm::vec2 position;
             glm::vec2 velocity;
         };
+        float picFlipRatio = 1.0;
+        GLuint oldUTex, oldVTex;
 	    std::unique_ptr<ShaderProgram> m_transferVelocityToGridShader;
 	    std::unique_ptr<ShaderProgram> m_uToGridShader;
 	    std::unique_ptr<ShaderProgram> m_vToGridShader;

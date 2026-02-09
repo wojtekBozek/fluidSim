@@ -165,13 +165,21 @@ void ParticleInCell2D::run()
         glBindTexture(GL_TEXTURE_2D, uInTex);
         glActiveTexture(GL_TEXTURE3);
         glBindTexture(GL_TEXTURE_2D, vInTex);
+        glActiveTexture(GL_TEXTURE4);
+        glBindTexture(GL_TEXTURE_2D, oldUTex);
+        glActiveTexture(GL_TEXTURE5);
+        glBindTexture(GL_TEXTURE_2D, oldVTex);
         m_calculateVelocityOfParticles->setIVec2("gridSize", glm::ivec2(nx,ny));    
         m_calculateVelocityOfParticles->setUint("numOfParticles", m_numOfParticles);
         m_calculateVelocityOfParticles->setFloat("dt", dt);
         m_calculateVelocityOfParticles->setFloat("dx", dx);
+        m_calculateVelocityOfParticles->setFloat("picFlipAlpha", picFlipRatio);
         glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
         
+        std::swap(oldUTex, uInTex);
+        std::swap(oldVTex, vInTex);
+
         //m_particleAdvectionShader->useProgram();
         //glActiveTexture(GL_TEXTURE0);
         //glBindTexture(GL_TEXTURE_2D, cellTypeTex);
@@ -201,6 +209,7 @@ void ParticleInCell2D::setup()
     m_currentStep = 0;
     setShaders();
     setTextures();
+    setCopyTextures();
     initilizeGrid();
 }
 
@@ -385,6 +394,8 @@ void ParticleInCell2D::restart()
 {
     glDeleteTextures(1, &uInTex); 
     glDeleteTextures(1, &vInTex); 
+    glDeleteTextures(1, &oldUTex); 
+    glDeleteTextures(1, &oldVTex); 
     glDeleteTextures(1, &uOutTex); 
     glDeleteTextures(1, &vOutTex); 
     glDeleteTextures(1, &divergenceTex); 
@@ -392,5 +403,29 @@ void ParticleInCell2D::restart()
     glDeleteTextures(1, &pressureOutTex); 
     glDeleteTextures(1, &cellTypeTex);
     setTextures();
+    setCopyTextures();
     initilizeGrid();
+}
+
+void ParticleInCell2D::setCopyTextures()
+{
+    glGenTextures(1, &oldUTex);
+    glBindTexture(GL_TEXTURE_2D, oldUTex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_R32F, nx + 1, ny);
+    std::vector<GLfloat> zeros((nx + 1) * ny, 0.0);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, nx+1, ny, GL_RED, GL_FLOAT, zeros.data());
+
+    glGenTextures(1, &oldVTex);
+    glBindTexture(GL_TEXTURE_2D, oldVTex);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexStorage2D(GL_TEXTURE_2D, 1, GL_R32F, nx, ny+1);
+    zeros = std::vector<GLfloat>(nx * (ny + 1), 0.0);
+    glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0, nx, ny + 1, GL_RED, GL_FLOAT, zeros.data());
 }

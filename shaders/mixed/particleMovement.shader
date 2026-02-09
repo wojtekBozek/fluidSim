@@ -14,14 +14,21 @@ layout(std430, binding = 1) buffer Particles {
     Particle particles[];
 };
 
+layout(std430, binding = 2) buffer OldVelocities {
+    vec2 oldVelocities[];
+};
 
-layout(binding = 2) uniform sampler2D uTex;
-layout(binding = 3) uniform sampler2D vTex;
+layout(binding = 2) uniform sampler2D uNewTex;
+layout(binding = 3) uniform sampler2D vNewTex;
+
+layout(binding = 4) uniform sampler2D uOldTex;
+layout(binding = 5) uniform sampler2D vOldTex; 
 
 
 uniform ivec2 gridSize;
 uniform float dt;
 uniform float dx;
+uniform float picFlipAlpha = 1.0;
 uniform uint numOfParticles;
 
 int Nx(){ return gridSize.x;}
@@ -51,7 +58,7 @@ bool vBlocked(int i, int j)
            checkCellType(ivec2(i, j  )) == SOLID;
 }
 
-float interpolateUinGrid(vec2 position)
+float interpolateUinGrid(vec2 position, sampler2D uTex)
 { 
     int i = int(position.x/dx);
     float backDistance = position.x - i*dx;
@@ -94,7 +101,7 @@ float interpolateUinGrid(vec2 position)
     return (sumW > 0.0) ? value/sumW : 0.0;
 }
 
-float interpolateVinGrid(vec2 position)
+float interpolateVinGrid(vec2 position, sampler2D vTex)
 { 
     int i = int((position.x-0.5*dx)/dx);
     float backDistance = (position.x-0.5*dx) - i*dx;
@@ -138,14 +145,14 @@ float interpolateVinGrid(vec2 position)
     return (sumW > 0.0) ? value/sumW : 0.0;
 }
 
-float sampleV(vec2 position)
+float sampleV(vec2 position, sampler2D vTex)
 {
-    return interpolateVinGrid(position);
+    return interpolateVinGrid(position, vTex);
 }
 
-float sampleU(vec2 position)
+float sampleU(vec2 position, sampler2D uTex)
 {
-    return interpolateUinGrid(position);
+    return interpolateUinGrid(position, uTex);
 }
 
 vec2 clampPosition(vec2 position)
@@ -170,7 +177,13 @@ vec2 forwardPosition(vec2 position, vec2 velocity)
     return newPosition;
 }
 
-Particle forwardRK2Position(vec2 position, vec2 velocity)
+vec2 computeFlipVelocity(vec2 position, vec2 oldParticleVelocity)
+{
+    vec2 flipVelocity = oldParticleVelocity +  vec2(sampleU(position, uNewTex), sampleV(position, vNewTex)) - vec2(sampleU(position, uOldTex), sampleV(position, vOldTex));
+    return flipVelocity;
+}
+
+Particle forwardRK2Position(vec2 position, vec2 velocity, vec2 oldParticleVelocity, float alpha)
 {
     vec2 halfPosition = position + dt*0.5*velocity;
     halfPosition = clampPosition(halfPosition);
@@ -182,7 +195,7 @@ Particle forwardRK2Position(vec2 position, vec2 velocity)
         halfPosition = position;
     }
 
-    vec2 halfVelocity = vec2(sampleU(halfPosition), sampleV(halfPosition));
+    vec2 halfVelocity = alpha*vec2(sampleU(halfPosition, uNewTex), sampleV(halfPosition, vNewTex))+(1.0-alpha)*computeFlipVelocity(halfPosition, oldParticleVelocity);
     vec2 newPosition = position + dt*halfVelocity;
     ivec2 newCell = ivec2(newPosition.x/dx, newPosition.y/dx);
     if(newCell.x < 0 || newCell.x >= gridSize.x 
@@ -195,13 +208,17 @@ Particle forwardRK2Position(vec2 position, vec2 velocity)
     return Particle(newPosition, halfVelocity);
 }
 
+
+
 void main()
 {
     uint id = gl_GlobalInvocationID.x;
     if(id >= numOfParticles) return;
 
     vec2 position = particles[id].position;
-    vec2 velocity = vec2(sampleU(position), sampleV(position));
+    vec2 oldVelocity = particles[id].velocity;
+    vec2 flipVelocity = computeFlipVelocity(position, oldVelocity);
+    vec2 picVelocity = vec2(sampleU(position, uNewTex), sampleV(position, vNewTex));
     //vec2 newPosition = position + velocity*dt;
     //newPosition = clampPosition(newPosition);
     //ivec2 newCell = ivec2(newPosition.x/dx, newPosition.y/dx);
@@ -211,7 +228,9 @@ void main()
     //{
     //    newPosition = position;
     //}
-    particles[id] = forwardRK2Position(position,velocity);
+    float alpha = clamp(picFlipAlpha, 0.0, 1.0);
+    Particle particle = forwardRK2Position(position,alpha*picVelocity+(1-alpha)*flipVelocity, oldVelocity, alpha);
+    particles[id] = particle;
     //particles[id].velocity = velocity;
     //particles[id].position = newPosition;
 }

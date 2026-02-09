@@ -8,7 +8,7 @@ class MixedSimulationUI : public BaseUI
 {
 public:
 	//SPHsimulationUI() = default;
-	MixedSimulationUI(std::shared_ptr<ContextState> context, std::shared_ptr<MixedRenderer> renderer, std::shared_ptr<Grid2D> simulation, GLFWwindow* window, std::shared_ptr<ProgramState> state) : BaseUI(window, state)
+	MixedSimulationUI(std::shared_ptr<ContextState> context, std::shared_ptr<MixedRenderer> renderer, std::shared_ptr<ParticleInCell2D> simulation, GLFWwindow* window, std::shared_ptr<ProgramState> state) : BaseUI(window, state)
 	{
 		refContext = context;
 		refRenderer = renderer;
@@ -24,6 +24,7 @@ private:
 	void setCellSize();
 	void setBorderSize();
 	void displayCurrentStep();
+	void setPicFlipRatio();
 	
 	void setDensity();
 	void setSolver();
@@ -44,7 +45,7 @@ private:
 	void timeStepTime();
 	void frameRate();
 	void resetSimulation();
-	std::shared_ptr<Grid2D> refSimulation;
+	std::shared_ptr<ParticleInCell2D> refSimulation;
 	std::shared_ptr<MixedRenderer> refRenderer;
 	std::shared_ptr<ContextState> refContext;
 };
