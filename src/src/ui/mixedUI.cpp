@@ -21,6 +21,7 @@ void MixedSimulationUI::showUI()
 	particleShader();
 	setDensity();
 
+	setPicFlipRatio();
 	setOverrelaxation();
 	setPressurePolicy();
 	setSolver();
@@ -143,6 +144,17 @@ void MixedSimulationUI::setBorderSize()
 void MixedSimulationUI::displayCurrentStep()
 {
 	ImGui::Value("CurrentStep", static_cast<unsigned int>(refSimulation->getCurrentStep()));
+}
+
+void MixedSimulationUI::setPicFlipRatio()
+{
+	float ratio =refSimulation->getPicFlipRatio();
+	const float ref = ratio;
+	ImGui::SliderFloat("Pic-Flip Ratio", &ratio, 0.0f, 1.0f, "%.2f");
+	if(ref != ratio)
+	{
+		refSimulation->setPicFlipRatio(ratio);
+	}
 }
 
 void MixedSimulationUI::setDensity()
