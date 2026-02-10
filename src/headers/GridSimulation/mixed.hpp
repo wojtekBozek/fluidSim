@@ -19,6 +19,7 @@ class ParticleInCell2D : public Grid2D
         {
             glm::vec2 position;
             glm::vec2 velocity;
+            glm::mat2 apicMat = glm::mat2(0.0);
         };
         float picFlipRatio = 1.0;
         GLuint oldUTex, oldVTex;
