@@ -11,6 +11,7 @@ uniform uint numOfParticles;
 struct Particle {
     vec2 position;
     vec2 velocity;
+    mat2 apicMat;
 };
 
 layout(std430, binding = 1) buffer Particles {

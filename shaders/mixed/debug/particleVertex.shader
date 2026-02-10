@@ -6,6 +6,7 @@ layout (location = 0) in float dummy;
 struct Particle {
     vec2 position;
     vec2 velocity;
+    mat2 apicMat;
 };
 
 layout(std430, binding = 0) buffer PosBuffer {
