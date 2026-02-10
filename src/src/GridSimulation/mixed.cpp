@@ -115,6 +115,9 @@ void ParticleInCell2D::run()
         
         std::swap(uInTex, uOutTex);
         std::swap(vInTex, vOutTex);
+        
+        std::swap(oldUTex, uInTex);
+        std::swap(oldVTex, vInTex);
         if(m_solver == SOLVER::JACOBI)
         {
             JacobiSolver();
@@ -176,9 +179,6 @@ void ParticleInCell2D::run()
         m_calculateVelocityOfParticles->setFloat("picFlipAlpha", picFlipRatio);
         glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-        
-        std::swap(oldUTex, uInTex);
-        std::swap(oldVTex, vInTex);
 
         //m_particleAdvectionShader->useProgram();
         //glActiveTexture(GL_TEXTURE0);

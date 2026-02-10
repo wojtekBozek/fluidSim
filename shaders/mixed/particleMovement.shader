@@ -175,7 +175,7 @@ vec2 forwardPosition(vec2 position, vec2 velocity)
 
 vec2 computeFlipVelocity(vec2 position, vec2 oldParticleVelocity)
 {
-    vec2 flipVelocity = oldParticleVelocity + vec2(sampleU(position, uNewTex), sampleV(position, vNewTex)) - vec2(sampleU(position, uOldTex), sampleV(position, vOldTex));
+    vec2 flipVelocity = oldParticleVelocity + (vec2(sampleU(position, uNewTex), sampleV(position, vNewTex)) - vec2(sampleU(position, uOldTex), sampleV(position, vOldTex)));
     return flipVelocity;
 }
 
@@ -216,7 +216,9 @@ void main()
     vec2 picVelocity = vec2(sampleU(position, uNewTex), sampleV(position, vNewTex));
     float alpha = clamp(picFlipAlpha, 0.0, 1.0);
 
-    vec2 newPosition = forwardRK2Position(position, picVelocity);
+
+    //vec2 newPosition = forwardRK2Position(position, oldVelocity);
     vec2 velocity = alpha * picVelocity + (1.0-alpha) * flipVelocity;
+    vec2 newPosition = forwardRK2Position(position, picVelocity);
     particles[id] = Particle(newPosition, velocity);
 }
