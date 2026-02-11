@@ -204,11 +204,6 @@ vec2 forwardRK2Position(vec2 position, vec2 velocity)
     return newPosition;
 }
 
-float getInvD()
-{
-    return 3.0/(dx*dx);
-}
-
 struct ApicData
 {
     vec2 velocity;
@@ -369,12 +364,11 @@ Particle computeAPIC(vec2 position)
     mat2 B = uData.B + vData.B;
     vec2 uVelocityComponent = uData.sumW > 0.0 ? uData.velocity/uData.sumW : vec2(0.0);
     vec2 vVelocityComponent = vData.sumW > 0.0 ? vData.velocity/vData.sumW : vec2(0.0);
-    vec2 velocity = uVelocityComponent + vVelocityComponent;
+    vec2 velocity = vec2(uVelocityComponent.x, vVelocityComponent.y);
 
-    float normalizer = uData.sumW + vData.sumW;
-    mat2 Cp = B * getInvD();
-    Cp = normalizer*Cp/2.0;
-    return Particle(position, velocity, Cp);
+    mat2 Cp = B;
+    vec2 newPosition = forwardRK2Position(position, velocity);
+    return Particle(newPosition, velocity, Cp);
 }
 
 void main()
@@ -383,14 +377,13 @@ void main()
     if(id >= numOfParticles) return;
 
     vec2 position = particles[id].position;
-    vec2 oldVelocity = particles[id].velocity;
-    vec2 flipVelocity = computeFlipVelocity(position, oldVelocity);
-    vec2 picVelocity = vec2(sampleU(position, uNewTex), sampleV(position, vNewTex));
-    float alpha = clamp(picFlipAlpha, 0.0, 1.0);
-
-
-    //vec2 newPosition = forwardRK2Position(position, oldVelocity);
-    vec2 velocity = alpha * picVelocity + (1.0-alpha) * flipVelocity;
-    vec2 newPosition = forwardRK2Position(position, picVelocity);
-    particles[id] = Particle(newPosition, velocity, mat2(0.0));
+    //vec2 oldVelocity = particles[id].velocity;
+    //vec2 flipVelocity = computeFlipVelocity(position, oldVelocity);
+    //vec2 picVelocity = vec2(sampleU(position, uNewTex), sampleV(position, vNewTex));
+    //float alpha = clamp(picFlipAlpha, 0.0, 1.0);
+//
+    //vec2 velocity = alpha * picVelocity + (1.0-alpha) * flipVelocity;
+    //vec2 newPosition = forwardRK2Position(position, picVelocity);
+    //particles[id] = Particle(newPosition, velocity, mat2(0.0));
+    particles[id] = computeAPIC(position);
 }
