@@ -356,7 +356,7 @@ ApicData computeAPICFromVFaces(vec2 position)
     return ApicData(totalVelocity, B, sumW);
 }
 
-Particle computeAPIC(vec2 position)
+Particle computeAPIC_N_PIC(vec2 position)
 {
     ApicData uData = computeAPICFromUFaces(position);
     ApicData vData = computeAPICFromVFaces(position);
@@ -365,8 +365,10 @@ Particle computeAPIC(vec2 position)
     vec2 uVelocityComponent = uData.sumW > 0.0 ? uData.velocity/uData.sumW : vec2(0.0);
     vec2 vVelocityComponent = vData.sumW > 0.0 ? vData.velocity/vData.sumW : vec2(0.0);
     vec2 velocity = vec2(uVelocityComponent.x, vVelocityComponent.y);
-
-    mat2 Cp = B;
+    vec2 picVelocity = vec2(sampleU(position, uNewTex), sampleV(position, vNewTex));
+    float alpha = clamp(picFlipAlpha, 0.0, 1.0);
+    mat2 Cp = alpha*B;
+    velocity = alpha*velocity + (1.0-alpha)*picVelocity;
     vec2 newPosition = forwardRK2Position(position, velocity);
     return Particle(newPosition, velocity, Cp);
 }
@@ -385,5 +387,5 @@ void main()
     //vec2 velocity = alpha * picVelocity + (1.0-alpha) * flipVelocity;
     //vec2 newPosition = forwardRK2Position(position, picVelocity);
     //particles[id] = Particle(newPosition, velocity, mat2(0.0));
-    particles[id] = computeAPIC(position);
+    particles[id] = computeAPIC_N_PIC(position);
 }
