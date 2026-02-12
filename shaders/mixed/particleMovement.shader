@@ -236,8 +236,8 @@ ApicData computeAPICFromUFaces(vec2 position)
     float vVelocity = 0.0;
     vec2 localVelocity = vec2(0.0);
     vec2 distance = vec2(0.0);
-    if(!uBlocked(i0,j0))
-    {
+    //if(!uBlocked(i0,j0))
+    //{
         velocityPosition = vec2(i0*dx, j0*dx+0.5*dx);
         uVelocity = texelFetch(uNewTex, ivec2(i0,j0),0).r;
         vVelocity = interpolateVinGrid(velocityPosition, vNewTex);
@@ -246,9 +246,9 @@ ApicData computeAPICFromUFaces(vec2 position)
         totalVelocity += localVelocity * w00 * w10;
         B += w00 * w10 * outerProduct(localVelocity, distance);
         sumW += w00 * w10;
-    }
-    if(!uBlocked(i0,j1))
-    {
+    //}
+    //if(!uBlocked(i0,j1))
+    //{
         velocityPosition = vec2(i0*dx, j1*dx+0.5*dx);
         uVelocity = texelFetch(uNewTex, ivec2(i0,j1),0).r;
         vVelocity = interpolateVinGrid(velocityPosition, vNewTex);
@@ -257,9 +257,9 @@ ApicData computeAPICFromUFaces(vec2 position)
         totalVelocity += localVelocity * w00 * w11;
         B += w00 * w11 * outerProduct(localVelocity, distance);
         sumW += w00 * w11;
-    }
-    if(!uBlocked(i1,j1))
-    {
+    //}
+    //if(!uBlocked(i1,j1))
+    //{
         velocityPosition = vec2(i1*dx, j1*dx+0.5*dx);
         uVelocity = texelFetch(uNewTex, ivec2(i1,j1),0).r;
         vVelocity = interpolateVinGrid(velocityPosition, vNewTex);
@@ -268,9 +268,9 @@ ApicData computeAPICFromUFaces(vec2 position)
         totalVelocity += localVelocity * w01 * w11;
         B += w01 * w11 * outerProduct(localVelocity, distance);
         sumW += w01 * w11;
-    }
-    if(!uBlocked(i1,j0))
-    {
+    //}
+    //if(!uBlocked(i1,j0))
+    //{
         velocityPosition = vec2(i1*dx, j0*dx+0.5*dx);
         uVelocity = texelFetch(uNewTex, ivec2(i1,j0),0).r;
         vVelocity = interpolateVinGrid(velocityPosition, vNewTex);
@@ -279,7 +279,7 @@ ApicData computeAPICFromUFaces(vec2 position)
         totalVelocity += localVelocity * w01 * w10;
         B += w01 * w10 * outerProduct(localVelocity, distance);
         sumW += w01 * w10;
-    }
+    //}
     return ApicData(totalVelocity, B, sumW);
 }
 
@@ -309,8 +309,8 @@ ApicData computeAPICFromVFaces(vec2 position)
     float vVelocity = 0.0;
     vec2 localVelocity = vec2(0.0);
     vec2 distance = vec2(0.0);
-    if(!vBlocked(i0,j0))
-    {
+    //if(!vBlocked(i0,j0))
+    //{
         velocityPosition = vec2(i0*dx + 0.5*dx, j0*dx);
         vVelocity = texelFetch(vNewTex, ivec2(i0,j0),0).r;
         uVelocity = interpolateUinGrid(velocityPosition, uNewTex);
@@ -319,9 +319,9 @@ ApicData computeAPICFromVFaces(vec2 position)
         totalVelocity += localVelocity * w00 * w10;
         B += w00 * w10 * outerProduct(localVelocity, distance);
         sumW += w00 * w10;
-    }
-    if(!vBlocked(i0,j1))
-    {
+    //}
+    //if(!vBlocked(i0,j1))
+    //{
         velocityPosition = vec2(i0*dx+0.5*dx, j1*dx);
         vVelocity = texelFetch(vNewTex, ivec2(i0,j1),0).r;
         uVelocity = interpolateUinGrid(velocityPosition, uNewTex);
@@ -330,9 +330,9 @@ ApicData computeAPICFromVFaces(vec2 position)
         totalVelocity += localVelocity * w00 * w11;
         B += w00 * w11 * outerProduct(localVelocity, distance);
         sumW += w00 * w11;
-    }
-    if(!vBlocked(i1,j1))
-    {
+    //}
+    //if(!vBlocked(i1,j1))
+    //{
         velocityPosition = vec2(i1*dx+0.5*dx, j1*dx);
         vVelocity = texelFetch(vNewTex, ivec2(i1,j1),0).r;
         uVelocity = interpolateUinGrid(velocityPosition, uNewTex);
@@ -341,9 +341,9 @@ ApicData computeAPICFromVFaces(vec2 position)
         totalVelocity += localVelocity * w01 * w11;
         B += w01 * w11 * outerProduct(localVelocity, distance);
         sumW += w01 * w11;
-    }
-    if(!vBlocked(i1,j0))
-    {
+    //}
+    //if(!vBlocked(i1,j0))
+    //{
         velocityPosition = vec2(i1*dx+0.5*dx, j0*dx);
         vVelocity = texelFetch(vNewTex, ivec2(i1,j0),0).r;
         uVelocity = interpolateUinGrid(velocityPosition, uNewTex);
@@ -352,7 +352,7 @@ ApicData computeAPICFromVFaces(vec2 position)
         totalVelocity += localVelocity * w01 * w10;
         B += w01 * w10 * outerProduct(localVelocity, distance);
         sumW += w01 * w10;
-    }
+    //}
     return ApicData(totalVelocity, B, sumW);
 }
 
@@ -361,13 +361,16 @@ Particle computeAPIC_N_PIC(vec2 position)
     ApicData uData = computeAPICFromUFaces(position);
     ApicData vData = computeAPICFromVFaces(position);
 
-    mat2 B = uData.B + vData.B;
+    uData.B = uData.sumW > 0.0 ? uData.B*(uData.sumW) : mat2(0.0);
+    vData.B = vData.sumW > 0.0 ? vData.B*(vData.sumW) : mat2(0.0);
+    mat2 B =  uData.B + vData.B;
     vec2 uVelocityComponent = uData.sumW > 0.0 ? uData.velocity/uData.sumW : vec2(0.0);
     vec2 vVelocityComponent = vData.sumW > 0.0 ? vData.velocity/vData.sumW : vec2(0.0);
     vec2 velocity = vec2(uVelocityComponent.x, vVelocityComponent.y);
     vec2 picVelocity = vec2(sampleU(position, uNewTex), sampleV(position, vNewTex));
     float alpha = clamp(picFlipAlpha, 0.0, 1.0);
-    mat2 Cp = alpha*B;
+    //mat2 Cp = alpha*B;
+    mat2 Cp = alpha*B*2/(dx*dx);
     velocity = alpha*velocity + (1.0-alpha)*picVelocity;
     vec2 newPosition = forwardRK2Position(position, velocity);
     return Particle(newPosition, velocity, Cp);
