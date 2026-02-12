@@ -66,7 +66,7 @@ void MainWindow::textureTestButton()
 
 void MainWindow::chooseMixedSimButton()
 {
-    if (ImGui::Button("PIC-FLIP simulation"))
+    if (ImGui::Button("PIC-APIC simulation"))
     {
         *m_state = ProgramState::MIXED_SIM;
     }

@@ -10,7 +10,7 @@ void MixedSimulationUI::showUI()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	ImGui::Begin("PIC-FLIP Simulation");
+	ImGui::Begin("PIC-APIC Simulation");
 	startSimulation();
 	resetSimulation();
 	vVelocityShader();
@@ -150,7 +150,7 @@ void MixedSimulationUI::setPicFlipRatio()
 {
 	float ratio =refSimulation->getPicFlipRatio();
 	const float ref = ratio;
-	ImGui::SliderFloat("Pic-Flip Ratio", &ratio, 0.0f, 1.0f, "%.2f");
+	ImGui::SliderFloat("Pic-APIC Ratio", &ratio, 0.0f, 1.0f, "%.2f");
 	if(ref != ratio)
 	{
 		refSimulation->setPicFlipRatio(ratio);
