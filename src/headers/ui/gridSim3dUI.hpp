@@ -2,7 +2,7 @@
 #include "baseUI.hpp"
 #include "baseGrid.hpp"
 #include "grid3d.hpp"
-#include "grid3drenderer.hpp"
+#include "grid3dRenderer.hpp"
 #include "SPHContextState.hpp"
 class Grid3dSimulationUI : public BaseUI
 {

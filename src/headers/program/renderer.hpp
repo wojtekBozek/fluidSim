@@ -1,6 +1,7 @@
 #pragma once
 #include <GL/glew.h>
 #include <vector>
+#include <memory>
 #include "mesh.hpp"
 #include "camera3D.hpp" 
 #include "shaderProgram.hpp"

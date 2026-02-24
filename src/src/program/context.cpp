@@ -15,7 +15,7 @@ void SPHSimulationContext::initContext()
 	sphSimulation = std::make_shared<FluidSPHSimulation>(FluidSPHSimulation());
 	sphSimulation->setFluidAndParticles();
 	sphSimulation->setParticleBufferData();
-	state = std::make_shared<ContextState>(ContextState::SETUP());
+	state = std::make_shared<ContextState>(ContextState::SETUP);
 	simulationUI = std::make_shared<SPHsimulationUI>(SPHsimulationUI(sphSimulation, state, m_window, m_state));
 
 	sphShaderProgram = std::make_shared<ShaderProgram>();

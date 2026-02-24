@@ -2,7 +2,7 @@
 #include "quaternion.hpp"
 #include "physics.hpp"
 
-void Object::default()
+void Object::setDefault()
 {
 	translation = glm::translate(glm::mat4(1.0f), glm::vec3(0.0f));
 	scaling = glm::scale(glm::mat4(1.0f), glm::vec3(1.0f));
