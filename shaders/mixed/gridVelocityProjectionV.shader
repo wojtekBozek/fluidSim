@@ -1,7 +1,7 @@
 #version 430 
 layout(local_size_x = 256) in;
 
-layout(r32f, binding = 0) uniform image2D writeonly vTex;
+layout(r32f, binding = 0) uniform writeonly image2D vTex;
 
 
 layout(std430, binding = 1) buffer velocities {

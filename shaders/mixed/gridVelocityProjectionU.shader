@@ -10,7 +10,7 @@ layout(std430, binding = 2) buffer weights {
     float weightsU[];
 };
 
-layout(r32f, binding = 0) uniform image2D writeonly uTex;
+layout(r32f, binding = 0) uniform writeonly image2D uTex;
 
 
 uniform ivec2 gridSize;
