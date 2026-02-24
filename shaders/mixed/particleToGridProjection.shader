@@ -1,4 +1,4 @@
-#version 460 core
+#version 450 core
 #extension GL_NV_shader_atomic_float : enable
 layout(local_size_x = 256) in;
 
