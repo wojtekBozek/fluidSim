@@ -2,16 +2,17 @@
 #include "mesh.hpp"
 #include "physics.hpp"
 #include <unordered_map>
+#include <memory>
 class Object {
 	public:
 		Object(std::shared_ptr<Mesh> mesh_ptr_)
 		{
 			mesh_ptr = mesh_ptr_;
 			//std::cout << mesh_ptr.get() << " object Mesh ptr\n";
-			default();
+			setDefault();
 			instance_id = mesh_ptr->addNewInstance(translation * rotation * scaling);
 		}
-		void default();
+		void setDefault();
 		void uniform_scale(float size, glm::vec3 axes);
 		void scale(glm::vec3 scaling_vec);
 		void translate(glm::vec3 translate);

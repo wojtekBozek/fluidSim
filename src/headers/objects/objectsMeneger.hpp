@@ -2,6 +2,7 @@
 #include <vector>
 #include "object.hpp"
 #include <unordered_map>
+#include <memory>
 #include "properties.hpp"
 class ObjectMenager
 {

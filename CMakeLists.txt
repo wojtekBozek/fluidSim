@@ -48,7 +48,7 @@ ${CMAKE_SOURCE_DIR}/src/headers/program/
 ${CMAKE_SOURCE_DIR}/src/headers/properties/
 ${CMAKE_SOURCE_DIR}/src/headers/ui/
 ${CMAKE_SOURCE_DIR}/src/headers/lights/
-${CMAKE_SOURCE_DIR}/src/headers/gridSimulation/
+${CMAKE_SOURCE_DIR}/src/headers/GridSimulation/
 )
 
 add_definitions(-DGLEW_STATIC)

@@ -13,7 +13,7 @@ void Grid3DSimulationContext::initContext()
 	renderer = std::make_shared<Grid3dRenderer>();
 	renderer->setupSimulation(simulation);
 	renderer->setupBackend();
-	state = std::make_shared<ContextState>(ContextState::SETUP());
+	state = std::make_shared<ContextState>(ContextState::SETUP);
 	simulationUI = std::make_shared<Grid3dSimulationUI>(Grid3dSimulationUI(state, renderer, simulation, m_window, m_state));
 }
 

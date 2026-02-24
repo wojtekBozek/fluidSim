@@ -3,7 +3,7 @@
 #include "baseUI.hpp"
 #include <memory>
 #include "context.hpp"
-#include <glfw/glfw3.h>
+#include <GLFW/glfw3.h>
 class MainWindow : public AbstractContext
 {
 public:

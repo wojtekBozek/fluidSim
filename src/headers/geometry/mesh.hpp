@@ -2,6 +2,7 @@
 
 #include <GL/glew.h>
 #include <vector>
+#include <memory>
 #include "vertex.hpp"                  
 #include "shaderProgram.hpp"
 #include "positionedLight.hpp"

@@ -10,7 +10,7 @@ void MixedSimulationContext::initContext()
 {
 	simulation = std::make_shared<ParticleInCell2D>();
 	renderer = std::make_shared<MixedRenderer>();
-	state = std::make_shared<ContextState>(ContextState::SETUP());
+	state = std::make_shared<ContextState>(ContextState::SETUP);
 	simulationUI = std::make_shared<MixedSimulationUI>(MixedSimulationUI(state, renderer, simulation, m_window, m_state));
 	renderer->setupBackend();
 	simulation->setup();
