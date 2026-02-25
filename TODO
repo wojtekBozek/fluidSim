@@ -1,6 +1,0 @@
-Podłączenie solidnej obsługi klawiatury i myszki
-
-Za każdym razem gdy zaktualizujemy, że obiekt ma property, aktualizujemy odpowiedni wektor pointerów na obiekt w menagerze i przy aktualizacji fizyki
-przekazujemy referencje tego wektora do odpowiedniego property menager. W property menager w wekotrze po kolei mamy fizyki dla każdego obiektu jak 
-w wektorze. Przy kasacji obiektu: w menagerze sprawdzamy jakie properties miał dany obiekt, zapisujemy jego adres, usuwamy ze wszysktich wektorów
-i map, na koniec usuwamy z wektora obiektów.
