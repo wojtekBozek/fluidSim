@@ -752,6 +752,7 @@ void Grid2D::restart()
     glDeleteTextures(1, &pressureInTex); 
     glDeleteTextures(1, &pressureOutTex); 
     glDeleteTextures(1, &cellTypeTex);
+    m_currentStep = 0;
     setTextures();
     initilizeGrid();
 }
