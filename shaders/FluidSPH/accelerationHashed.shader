@@ -67,6 +67,7 @@ const uint DIMENSION_3 = 2u;
 
 const uint BOUNDARY_SOLID = 0u;
 const uint BOUNDARY_PARTICLES = 1u;
+const float eps = 0.000001;
 
 float getAlfa(float kernelRadius, uint dimension)
 {
@@ -148,9 +149,12 @@ void main()
                             }
                             else if(borderPolicy == BOUNDARY_PARTICLES)// boundary
                             {
-                                temp += particle.mass * otherParticle.mass * fluid.fluidDensity * localPBD2 * kernelGradient;
+                                //temp += particle.mass * otherParticle.mass * fluid.fluidDensity * localPBD2 * kernelGradient;
+                                otherParticle.pressure = particle.pressure;
+                                otherParticle.density = fluid.fluidDensity;
+                                temp += otherParticle.mass *(localPBD2+PressureByDensity2(otherParticle))* kernelGradient;
 //
-                                particle.velocity.xyz += epsilonBoundary * otherParticle.mass / fluid.fluidDensity *(otherParticle.velocity.xyz - particle.velocity.xyz) * kernel;
+                                particle.velocity.xyz += epsilonBoundary * otherParticle.mass / otherParticle.density *(otherParticle.velocity.xyz - particle.velocity.xyz) * kernel;
                             }
                         }
                         //if(nextNode[currentParticle]!=-1)
@@ -179,7 +183,7 @@ float PressureByDensity2(FluidParticle part)
 
 float CubicSplineKernel(float kernelRadius, float distance, float alfa)
 {
-    float q = distance/kernelRadius;
+    const float q = distance/kernelRadius;
     float retVal = 0.0;
 
     if (q >= 0.0 && q < 1.0)
@@ -191,10 +195,10 @@ float CubicSplineKernel(float kernelRadius, float distance, float alfa)
 
 vec3 KernelGradient(float kernelRadius, vec3 distanceVector, float alfa)
 {
-    float r = length(distanceVector);
-    if (r < 0.00001) return vec3(0.0);
+    const float r = length(distanceVector);
+    if (r < eps) return vec3(0.0);
 
-    float q = r / kernelRadius;
+    const float q = r / kernelRadius;
     float grad_q = 0.0;
 
     if (q >= 0.0 && q < 1.0)
