@@ -36,6 +36,7 @@ private:
 	void setBorderPolicy();
 	void displayStep();
 
+	void setBorderDepth();
 	void timeStepInput();
 
 	void startSimulationButton();
@@ -49,6 +50,7 @@ private:
 	struct UiValues
 	{
 		float k, y, timeStep, density, kernelRadius, visualRadius;
+		int borderSize;
 		glm::vec3 simDomainSize, simDomainPos, fluidInitSize, fluidInitPos;
 		SimDim dimension;
 		BorderPolicy policy;

@@ -23,6 +23,7 @@ void SPHsimulationUI::showUI()
 		simulationVolumeTextInputs();
 		simulationPositionTextInputs();
 		setBorderPolicy();
+		setBorderDepth();
 	}
 	sphKernelRadiusSizeInput();
 	visualRadiusSizeInput();
@@ -229,6 +230,22 @@ void SPHsimulationUI::setBorderPolicy()
 void SPHsimulationUI::displayStep()
 {
 	ImGui::Value("CurrentStep", static_cast<unsigned int>(refSimulation->getCurentStep()));
+}
+
+void SPHsimulationUI::setBorderDepth()
+{
+	int PrevValue = refSimulation->getBoundaryDepth();
+	uiValues.borderSize = PrevValue;
+	ImGui::InputInt("BoundaryDepth", &uiValues.borderSize);
+
+	if(uiValues.borderSize < 1 || uiValues.borderSize > 10)
+	{
+		uiValues.borderSize = PrevValue;
+	}
+	if (uiValues.borderSize != PrevValue)
+	{
+		refSimulation->setBoundaryDepth(uiValues.borderSize);
+	}
 }
 
 void SPHsimulationUI::timeStepInput()

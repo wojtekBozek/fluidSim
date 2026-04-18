@@ -146,6 +146,8 @@ public:
     GLuint getSimulationDimension() const { return m_dimension; }
     void setSimulationDimension(float dimension) { m_dimension = dimension; }
     void clearSimulation();
+    int getBoundaryDepth(){return m_boundaryDepth;}
+    void setBoundaryDepth(int boundaryDepth){m_boundaryDepth = boundaryDepth;}
 
     uint64_t getCurentStep() {return m_computationStep;}
 private:
@@ -155,7 +157,7 @@ private:
     GLuint m_nextNodeBuf;
 
     uint64_t m_computationStep = 0;
-    int boundarySize = 3;
+    int m_boundaryDepth = 3;
     GLuint m_dimension = SimDim::DIMENSION_3;
 
     BorderPolicy m_borderPolicy = BorderPolicy::BOUNDARY_SOLID;

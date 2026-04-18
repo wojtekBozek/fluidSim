@@ -150,7 +150,7 @@ void FluidSPHSimulation::setFluidAndParticles()
     //initialParticle.density = 1000.0/static_cast<float>(numOfBoundaryParticles);
     initialParticle.type = particleType::BOUNDARY;
 
-    int depth = 5;
+    int depth = m_boundaryDepth;
     if (SimDim::DIMENSION_2 == m_dimension)
     {
         initialParticle.position.z = m_initialDomain.position.z;
@@ -159,7 +159,7 @@ void FluidSPHSimulation::setFluidAndParticles()
         {
             for (int j = -depth; j <= int(boundaryYmax)+depth; j++)
             {
-                if (i <= 0 || i > boundaryXmax || j <= 0 || j > boundaryYmax)
+                if (i <= 0 || i >= boundaryXmax || j <= 0 || j >= boundaryYmax)
                 {
                     initialParticle.position = glm::vec4(m_simulationDomain.position + glm::vec3(i * m_kernelRadius/1.5, j * m_kernelRadius/1.5, 0.0), 1.0);
                     boundaryParticles.push_back(initialParticle);
@@ -176,7 +176,7 @@ void FluidSPHSimulation::setFluidAndParticles()
             for (int j = -depth; j <= int(boundaryYmax)+depth; j++)
             {
                 for (int z = -depth; z <= int(boundaryZmax)+depth; z++)
-                    if (i <= 0 || i > boundaryXmax  || j <= 0 || j > boundaryYmax  || z <= 0 || z > boundaryZmax)
+                    if (i <= 0 || i >= boundaryXmax  || j <= 0 || j >= boundaryYmax  || z <= 0 || z >= boundaryZmax)
                     {
                         initialParticle.position =  glm::vec4(m_simulationDomain.position + glm::vec3(i * m_kernelRadius/1.5, j * m_kernelRadius/1.5, z * m_kernelRadius/1.5), 1.0);
                         boundaryParticles.push_back(initialParticle);
