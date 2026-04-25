@@ -1,5 +1,6 @@
 #include "FluidSPHSimulation.hpp"
 #include <iostream>
+#include <debug_data.hpp>
 FluidSPHSimulation::FluidSPHSimulation(std::unique_ptr<ShaderProgram> computePressureShader, std::unique_ptr<ShaderProgram> computeMovementShader, Domain simulationDomain, Fluid fluid, uint32_t numOfParticles)
 : m_pressureNdensityComputeShader(std::move(computePressureShader)), m_movementComputeShader(std::move(computeMovementShader))
 {
@@ -256,8 +257,7 @@ void FluidSPHSimulation::setMemoryLayout()
     m_accelerationComputeShader->setFloat("boundaryMaxDist", m_boundCof * m_kernelRadius);
     m_accelerationComputeShader->setUint("tableSize", hashCoef * m_numOfParticles);
     m_accelerationComputeShader->setFloat("cellSize", 2.0 * m_kernelRadius);
-    m_accelerationComputeShader->setUint("toonerP", 7);
-    m_accelerationComputeShader->setFloat("stiffnessK", 35000);
+    m_accelerationComputeShader->setFloat("wallStiffness", 10000.0);
     m_accelerationComputeShader->setFloat("epsilon", 0.1f);
     m_accelerationComputeShader->setFloat("epsilonBoundary", 0.15f);
     m_accelerationComputeShader->setUint("borderPolicy", m_borderPolicy);
@@ -285,19 +285,19 @@ void FluidSPHSimulation::setMemoryLayout()
 
 void FluidSPHSimulation::setParticleBufferData()
 {
-    if (!m_partBUfferCreated)
+    if (!m_partBufferCreated)
     {
         if (glIsBuffer(m_partBuf) == GL_FALSE)
         {
             glGenBuffers(1, &m_partBuf);
         }
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_partBuf);
-        m_partBUfferCreated = true;
+        m_partBufferCreated = true;
     }
     GLuint bufsize = m_numOfParticles * sizeof(FluidParticle);
     if (bufsize != m_particleBufferSize)
     {
-        std::cout << "Creating particle Buffer\n";
+        Debug("Creating particle Buffer");
         m_particleBufferSize = bufsize;
         glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_partBuf);
         glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, m_particles.data(), GL_DYNAMIC_DRAW);
@@ -344,11 +344,6 @@ void FluidSPHSimulation::simulationStep(float timeStep)
         glDispatchCompute((m_numOfParticles + MinInvocations - 1) / MinInvocations, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-        //m_smoothingComputeShader->useProgram();
-        //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_velocitiesBuf);
-        //glDispatchCompute((m_numOfParticles + MinInvocations - 1) / MinInvocations, 1, 1);
-        //glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
-
         m_movementComputeShader->useProgram();
         glDispatchCompute((m_numOfParticles + MinInvocations - 1) / MinInvocations, 1, 1);
 
@@ -366,6 +361,6 @@ void FluidSPHSimulation::clearSimulation()
 {
     m_computationStep = 0;
     m_particles.clear();
-    m_partBUfferCreated = false;
+    m_partBufferCreated = false;
     m_particleBufferSize = 0;
 }

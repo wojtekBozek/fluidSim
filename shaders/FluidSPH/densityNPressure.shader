@@ -15,17 +15,11 @@ struct Fluid
 {
     float fluidDensity; // kg
     float volume; // m^3
-    float stiffnesK;// nazewnictwo luźno powiązane z prędkością dźwięku 
+    float stiffnesK; 
     float stiffnesY;
 };
 
-layout(std430, binding = 0) buffer PartBuffer {
-    FluidParticle particles[];
-};
 
-layout(std430, binding = 1) buffer FluidBuffer {
-    Fluid fluid;
-};
 
 uniform uint numOfParticles;
 uniform uint DIMENSION;
@@ -59,29 +53,43 @@ float getAlfa(float kernelRadius, uint dimension)
     return alfa;
 }
 
+float dimensionAlpha()
+{
+    return getAlfa(sphKernelRadius, DIMENSION);
+}
+
+layout(std430, binding = 0) buffer PartBuffer {
+    FluidParticle particles[];
+};
+
+layout(std430, binding = 1) buffer FluidBuffer {
+    Fluid fluid;
+};
+
 void main()
 {
     uint fluidParticle_id = gl_GlobalInvocationID.x;
     if(fluidParticle_id >= numOfParticles) return;
 
-    float alfa = getAlfa(sphKernelRadius, DIMENSION);
     FluidParticle particle = particles[fluidParticle_id];
     particle.density=0.0;
     for (uint i=0; i < numOfParticles; i++)
     {
-        if(distance(particle.position.xyz, particles[i].position.xyz) <= 2*sphKernelRadius)
+        const float particleDistance = distance(particle.position.xyz, particles[i].position.xyz)
+        if(distance <= 2*sphKernelRadius)
         {
-            particle.density += particles[i].mass * CubicSplineKernel(sphKernelRadius, distance(particle.position.xyz, particles[i].position.xyz), alfa);       
+            const float kernel = CubicSplineKernel(sphKernelRadius, particleDistance, dimensionAlpha());
+            particle.density += particles[i].mass * kernel;       
         }
     }
-    particle.pressure = (fluid.stiffnesK*fluid.fluidDensity)/fluid.stiffnesY*(pow((particle.density/fluid.fluidDensity),fluid.stiffnesY)-1.0);// -;
+    particle.pressure = (fluid.stiffnesK*fluid.fluidDensity)/fluid.stiffnesY*(pow((particle.density/fluid.fluidDensity),fluid.stiffnesY)-1.0);
     particles[fluidParticle_id].pressure = particle.pressure;
     particles[fluidParticle_id].density = particle.density;
 }
 
 float CubicSplineKernel(float kernelRadius, float distance, float alfa)
 {
-    float q = distance/kernelRadius;
+    const float q = distance/kernelRadius;
     float retVal = 0.0;
 
     if (q >= 0.0 && q < 1.0)

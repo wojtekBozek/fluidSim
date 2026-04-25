@@ -16,14 +16,13 @@ void main() {
     //// Kill fragments outside circle for clean edges
     if (dist > 1.0)
         discard;
-//
     //// Final color
     if(dist+0.01 < 1.0)
     {
         if(isFluid == 0)
             FragColor = vec4(color, 1.0);
         else
-            FragColor = vec4(0.5, 0.5, 0.5, 0.2);
+            FragColor = vec4(0.0, 0.0, 0.0, 0.0);
     }
     else
         FragColor = vec4(0.0,0.0,0.0,1.0);

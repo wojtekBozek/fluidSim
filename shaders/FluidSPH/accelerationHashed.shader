@@ -55,9 +55,7 @@ uniform vec3 domainRefPos;
 uniform vec3 domainDimennsions;
 uniform float boundaryMaxDist;
 
-//uniform float timeStep;
-uniform uint toonerP;
-uniform float stiffnessK = 100.0;//n/m
+uniform float wallStiffness = 100.0;//n/m
 
 uniform float epsilon;
 uniform float epsilonBoundary;
@@ -216,11 +214,11 @@ vec3 KernelGradient(float kernelRadius, vec3 distanceVector, float alfa)
     return gradW * (distanceVector / r);
 }
 
-float WallForce(float dist,float mass)
+float WallAcceleration(float dist,float mass)
 {
     if(dist < boundaryMaxDist)
     {
-        return stiffnessK *pow((boundaryMaxDist - dist)/boundaryMaxDist, toonerP)/mass;
+        return wallStiffness *(boundaryMaxDist - dist)/boundaryMaxDist;
     } else
     {
         return 0.0;
@@ -245,12 +243,12 @@ vec3 applyDomainForces(vec3 position, FluidParticle particle)
     vec3 domainForces = vec3(0.0,0.0,0.0);
     if(DIMENSION == DIMENSION_3)
     {
-        domainForces += WallForce(abs(position.z-backSurface),particle.mass)*backNormal;
-        domainForces += WallForce(abs(position.z-frontSurface),particle.mass)*frontNormal;
+        domainForces += WallAcceleration(abs(position.z-backSurface),particle.mass)*backNormal;
+        domainForces += WallAcceleration(abs(position.z-frontSurface),particle.mass)*frontNormal;
     }
-    domainForces += WallForce(abs(position.y-up),particle.mass)*upNormal;
-    domainForces += WallForce(abs(position.y-down),particle.mass)*downNormal;
-    domainForces += WallForce(abs(position.x-right),particle.mass)*rightNormal;
-    domainForces += WallForce(abs(position.x-left),particle.mass)*leftNormal;
+    domainForces += WallAcceleration(abs(position.y-up),particle.mass)*upNormal;
+    domainForces += WallAcceleration(abs(position.y-down),particle.mass)*downNormal;
+    domainForces += WallAcceleration(abs(position.x-right),particle.mass)*rightNormal;
+    domainForces += WallAcceleration(abs(position.x-left),particle.mass)*leftNormal;
     return domainForces;
 }

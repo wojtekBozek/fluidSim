@@ -37,7 +37,7 @@ void main() {
         gl_PointSize = 0.0;
         return;
     }
-    vec4 pos = particles[particleID].position; //particles[particleID].position;
+    vec4 pos = particles[particleID].position; 
     isFluid = particles[particleID].type;
     vec4 viewPos = view * pos;
     gl_Position = proj *viewPos;
@@ -51,10 +51,4 @@ void main() {
     {  
         gl_PointSize = 2*particleRadius * viewportHeight / (top-bottom);
     }
-    //gl_Position = proj * view * pos;
-    //gl_PointSize = 10.0;
-    //gl_PointSize = (particleRadius*2/z_eye) * (viewportHeight/
-    //               (z_eye * tan(fovy)));
-    // clamp to reasonable range
-    //gl_PointSize = clamp(pixelSize, 1.0, 200.0);
 }

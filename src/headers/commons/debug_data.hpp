@@ -29,3 +29,10 @@ bool GLLogCall(const char* function, const char* file, int line)
 	}
 	return true;
 }
+
+void Debug(std::string comm)
+{
+	#ifdef DEBUG
+		std::cout << comm << "\n";
+	#endif
+}

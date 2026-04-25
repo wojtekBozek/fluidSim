@@ -185,7 +185,7 @@ private:
     float m_kernelCof = 2.5;
     float m_boundCof = 1.0;
     float m_kernelRadius = 0.2f;
-    bool m_partBUfferCreated = false;
+    bool m_partBufferCreated = false;
     GLuint m_particleBufferSize = 0;
     GLuint64 m_computeTime = 0;
     GLuint MinInvocations = 128;
