@@ -282,7 +282,7 @@ void FluidSPHSimulation::setMemoryLayout()
     m_accelerationComputeShader->setFloat("cellSize", 2.0 * m_kernelRadius);
     m_accelerationComputeShader->setUint("toonerP", 7);
     m_accelerationComputeShader->setFloat("stiffnessK", 35000);
-    m_accelerationComputeShader->setFloat("epsilon", 0.05f);
+    m_accelerationComputeShader->setFloat("epsilon", 0.1f);
     m_accelerationComputeShader->setFloat("epsilonBoundary", 0.15f);
     m_accelerationComputeShader->setUint("borderPolicy", m_borderPolicy);
 

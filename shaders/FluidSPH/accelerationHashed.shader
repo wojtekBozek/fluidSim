@@ -151,10 +151,10 @@ void main()
                             {
                                 //temp += particle.mass * otherParticle.mass * fluid.fluidDensity * localPBD2 * kernelGradient;
                                 otherParticle.pressure = particle.pressure;
-                                otherParticle.density = fluid.fluidDensity;
+                                //otherParticle.density = fluid.fluidDensity;
                                 temp += otherParticle.mass *(localPBD2+PressureByDensity2(otherParticle))* kernelGradient;
 //
-                                particle.velocity.xyz += epsilon * otherParticle.mass / otherParticle.density *(otherParticle.velocity.xyz - particle.velocity.xyz) * kernel;
+                                particle.velocity.xyz += epsilon * otherParticle.mass / fluid.fluidDensity *(otherParticle.velocity.xyz - particle.velocity.xyz) * kernel;
                             }
                         }
                         //if(nextNode[currentParticle]!=-1)

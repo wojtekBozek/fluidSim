@@ -86,7 +86,7 @@ void particlesToFacesU(vec2 position, vec2 velocity, mat2 Cp)
         float sumW = w00 * w10;
         velocityPosition = vec2(i0*dx, j0*dx + 0.5*dx);
         distance = velocityPosition - position;
-        vec2 computed = velocity + Cp * distance;
+        vec2 computed = velocity + Cp * dx*dx/4.0* distance;
         atomicAdd(velocitiesU[j0*(Nx()+1)+i0], sumW*computed.x);
         atomicAdd(weightsU[j0*(Nx()+1)+i0], sumW);
     }
@@ -95,7 +95,7 @@ void particlesToFacesU(vec2 position, vec2 velocity, mat2 Cp)
         float sumW = w00 * w11;
         velocityPosition = vec2(i0*dx, j1*dx + 0.5*dx);
         distance = velocityPosition - position;
-        vec2 computed = velocity + Cp * distance;
+        vec2 computed = velocity + Cp * dx*dx/4.0 * distance;
         atomicAdd(velocitiesU[j1*(Nx()+1)+i0], sumW*computed.x);
         atomicAdd(weightsU[j1*(Nx()+1)+i0], sumW);
     }
@@ -104,7 +104,7 @@ void particlesToFacesU(vec2 position, vec2 velocity, mat2 Cp)
         float sumW = w01 * w11;
         velocityPosition = vec2(i1*dx, j1*dx + 0.5*dx);
         distance = velocityPosition - position;
-        vec2 computed = velocity + Cp * distance;
+        vec2 computed = velocity + Cp * dx*dx/4.0* distance;
         atomicAdd(velocitiesU[j1*(Nx()+1)+i1], sumW*computed.x);
         atomicAdd(weightsU[j1*(Nx()+1)+i1], sumW);
     }
@@ -113,7 +113,7 @@ void particlesToFacesU(vec2 position, vec2 velocity, mat2 Cp)
         float sumW = w01 * w10;
         velocityPosition = vec2(i1*dx, j0*dx + 0.5*dx);
         distance = velocityPosition - position;
-        vec2 computed = velocity + Cp * distance;
+        vec2 computed = velocity + Cp * dx*dx/4.0* distance;
         atomicAdd(velocitiesU[j0*(Nx()+1)+i1], sumW*computed.x);
         atomicAdd(weightsU[j0*(Nx()+1)+i1], sumW);
     }
@@ -144,7 +144,7 @@ void particlesToFacesV(vec2 position, vec2 velocity, mat2 Cp)
         float sumW = w00 * w10;
         velocityPosition = vec2(i0*dx + 0.5*dx, j0*dx);
         distance = velocityPosition - position;
-        vec2 computed = velocity + Cp * distance;
+        vec2 computed = velocity + Cp* dx*dx/4.0 * distance;
         atomicAdd(velocitiesV[j0*(Nx())+i0], sumW*computed.y);
         atomicAdd(weightsV[j0*(Nx())+i0], sumW);
     }
@@ -153,7 +153,7 @@ void particlesToFacesV(vec2 position, vec2 velocity, mat2 Cp)
         float sumW = w00 * w11;
         velocityPosition = vec2(i0*dx + 0.5*dx, j1*dx);
         distance = velocityPosition - position;
-        vec2 computed = velocity + Cp * distance;
+        vec2 computed = velocity + Cp* dx*dx/4.0 * distance;
         atomicAdd(velocitiesV[j1*(Nx())+i0], sumW*computed.y);
         atomicAdd(weightsV[j1*(Nx())+i0], sumW);
     }
@@ -162,7 +162,7 @@ void particlesToFacesV(vec2 position, vec2 velocity, mat2 Cp)
         float sumW = w01 * w11;
         velocityPosition = vec2(i1*dx + 0.5*dx, j1*dx);
         distance = velocityPosition - position;
-        vec2 computed = velocity + Cp * distance;
+        vec2 computed = velocity + Cp* dx*dx/4.0 * distance;
         atomicAdd(velocitiesV[j1*(Nx())+i1], sumW*computed.y);
         atomicAdd(weightsV[j1*(Nx())+i1], sumW);
     }
@@ -171,7 +171,7 @@ void particlesToFacesV(vec2 position, vec2 velocity, mat2 Cp)
         float sumW = w01 * w10;
         velocityPosition = vec2(i1*dx + 0.5*dx, j0*dx);
         distance = velocityPosition - position;
-        vec2 computed = velocity + Cp * distance;
+        vec2 computed = velocity + Cp* dx*dx/4.0 * distance;
         atomicAdd(velocitiesV[j0*(Nx())+i1], sumW*computed.y);
         atomicAdd(weightsV[j0*(Nx())+i1], sumW);
     }
