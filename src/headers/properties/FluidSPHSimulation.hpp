@@ -79,9 +79,9 @@ public:
         m_movementComputeShader = std::make_unique<ShaderProgram>();
         m_movementComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/movement.shader");
         m_movementComputeShader->linkProgram();
-        m_smoothingComputeShader = std::make_unique<ShaderProgram>();
-        m_smoothingComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/smoothingHashed.shader");
-        m_smoothingComputeShader->linkProgram();
+        //m_smoothingComputeShader = std::make_unique<ShaderProgram>();
+        //m_smoothingComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/smoothingHashed.shader");
+        //m_smoothingComputeShader->linkProgram();
         m_accelerationComputeShader = std::make_unique<ShaderProgram>();
         m_accelerationComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/accelerationHashed.shader");
         m_accelerationComputeShader->linkProgram();
@@ -157,6 +157,7 @@ private:
     GLuint m_partBuf;
     GLuint m_fluidBuf;
     GLuint m_hashBuf;
+    GLuint m_velocitiesBuf;
     GLuint m_nextNodeBuf;
 
     uint64_t m_computationStep = 0;
@@ -171,7 +172,7 @@ private:
     std::unique_ptr<ShaderProgram> m_movementComputeShader;
     std::unique_ptr<ShaderProgram> m_accelerationComputeShader;
     std::unique_ptr<ShaderProgram> m_pressureNdensityComputeShader;
-    std::unique_ptr<ShaderProgram> m_smoothingComputeShader;
+    //std::unique_ptr<ShaderProgram> m_smoothingComputeShader;
     std::unique_ptr<ShaderProgram> m_boundaryParticleMassComputeShader;
     Domain m_simulationDomain, m_initialDomain;
     Fluid m_fluid, refFluid;

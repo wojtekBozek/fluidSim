@@ -202,6 +202,13 @@ void FluidSPHSimulation::setMemoryLayout()
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_fluidBuf);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, &m_fluid, GL_DYNAMIC_DRAW);
 
+    bufsize = m_numOfParticles * sizeof(glm::vec4);
+    if (glIsBuffer(m_velocitiesBuf) == GL_FALSE)
+    {
+        glGenBuffers(1, &m_velocitiesBuf);
+    }
+    glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_velocitiesBuf);
+    glBufferData(GL_SHADER_STORAGE_BUFFER, hashCoef * bufsize, nullptr, GL_DYNAMIC_DRAW);
     m_hashValues = std::vector<GLint>(hashCoef * m_numOfParticles, -1);
     m_nextNodes = std::vector<GLint>(m_numOfParticles, -1);
 
@@ -219,6 +226,8 @@ void FluidSPHSimulation::setMemoryLayout()
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, m_nextNodeBuf);
     glBufferData(GL_SHADER_STORAGE_BUFFER, bufsize, m_nextNodes.data(), GL_DYNAMIC_DRAW);
     glBindBuffer(GL_SHADER_STORAGE_BUFFER, 0);
+
+    
 
 
     m_resetHashTableComputeShader->useProgram();
@@ -253,21 +262,21 @@ void FluidSPHSimulation::setMemoryLayout()
     m_accelerationComputeShader->setFloat("epsilonBoundary", 0.15f);
     m_accelerationComputeShader->setUint("borderPolicy", m_borderPolicy);
 
-    m_smoothingComputeShader->useProgram();
-    m_smoothingComputeShader->setUint("numOfParticles", m_numOfParticles);
-    m_smoothingComputeShader->setFloat("sphKernelRadius", m_kernelRadius);
-    m_smoothingComputeShader->setUint("DIMENSION", m_dimension);
-    m_smoothingComputeShader->setVec3("externalAccelerations", { 0.0f,-9.8f,0.0f });
-    m_smoothingComputeShader->setVec3("domainRefPos", m_simulationDomain.position);
-    m_smoothingComputeShader->setVec3("domainDimennsions", m_simulationDomain.size);
-    m_smoothingComputeShader->setFloat("boundaryMaxDist", m_boundCof * m_kernelRadius);
-    m_smoothingComputeShader->setUint("tableSize", hashCoef * m_numOfParticles);
-    m_smoothingComputeShader->setFloat("cellSize", 2.0 * m_kernelRadius);
-    m_smoothingComputeShader->setUint("toonerP", 7);
-    m_smoothingComputeShader->setFloat("stiffnessK", 35000);
-    m_smoothingComputeShader->setFloat("epsilon", 0.1f);
-    m_smoothingComputeShader->setFloat("epsilonBoundary", 0.15f);
-    m_smoothingComputeShader->setUint("borderPolicy", m_borderPolicy);
+    //m_smoothingComputeShader->useProgram();
+    //m_smoothingComputeShader->setUint("numOfParticles", m_numOfParticles);
+    //m_smoothingComputeShader->setFloat("sphKernelRadius", m_kernelRadius);
+    //m_smoothingComputeShader->setUint("DIMENSION", m_dimension);
+    //m_smoothingComputeShader->setVec3("externalAccelerations", { 0.0f,-9.8f,0.0f });
+    //m_smoothingComputeShader->setVec3("domainRefPos", m_simulationDomain.position);
+    //m_smoothingComputeShader->setVec3("domainDimennsions", m_simulationDomain.size);
+    //m_smoothingComputeShader->setFloat("boundaryMaxDist", m_boundCof * m_kernelRadius);
+    //m_smoothingComputeShader->setUint("tableSize", hashCoef * m_numOfParticles);
+    //m_smoothingComputeShader->setFloat("cellSize", 2.0 * m_kernelRadius);
+    //m_smoothingComputeShader->setUint("toonerP", 7);
+    //m_smoothingComputeShader->setFloat("stiffnessK", 35000);
+    //m_smoothingComputeShader->setFloat("epsilon", 0.1f);
+    //m_smoothingComputeShader->setFloat("epsilonBoundary", 0.15f);
+    //m_smoothingComputeShader->setUint("borderPolicy", m_borderPolicy);
 
     m_movementComputeShader->useProgram();
     m_movementComputeShader->setFloat("timeStep", m_timeStep);
@@ -331,12 +340,14 @@ void FluidSPHSimulation::simulationStep(float timeStep)
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
         m_accelerationComputeShader->useProgram();
+        glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_velocitiesBuf);
         glDispatchCompute((m_numOfParticles + MinInvocations - 1) / MinInvocations, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
-        m_smoothingComputeShader->useProgram();
-        glDispatchCompute((m_numOfParticles + MinInvocations - 1) / MinInvocations, 1, 1);
-        glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
+        //m_smoothingComputeShader->useProgram();
+        //glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 4, m_velocitiesBuf);
+        //glDispatchCompute((m_numOfParticles + MinInvocations - 1) / MinInvocations, 1, 1);
+        //glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
 
         m_movementComputeShader->useProgram();
         glDispatchCompute((m_numOfParticles + MinInvocations - 1) / MinInvocations, 1, 1);

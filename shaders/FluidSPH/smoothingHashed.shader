@@ -34,6 +34,10 @@ layout(std430, binding = 3) buffer NextNodeBuffer {
     int nextNode[];
 };
 
+layout(std430, binding = 4) buffer VelocityBuffer {
+    vec4 velocities[];
+};
+
 uint hash(ivec3 cell) {
     const uint p1 = 73856093u;
     const uint p2 = 19349663u;
@@ -164,7 +168,7 @@ void main()
             }      
         }
     }
-    particles[fluidParticle_id].velocity.xyz = particle.velocity.xyz;
+    velocities[fluidParticle_id].xyz = particle.velocity.xyz;
 } 
 
 float PressureByDensity2(FluidParticle part)

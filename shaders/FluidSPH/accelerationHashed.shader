@@ -33,6 +33,10 @@ layout(std430, binding = 2) buffer HashHeadBuffer {
 layout(std430, binding = 3) buffer NextNodeBuffer {
     int nextNode[];
 };
+layout(std430, binding = 4) buffer VelocityBuffer {
+    vec4 velocities[];
+};
+
 
 uint hash(ivec3 cell) {
     const uint p1 = 73856093u;
@@ -145,7 +149,7 @@ void main()
                             if(otherParticle.type == 0) // fluid
                             {
                                 temp += otherParticle.mass*(localPBD2+PressureByDensity2(otherParticle))*kernelGradient;
-                                //particle.velocity.xyz += epsilon*otherParticle.mass/otherParticle.density*(otherParticle.velocity.xyz-particle.velocity.xyz)*kernel;  
+                                particle.velocity.xyz += epsilon*otherParticle.mass/otherParticle.density*(otherParticle.velocity.xyz-particle.velocity.xyz)*kernel;  
                             }
                             else if(borderPolicy == BOUNDARY_PARTICLES)// boundary
                             {
@@ -154,7 +158,7 @@ void main()
                                 otherParticle.density = fluid.fluidDensity;
                                 temp += otherParticle.mass *(localPBD2+PressureByDensity2(otherParticle))* kernelGradient;
 //
-                                //particle.velocity.xyz += epsilon * otherParticle.mass / otherParticle.density *(otherParticle.velocity.xyz - particle.velocity.xyz) * kernel;
+                                particle.velocity.xyz += epsilon * otherParticle.mass / otherParticle.density *(otherParticle.velocity.xyz - particle.velocity.xyz) * kernel;
                             }
                         }
                         //if(nextNode[currentParticle]!=-1)
@@ -173,6 +177,8 @@ void main()
         particle.acceleration.xyz += applyDomainForces(particle.position.xyz, particle);
     }
     particles[fluidParticle_id].acceleration.xyz = particle.acceleration.xyz;
+    
+    velocities[fluidParticle_id].xyz = particle.velocity.xyz;
     //particles[fluidParticle_id].velocity.xyz = particle.velocity.xyz;
 } 
 

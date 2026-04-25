@@ -26,6 +26,9 @@ layout(std430, binding = 1) buffer FluidBuffer {
     Fluid fluid;
 };
 
+layout(std430, binding = 4) buffer VelocityBuffer {
+    vec4 velocities[];
+};
 uniform uint numOfParticles;
 uniform float timeStep;
 
@@ -38,6 +41,6 @@ void main()
     if(particle.type == 0)
     {
         particles[fluidParticle_id].position.xyz += particle.velocity.xyz*timeStep;
-        particles[fluidParticle_id].velocity.xyz += particle.acceleration.xyz*timeStep;
+        particles[fluidParticle_id].velocity.xyz = velocities[fluidParticle_id].xyz + particle.acceleration.xyz*timeStep;
     }
 }
