@@ -38,8 +38,8 @@ struct alignas(16) FluidParticle : Particle
 /// @brief cell defined with a position of it's back, lower, left vertex and size right up and front
 struct Domain
 {
-    glm::vec3 position = {-20,-2,-10};
-    glm::vec3 size = {200,200,200}; // {m,m,m}
+    glm::vec3 position = {0,0,0};
+    glm::vec3 size = {10,10,10}; // {m,m,m}
 };
 
 struct Fluid
@@ -79,6 +79,9 @@ public:
         m_movementComputeShader = std::make_unique<ShaderProgram>();
         m_movementComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/movement.shader");
         m_movementComputeShader->linkProgram();
+        m_smoothingComputeShader = std::make_unique<ShaderProgram>();
+        m_smoothingComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/smoothingHashed.shader");
+        m_smoothingComputeShader->linkProgram();
         m_accelerationComputeShader = std::make_unique<ShaderProgram>();
         m_accelerationComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/accelerationHashed.shader");
         m_accelerationComputeShader->linkProgram();
@@ -134,7 +137,7 @@ public:
         }
         else if (m_dimension == SimDim::DIMENSION_2)
         {
-            m_fluid.volume = m_initialDomain.size.x * m_initialDomain.size.y;// *m_initialDomain.size.z;
+            m_fluid.volume = m_initialDomain.size.x * m_initialDomain.size.y*m_particleRadius * m_particleRadius*2;// *m_initialDomain.size.z;
             //m_numOfParticles = m_fluid.volume / (std::pow(m_particleRadius, 2) * M_PI);
         }
     }
@@ -168,6 +171,7 @@ private:
     std::unique_ptr<ShaderProgram> m_movementComputeShader;
     std::unique_ptr<ShaderProgram> m_accelerationComputeShader;
     std::unique_ptr<ShaderProgram> m_pressureNdensityComputeShader;
+    std::unique_ptr<ShaderProgram> m_smoothingComputeShader;
     std::unique_ptr<ShaderProgram> m_boundaryParticleMassComputeShader;
     Domain m_simulationDomain, m_initialDomain;
     Fluid m_fluid, refFluid;
@@ -183,7 +187,7 @@ private:
     bool m_partBUfferCreated = false;
     GLuint m_particleBufferSize = 0;
     GLuint64 m_computeTime = 0;
-    GLuint invocations = 128;
+    GLuint MinInvocations = 128;
 };
 
 
