@@ -68,14 +68,6 @@ void main()
                     real_ii = ii;
                     real_jj = jj;
                 }
-                //else if(pow(ii,2) + pow(jj,2) == pow(real_ii,2) + pow(real_jj,2))
-                //{
-                //    if(abs(ii) < abs(real_ii))
-                //    {
-                //        real_ii = ii;
-                //        real_jj = jj;
-                //    }
-                //}
             }
         }
     }

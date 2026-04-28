@@ -26,7 +26,7 @@ void Grid3D::JacobiSolver()
     m_jacobiPSolverShader->setFloat("dx", dx);
     m_jacobiPSolverShader->setFloat("dens", m_dens);
     m_jacobiPSolverShader->setFloat("dt", dt);
-    m_jacobiPSolverShader->setFloat("overrelaxation", m_overrelaxation);
+    m_jacobiPSolverShader->setFloat("weight", m_overrelaxation);
     //glBindImageTexture(1, divergenceTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R32F);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_3D, divergenceTex);

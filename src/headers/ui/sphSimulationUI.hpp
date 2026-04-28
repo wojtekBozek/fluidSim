@@ -28,6 +28,8 @@ private:
 	void simulationPositionTextInputs();
 	void sphKernelRadiusSizeInput();
 	void visualRadiusSizeInput();
+	void smothingEpsilonInpu();
+	void kernelCoefInput();
 
 	void numOfParticlesTextInfo();
 	void volumeTextInfo();
@@ -49,7 +51,7 @@ private:
 	std::shared_ptr<ContextState> simulationContext;
 	struct UiValues
 	{
-		float k, y, timeStep, density, kernelRadius, visualRadius;
+		float k, y, timeStep, density, kernelRadius, visualRadius, smoothingEpsilon, kerneCoef;
 		int borderSize;
 		glm::vec3 simDomainSize, simDomainPos, fluidInitSize, fluidInitPos;
 		SimDim dimension;

@@ -76,7 +76,7 @@ void main()
     for (uint i=0; i < numOfParticles; i++)
     {
         const float particleDistance = distance(particle.position.xyz, particles[i].position.xyz)
-        if(distance <= 2*sphKernelRadius)
+        if(particleDistance <= 2*sphKernelRadius)
         {
             const float kernel = CubicSplineKernel(sphKernelRadius, particleDistance, dimensionAlpha());
             particle.density += particles[i].mass * kernel;       

@@ -25,8 +25,10 @@ void SPHsimulationUI::showUI()
 		setBorderPolicy();
 		setBorderDepth();
 	}
+	smothingEpsilonInpu();
 	sphKernelRadiusSizeInput();
 	visualRadiusSizeInput();
+	kernelCoefInput();
 	timeStepInput();
 	numOfParticlesTextInfo();
 	volumeTextInfo();
@@ -191,10 +193,38 @@ void SPHsimulationUI::visualRadiusSizeInput()
 	}
 }
 
+void SPHsimulationUI::smothingEpsilonInpu()
+{
+	float PrevValue = refSimulation->getSmoothingEpsilon();
+	uiValues.smoothingEpsilon = PrevValue;
+	ImGui::InputFloat("Smoothing epsilon", &uiValues.smoothingEpsilon, 0.001f, 10.0f, "%.3f");
+
+	if (uiValues.smoothingEpsilon != PrevValue)
+	{
+		refSimulation->setSmothingEpsilon(uiValues.smoothingEpsilon);
+	}
+}
+
+void SPHsimulationUI::kernelCoefInput()
+{
+	float PrevValue = refSimulation->getRadiusCoef();
+	uiValues.kerneCoef = PrevValue;
+	ImGui::InputFloat("Kernel/partcle size", &uiValues.kerneCoef, 0.001f, 10.0f, "%.3f");
+
+	if (uiValues.kerneCoef != PrevValue)
+	{
+		refSimulation->setRadiusCoef(uiValues.kerneCoef);
+	}
+}
+
 void SPHsimulationUI::numOfParticlesTextInfo()
 {
 	volatile uint32_t value = refSimulation->getNumOfParticles();
 	ImGui::Value("NumOfParticles", value);
+	volatile uint32_t value2 = refSimulation->getNumOfFluidParticles();
+	ImGui::Value("NumOfFluidParticles", value2);
+	volatile uint32_t value3 = refSimulation->getNumOfBoundaryParticles();
+	ImGui::Value("NumOfBoundaryParticles", value3);
 }
 
 void SPHsimulationUI::volumeTextInfo()

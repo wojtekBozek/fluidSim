@@ -77,6 +77,11 @@ float getAlfa(float kernelRadius, uint dimension)
     return alfa;
 }
 
+float dimensionAlpha()
+{
+    return getAlfa(sphKernelRadius, DIMENSION);
+}
+
 void main()
 {
     uint fluidParticle_id = gl_GlobalInvocationID.x;
@@ -108,23 +113,18 @@ void main()
                 theirCellPosition = cellPosition + ivec3(dx, dy, dz);
                 theirHashValue = hash(theirCellPosition) % tableSize;
 
-                //if(hashHead[theirHashValue] != -1)
-                //{
                     int currentParticle = hashHead[theirHashValue];
                     while(currentParticle != -1)
                     {
                         otherParticle = particles[currentParticle];
                         dist = distance(particle.position.xyz, otherParticle.position.xyz);
                         if(dist <= 2*sphKernelRadius)
-                        {
-                            particle.density += otherParticle.mass * CubicSplineKernel(sphKernelRadius, dist, alfa);       
+                        {                            
+                            const float kernel = CubicSplineKernel(sphKernelRadius, dist, dimensionAlpha());
+                            particle.density += otherParticle.mass * kernel;       
                         }
-                        //if(nextNode[currentParticle]!=-1)
-                        //{
                             currentParticle = nextNode[currentParticle];
-                        //}
                     }
-                //}
             }     
         }
     }

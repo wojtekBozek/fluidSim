@@ -49,7 +49,7 @@ void main()
     float newPressure = (sum - dens*dx*div/dt) / (float(max(count,1)));
     float oldPressure = P(i,j);
     
-    newPressure = oldPressure+(newPressure-oldPressure);
+    newPressure = oldPressure+overrelaxation*(newPressure-oldPressure);
 
     imageStore(pressureOut, id, vec4(newPressure));
 }

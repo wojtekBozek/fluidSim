@@ -27,15 +27,15 @@ int checkCellType(ivec2 c)
 bool uBlocked(int i, int j)
 {
     if(0 == i || i >= gridSize.x) return true;
-    return checkCellType(ivec2(i-1, j)) == SOLID ||
-           checkCellType(ivec2(i,   j)) == SOLID;
+     return checkCellType(ivec2(i-1, j)) == SOLID ||
+           checkCellType(ivec2(i,   j)) == SOLID || (checkCellType(ivec2(i-1, j))==AIR && checkCellType(ivec2(i,   j)) == AIR);
 }
 
 bool vBlocked(int i, int j)
 {
-    if(0 == j || j >= gridSize.y) return true;
+    if(0 == j) return true;
     return checkCellType(ivec2(i, j-1)) == SOLID ||
-           checkCellType(ivec2(i, j  )) == SOLID;
+           checkCellType(ivec2(i, j  )) == SOLID|| (checkCellType(ivec2(i, j-1))==AIR && checkCellType(ivec2(i,   j)) == AIR);
 }
 
 void main()

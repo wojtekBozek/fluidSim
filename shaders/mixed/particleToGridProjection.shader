@@ -33,6 +33,7 @@ layout(std430, binding = 5) buffer WeightsV {
 uniform ivec2 gridSize;
 uniform float dt;
 uniform float dx;
+uniform float picFlipAlpha;
 uniform uint numOfParticles;
 
 int Nx(){return gridSize.x;}
@@ -52,14 +53,14 @@ bool uBlocked(int i, int j)
 {
     if(0 == i) return true;
     return checkCellType(ivec2(i-1, j)) == SOLID ||
-           checkCellType(ivec2(i,   j)) == SOLID;
+           checkCellType(ivec2(i,   j)) == SOLID || (checkCellType(ivec2(i-1, j))==AIR && checkCellType(ivec2(i,   j)) == AIR);
 }
 
 bool vBlocked(int i, int j)
 {
     if(0 == j) return true;
     return checkCellType(ivec2(i, j-1)) == SOLID ||
-           checkCellType(ivec2(i, j  )) == SOLID;
+           checkCellType(ivec2(i, j  )) == SOLID || (checkCellType(ivec2(i, j-1))==AIR && checkCellType(ivec2(i,   j)) == AIR);
 }
 
 void particlesToFacesU(vec2 position, vec2 velocity, mat2 Cp)
@@ -81,12 +82,14 @@ void particlesToFacesU(vec2 position, vec2 velocity, mat2 Cp)
     vec2 distance = vec2(0.0);
     vec2 velocityPosition = vec2(0.0);
 
+
+    float alpha = clamp(picFlipAlpha, 0.0, 1.0);
     if(!uBlocked(i0,j0))
     {
         float sumW = w00 * w10;
         velocityPosition = vec2(i0*dx, j0*dx + 0.5*dx);
         distance = velocityPosition - position;
-        vec2 computed = velocity + Cp * dx*dx/4.0* distance;
+        vec2 computed = velocity + alpha*Cp * dx*dx/4.0* distance;
         atomicAdd(velocitiesU[j0*(Nx()+1)+i0], sumW*computed.x);
         atomicAdd(weightsU[j0*(Nx()+1)+i0], sumW);
     }
@@ -95,7 +98,7 @@ void particlesToFacesU(vec2 position, vec2 velocity, mat2 Cp)
         float sumW = w00 * w11;
         velocityPosition = vec2(i0*dx, j1*dx + 0.5*dx);
         distance = velocityPosition - position;
-        vec2 computed = velocity + Cp * dx*dx/4.0 * distance;
+        vec2 computed = velocity + alpha*Cp * dx*dx/4.0 * distance;
         atomicAdd(velocitiesU[j1*(Nx()+1)+i0], sumW*computed.x);
         atomicAdd(weightsU[j1*(Nx()+1)+i0], sumW);
     }
@@ -104,7 +107,7 @@ void particlesToFacesU(vec2 position, vec2 velocity, mat2 Cp)
         float sumW = w01 * w11;
         velocityPosition = vec2(i1*dx, j1*dx + 0.5*dx);
         distance = velocityPosition - position;
-        vec2 computed = velocity + Cp * dx*dx/4.0* distance;
+        vec2 computed = velocity + alpha*Cp * dx*dx/4.0* distance;
         atomicAdd(velocitiesU[j1*(Nx()+1)+i1], sumW*computed.x);
         atomicAdd(weightsU[j1*(Nx()+1)+i1], sumW);
     }
@@ -113,7 +116,7 @@ void particlesToFacesU(vec2 position, vec2 velocity, mat2 Cp)
         float sumW = w01 * w10;
         velocityPosition = vec2(i1*dx, j0*dx + 0.5*dx);
         distance = velocityPosition - position;
-        vec2 computed = velocity + Cp * dx*dx/4.0* distance;
+        vec2 computed = velocity + alpha*Cp * dx*dx/4.0* distance;
         atomicAdd(velocitiesU[j0*(Nx()+1)+i1], sumW*computed.x);
         atomicAdd(weightsU[j0*(Nx()+1)+i1], sumW);
     }
@@ -139,12 +142,13 @@ void particlesToFacesV(vec2 position, vec2 velocity, mat2 Cp)
     vec2 distance = vec2(0.0);
     vec2 velocityPosition = vec2(0.0);
 
+    float alpha = clamp(picFlipAlpha, 0.0, 1.0);
     if(!vBlocked(i0,j0))
     {
         float sumW = w00 * w10;
         velocityPosition = vec2(i0*dx + 0.5*dx, j0*dx);
         distance = velocityPosition - position;
-        vec2 computed = velocity + Cp* dx*dx/4.0 * distance;
+        vec2 computed = velocity + alpha*Cp* dx*dx/4.0 * distance;
         atomicAdd(velocitiesV[j0*(Nx())+i0], sumW*computed.y);
         atomicAdd(weightsV[j0*(Nx())+i0], sumW);
     }
@@ -153,7 +157,7 @@ void particlesToFacesV(vec2 position, vec2 velocity, mat2 Cp)
         float sumW = w00 * w11;
         velocityPosition = vec2(i0*dx + 0.5*dx, j1*dx);
         distance = velocityPosition - position;
-        vec2 computed = velocity + Cp* dx*dx/4.0 * distance;
+        vec2 computed = velocity + alpha*Cp* dx*dx/4.0 * distance;
         atomicAdd(velocitiesV[j1*(Nx())+i0], sumW*computed.y);
         atomicAdd(weightsV[j1*(Nx())+i0], sumW);
     }
@@ -162,7 +166,7 @@ void particlesToFacesV(vec2 position, vec2 velocity, mat2 Cp)
         float sumW = w01 * w11;
         velocityPosition = vec2(i1*dx + 0.5*dx, j1*dx);
         distance = velocityPosition - position;
-        vec2 computed = velocity + Cp* dx*dx/4.0 * distance;
+        vec2 computed = velocity + alpha*Cp* dx*dx/4.0 * distance;
         atomicAdd(velocitiesV[j1*(Nx())+i1], sumW*computed.y);
         atomicAdd(weightsV[j1*(Nx())+i1], sumW);
     }
@@ -171,7 +175,7 @@ void particlesToFacesV(vec2 position, vec2 velocity, mat2 Cp)
         float sumW = w01 * w10;
         velocityPosition = vec2(i1*dx + 0.5*dx, j0*dx);
         distance = velocityPosition - position;
-        vec2 computed = velocity + Cp* dx*dx/4.0 * distance;
+        vec2 computed = velocity + alpha*Cp* dx*dx/4.0 * distance;
         atomicAdd(velocitiesV[j0*(Nx())+i1], sumW*computed.y);
         atomicAdd(weightsV[j0*(Nx())+i1], sumW);
     }

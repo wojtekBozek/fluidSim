@@ -22,7 +22,7 @@ void main() {
         if(isFluid == 0)
             FragColor = vec4(color, 1.0);
         else
-            FragColor = vec4(0.0, 0.0, 0.0, 0.0);
+            FragColor = vec4(0.00, 0.00, 0.00, 0.1);
     }
     else
         FragColor = vec4(0.0,0.0,0.0,1.0);

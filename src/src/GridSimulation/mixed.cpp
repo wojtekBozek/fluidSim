@@ -57,6 +57,7 @@ void ParticleInCell2D::run()
         m_transferVelocityToGridShader->setUint("numOfParticles", m_numOfParticles);
         m_transferVelocityToGridShader->setFloat("dt", dt);
         m_transferVelocityToGridShader->setFloat("dx", dx);
+        m_transferVelocityToGridShader->setFloat("picFlipAlpha", picFlipRatio);
         glDispatchCompute((m_numOfParticles + 255) / 256, 1, 1);
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT | GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 

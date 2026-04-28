@@ -48,6 +48,7 @@ uint hash(ivec3 cell) {
 uniform uint tableSize;
 uniform uint numOfParticles;
 uniform float sphKernelRadius;
+uniform float particleRadius;
 uniform uint DIMENSION;
 uniform vec3 externalAccelerations;
 
@@ -69,7 +70,6 @@ const uint DIMENSION_3 = 2u;
 
 const uint BOUNDARY_SOLID = 0u;
 const uint BOUNDARY_PARTICLES = 1u;
-const float eps = 0.000001;
 
 float getAlfa(float kernelRadius, uint dimension)
 {
@@ -151,12 +151,11 @@ void main()
                             }
                             else if(borderPolicy == BOUNDARY_PARTICLES)// boundary
                             {
-                                //temp += particle.mass * otherParticle.mass * fluid.fluidDensity * localPBD2 * kernelGradient;
                                 otherParticle.pressure = particle.pressure;
                                 otherParticle.density = fluid.fluidDensity;
                                 temp += otherParticle.mass *(localPBD2+PressureByDensity2(otherParticle))* kernelGradient;
-//
-                                particle.velocity.xyz += epsilon * otherParticle.mass / otherParticle.density *(otherParticle.velocity.xyz - particle.velocity.xyz) * kernel;
+                                
+                                particle.velocity.xyz += epsilon*otherParticle.mass/fluid.fluidDensity*(otherParticle.velocity.xyz-particle.velocity.xyz)*kernel;
                             }
                         }
                         //if(nextNode[currentParticle]!=-1)
@@ -199,9 +198,9 @@ float CubicSplineKernel(float kernelRadius, float distance, float alfa)
 
 vec3 KernelGradient(float kernelRadius, vec3 distanceVector, float alfa)
 {
-    const float r = length(distanceVector);
-    if (r < eps) return vec3(0.0);
-
+    float r = length(distanceVector);
+    if (r < particleRadius*0.1) r = particleRadius*0.1;
+    
     const float q = r / kernelRadius;
     float grad_q = 0.0;
 

@@ -21,6 +21,24 @@ const uint SOLID = 2u;
 float P(int i, int j) {return texelFetch(pressureIn, ivec2(i, j), 0).r;}
 uint typeAt(int i, int j){if(i<0 || i>= gridSize.x || j <0 || j>= gridSize.y) return SOLID; return texelFetch(cellType, ivec2(i, j), 0).r;}
 
+float PoissonEquation(int i, int j)
+{
+    float sum = 0.0;
+    int count = 0;
+//
+    // Left
+    if (typeAt(i-1,j) == FLUID) { sum += P(i-1,j); count++; } else if(typeAt(i-1,j) == AIR) { sum += 0.0; count++; }  
+    // Right////
+    if (typeAt(i+1,j) == FLUID) { sum += P(i+1,j); count++; } else if(typeAt(i+1,j) == AIR) { sum += 0.0; count++; }  
+    // Bottom////
+    if (typeAt(i,j-1) == FLUID) { sum += P(i,j-1); count++; } else if(typeAt(i,j-1) == AIR) { sum += 0.0; count++; }  
+    // Top////
+    if (typeAt(i,j+1) == FLUID) { sum += P(i,j+1); count++; } else if(typeAt(i,j+1) == AIR) { sum += 0.0; count++; }  
+    float div = texelFetch(divergence, ivec2(i,j), 0).r;
+    // Free-surface Poisson update
+   return (sum - dens*dx*div/dt) / (float(max(count,1)));
+}
+
 void main()
 {
     ivec2 id = ivec2(gl_GlobalInvocationID.xy);
@@ -33,22 +51,9 @@ void main()
 
     if(typeAt(i,j) != FLUID) {imageStore(pressureOut, id, vec4(0.0)); return;}
 
-    float sum = 0.0;
-    int count = 0;
-//
-    // Left
-    if (typeAt(i-1,j) == FLUID) { sum += P(i-1,j); count++; } else if(typeAt(i-1,j) == AIR) { sum += 0.0; count++; }  
-    // Right////
-    if (typeAt(i+1,j) == FLUID) { sum += P(i+1,j); count++; } else if(typeAt(i+1,j) == AIR) { sum += 0.0; count++; }  
-    // Bottom////
-    if (typeAt(i,j-1) == FLUID) { sum += P(i,j-1); count++; } else if(typeAt(i,j-1) == AIR) { sum += 0.0; count++; }  
-    // Top////
-    if (typeAt(i,j+1) == FLUID) { sum += P(i,j+1); count++; } else if(typeAt(i,j+1) == AIR) { sum += 0.0; count++; }  
-    float div = texelFetch(divergence, id, 0).r;
-    // Free-surface Poisson update
-    float newPressure = (sum - dens*dx*div/dt) / (float(max(count,1)));
+    float newPressure = PoissonEquation(i,j);
     float oldPressure = P(i,j);
-    newPressure = oldPressure+(newPressure-oldPressure);
+    newPressure = oldPressure+overrelaxation*(newPressure-oldPressure);
 
     imageStore(pressureOut, id, vec4(newPressure));
 }

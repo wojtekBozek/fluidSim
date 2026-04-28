@@ -103,21 +103,28 @@ public:
 
     const Fluid& getFluid() const{ return m_fluid; }
     void setFluidDensity(float density) { m_fluid.fluidDensity = density; }
+    void setSmothingEpsilon(float epsilon) { m_smooothingEpsilon = epsilon; }
     void setFluidStiffnessKCoefficient(float k) { m_fluid.stiffnesK = k; }
     void setFluidStiffnessYCoefficient(float y) { m_fluid.stiffnesY = y; }
 
     uint32_t getNumOfParticles() const { return m_numOfParticles; }
+    uint32_t getNumOfFluidParticles() const { return m_numOfParticles-numOfBoundaryParticles; }
+    uint32_t getNumOfBoundaryParticles() const { return numOfBoundaryParticles; }
 
     const std::vector<FluidParticle>& getParticles() const { return m_particles; }
 
     float getParticleRadius() const {return m_particleRadius;}
     void setParticleRadius(float radius) { m_particleRadius = radius; }
 
+    float getRadiusCoef() const {return m_kernelCof;}
+    void setRadiusCoef(float radius) { m_kernelCof = radius; }
+
     float getKernelRadius() const { return m_kernelRadius; }
     void setKernelRadius(float radius) { m_kernelRadius = radius; }
 
     void simulationStep(float timeStep);
     float getSimulationStep() const { return m_timeStep; }
+    float getSmoothingEpsilon() const { return m_smooothingEpsilon; }
     void setSimulationStep(float timeStep) { m_timeStep = timeStep; }
 
     const Domain& getSimulationDomain() const { return m_simulationDomain; }
@@ -180,11 +187,13 @@ private:
     std::vector<FluidParticle> m_boundaryParticles;
     GLuint hashCoef = 1;
     uint32_t m_numOfParticles = 0;
+    uint32_t numOfBoundaryParticles = 0;
     float m_timeStep = 0.001f;
     float m_particleRadius = 0.05f;
     float m_kernelCof = 2.5;
     float m_boundCof = 1.0;
     float m_kernelRadius = 0.2f;
+    float m_smooothingEpsilon = 0.1f;
     bool m_partBufferCreated = false;
     GLuint m_particleBufferSize = 0;
     GLuint64 m_computeTime = 0;

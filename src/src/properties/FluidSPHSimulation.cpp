@@ -84,7 +84,7 @@ void FluidSPHSimulation::setFluidAndParticles()
     initialParticle.mass = (m_fluid.fluidDensity * m_fluid.volume) /static_cast<float>(m_numOfParticles); // masa cząstki
     std::cout << "Num of particles: " << m_numOfParticles << "\n";
     std::cout << m_particleRadius << ", " << initialParticle.mass << " - particle radius, mass\n";
-    initialParticle.position = glm::vec4(m_initialDomain.position + glm::vec3(m_kernelRadius), 1.0f);
+    initialParticle.position = glm::vec4(m_initialDomain.position + glm::vec3(m_kernelRadius+0.1*m_particleRadius), 1.0f);
     
     if (SimDim::DIMENSION_2 == m_dimension)
     {
@@ -100,7 +100,7 @@ void FluidSPHSimulation::setFluidAndParticles()
     uint32_t boundaryXmax = m_simulationDomain.size.x/(particleDiameter);
     uint32_t boundaryYmax = m_simulationDomain.size.y/(particleDiameter);
     uint32_t boundaryZmax = m_simulationDomain.size.z/(particleDiameter);
-    uint32_t numOfBoundaryParticles = 2*boundaryXmax + 2*boundaryYmax;
+    numOfBoundaryParticles = 2*boundaryXmax + 2*boundaryYmax;
     
     m_numOfParticles = xMax*yMax;
     if (m_dimension == SimDim::DIMENSION_3)
@@ -117,7 +117,7 @@ void FluidSPHSimulation::setFluidAndParticles()
     for(int i=0; i<m_numOfParticles; ++i)
     {
         FluidParticle part = initialParticle;
-        part.position += glm::vec4(glm::vec3(a*particleDiameter, b*particleDiameter, c*particleDiameter),0.0f);
+        part.position += glm::vec4(glm::vec3(a*(particleDiameter+0.1*m_particleRadius), b*(particleDiameter+0.1*m_particleRadius), c*(particleDiameter+0.1*m_particleRadius)),0.0f);
         m_particles.push_back(part);
         if(a < xMax)
         {
@@ -160,7 +160,7 @@ void FluidSPHSimulation::setFluidAndParticles()
             {
                 if (i <= 0 || i >= boundaryXmax || j <= 0 || j >= boundaryYmax)
                 {
-                    initialParticle.position = glm::vec4(m_simulationDomain.position + glm::vec3(i * particleDiameter, j * particleDiameter, 0.0), 1.0);
+                    initialParticle.position = glm::vec4(m_simulationDomain.position + glm::vec3(i * (particleDiameter + 0.00001), j * (particleDiameter + 0.00001), 0.0), 1.0);
                     boundaryParticles.push_back(initialParticle);
                 }
             }
@@ -177,7 +177,7 @@ void FluidSPHSimulation::setFluidAndParticles()
                 for (int z = -depth; z <= int(boundaryZmax)+depth; z++)
                     if (i <= 0 || i >= boundaryXmax  || j <= 0 || j >= boundaryYmax  || z <= 0 || z >= boundaryZmax)
                     {
-                        initialParticle.position =  glm::vec4(m_simulationDomain.position + glm::vec3(i * particleDiameter, j * particleDiameter, z * particleDiameter), 1.0);
+                        initialParticle.position =  glm::vec4(m_simulationDomain.position + glm::vec3(i * (particleDiameter + 0.00001), j * (particleDiameter + 0.00001), z * (particleDiameter + 0.00001)), 1.0);
                         boundaryParticles.push_back(initialParticle);
                     }
             }
@@ -186,6 +186,7 @@ void FluidSPHSimulation::setFluidAndParticles()
     GLuint ssbo;
     glGenBuffers(1, &ssbo);
     GLuint bufsize = boundaryParticles.size() * sizeof(FluidParticle);
+    numOfBoundaryParticles = boundaryParticles.size();
 
     m_particles.insert(m_particles.end(), std::make_move_iterator(boundaryParticles.begin()), std::make_move_iterator(boundaryParticles.end()));
     m_numOfParticles = m_particles.size();
@@ -250,6 +251,7 @@ void FluidSPHSimulation::setMemoryLayout()
     m_accelerationComputeShader->useProgram();
     m_accelerationComputeShader->setUint("numOfParticles", m_numOfParticles);
     m_accelerationComputeShader->setFloat("sphKernelRadius", m_kernelRadius);
+    m_accelerationComputeShader->setFloat("particleRadius", m_particleRadius);
     m_accelerationComputeShader->setUint("DIMENSION", m_dimension);
     m_accelerationComputeShader->setVec3("externalAccelerations", { 0.0f,-9.8f,0.0f });
     m_accelerationComputeShader->setVec3("domainRefPos", m_simulationDomain.position);
@@ -258,8 +260,8 @@ void FluidSPHSimulation::setMemoryLayout()
     m_accelerationComputeShader->setUint("tableSize", hashCoef * m_numOfParticles);
     m_accelerationComputeShader->setFloat("cellSize", 2.0 * m_kernelRadius);
     m_accelerationComputeShader->setFloat("wallStiffness", 10000.0);
-    m_accelerationComputeShader->setFloat("epsilon", 0.1f);
-    m_accelerationComputeShader->setFloat("epsilonBoundary", 0.15f);
+    m_accelerationComputeShader->setFloat("epsilon", m_smooothingEpsilon);
+    m_accelerationComputeShader->setFloat("epsilonBoundary", m_smooothingEpsilon);
     m_accelerationComputeShader->setUint("borderPolicy", m_borderPolicy);
 
     //m_smoothingComputeShader->useProgram();
