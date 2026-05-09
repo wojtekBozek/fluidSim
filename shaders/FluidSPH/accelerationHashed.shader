@@ -199,7 +199,7 @@ float CubicSplineKernel(float kernelRadius, float distance, float alfa)
 vec3 KernelGradient(float kernelRadius, vec3 distanceVector, float alfa)
 {
     float r = length(distanceVector);
-    if (r < particleRadius*0.1) r = particleRadius*0.1;
+    if (r < 0.00000001) return vec3(0.0,0.0,0.0);//r = particleRadius;
     
     const float q = r / kernelRadius;
     float grad_q = 0.0;

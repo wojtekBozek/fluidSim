@@ -84,7 +84,7 @@ void FluidSPHSimulation::setFluidAndParticles()
     initialParticle.mass = (m_fluid.fluidDensity * m_fluid.volume) /static_cast<float>(m_numOfParticles); // masa cząstki
     std::cout << "Num of particles: " << m_numOfParticles << "\n";
     std::cout << m_particleRadius << ", " << initialParticle.mass << " - particle radius, mass\n";
-    initialParticle.position = glm::vec4(m_initialDomain.position + glm::vec3(m_kernelRadius+0.1*m_particleRadius), 1.0f);
+    initialParticle.position = glm::vec4(m_initialDomain.position + glm::vec3(particleDiameter), 1.0f);
     
     if (SimDim::DIMENSION_2 == m_dimension)
     {
@@ -117,7 +117,7 @@ void FluidSPHSimulation::setFluidAndParticles()
     for(int i=0; i<m_numOfParticles; ++i)
     {
         FluidParticle part = initialParticle;
-        part.position += glm::vec4(glm::vec3(a*(particleDiameter+0.1*m_particleRadius), b*(particleDiameter+0.1*m_particleRadius), c*(particleDiameter+0.1*m_particleRadius)),0.0f);
+        part.position += glm::vec4(glm::vec3(a*(particleDiameter), b*(particleDiameter), c*(particleDiameter)),0.0f);
         m_particles.push_back(part);
         if(a < xMax)
         {
@@ -160,7 +160,7 @@ void FluidSPHSimulation::setFluidAndParticles()
             {
                 if (i <= 0 || i >= boundaryXmax || j <= 0 || j >= boundaryYmax)
                 {
-                    initialParticle.position = glm::vec4(m_simulationDomain.position + glm::vec3(i * (particleDiameter + 0.00001), j * (particleDiameter + 0.00001), 0.0), 1.0);
+                    initialParticle.position = glm::vec4(m_simulationDomain.position + glm::vec3(i * (particleDiameter), j * (particleDiameter), 0.0), 1.0);
                     boundaryParticles.push_back(initialParticle);
                 }
             }
@@ -177,7 +177,7 @@ void FluidSPHSimulation::setFluidAndParticles()
                 for (int z = -depth; z <= int(boundaryZmax)+depth; z++)
                     if (i <= 0 || i >= boundaryXmax  || j <= 0 || j >= boundaryYmax  || z <= 0 || z >= boundaryZmax)
                     {
-                        initialParticle.position =  glm::vec4(m_simulationDomain.position + glm::vec3(i * (particleDiameter + 0.00001), j * (particleDiameter + 0.00001), z * (particleDiameter + 0.00001)), 1.0);
+                        initialParticle.position =  glm::vec4(m_simulationDomain.position + glm::vec3(i * (particleDiameter), j * (particleDiameter), z * (particleDiameter)), 1.0);
                         boundaryParticles.push_back(initialParticle);
                     }
             }

@@ -46,8 +46,8 @@ struct Fluid
 {
     float fluidDensity = 1000; // kg
     float volume = 10.0f; // m^3
-    float stiffnesK = 3.5f;  
-    float stiffnesY= 5.0f;
+    float stiffnesK = 3500.0f;  
+    float stiffnesY= 7.0f;
 };
 
 
@@ -168,8 +168,8 @@ private:
     GLuint m_nextNodeBuf;
 
     uint64_t m_computationStep = 0;
-    int m_boundaryDepth = 3;
-    GLuint m_dimension = SimDim::DIMENSION_3;
+    int m_boundaryDepth = 1;
+    GLuint m_dimension = SimDim::DIMENSION_2;
 
     BorderPolicy m_borderPolicy = BorderPolicy::BOUNDARY_SOLID;
     std::vector<GLint> m_hashValues;
@@ -188,12 +188,12 @@ private:
     GLuint hashCoef = 1;
     uint32_t m_numOfParticles = 0;
     uint32_t numOfBoundaryParticles = 0;
-    float m_timeStep = 0.001f;
+    float m_timeStep = 0.0001f;
     float m_particleRadius = 0.05f;
-    float m_kernelCof = 2.5;
+    float m_kernelCof = 1.5;
     float m_boundCof = 1.0;
     float m_kernelRadius = 0.2f;
-    float m_smooothingEpsilon = 0.1f;
+    float m_smooothingEpsilon = 0.05f;
     bool m_partBufferCreated = false;
     GLuint m_particleBufferSize = 0;
     GLuint64 m_computeTime = 0;

@@ -55,7 +55,7 @@ void MyApp::setupResources()
 {
     programState = std::make_shared<ProgramState>(ProgramState::MAIN_MENU);
 
-    rendering::CameraHandler::addActiveCamera(std::make_shared<rendering::PerspectiveCamera>(glm::vec3(0, 2, 25), glm::vec3(0, 1, 0),
+    rendering::CameraHandler::addActiveCamera(std::make_shared<rendering::PerspectiveCamera>(glm::vec3(10 , 10, 25), glm::vec3(0, 1, 0),
         float(WIDTH) / float(HEIGHT), 0.1f, 100.0f, window, 60.0f));
     rendering::CameraHandler::addCamera(std::make_shared<rendering::OrthographicCamera>(glm::vec3(0, 2, 5), glm::vec3(0, 1, 0),
     -5.1315f, 5.1315f,     // left, right

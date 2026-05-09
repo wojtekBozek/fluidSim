@@ -50,7 +50,7 @@ void SPHsimulationUI::fluidStiffKcoeffTextInput()
 {
 	float PrevValue = refSimulation->getFluid().stiffnesK;
 	uiValues.k = PrevValue;
-	ImGui::InputFloat("StiffnessK", &uiValues.k, 0.0001f, 10000.0f, "%.5f");
+	ImGui::InputFloat("StiffnessK", &uiValues.k, 0.0001f, 10000.0f, "%.2f");
 
 	if (uiValues.k != PrevValue)
 	{
@@ -62,7 +62,7 @@ void SPHsimulationUI::fluidStiffYcoeffTextInput()
 {
 	float PrevValue = refSimulation->getFluid().stiffnesY;
 	uiValues.y = PrevValue;
-	ImGui::InputFloat("StiffnessY", &uiValues.y, 1.0f, 15.0f, "%.3f");
+	ImGui::InputFloat("StiffnessY", &uiValues.y, 1.0f, 15.0f, "%.2f");
 
 	if (uiValues.y != PrevValue)
 	{
@@ -282,7 +282,7 @@ void SPHsimulationUI::timeStepInput()
 {
 	float PrevValue = refSimulation->getSimulationStep();
 	uiValues.timeStep = PrevValue;
-	ImGui::InputFloat("TimeStep", &uiValues.timeStep, 0.0001f, 0.1f, "%.4f");
+	ImGui::InputFloat("TimeStep", &uiValues.timeStep, 0.0001f, 0.1f, "%.6f");
 
 	if (uiValues.timeStep != PrevValue)
 	{
