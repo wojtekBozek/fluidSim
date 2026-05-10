@@ -8,9 +8,6 @@ uniform ivec2 gridSize;
 uniform vec2 gridMin;
 uniform vec2 gridMax;
 uniform uint numOfParticles;
-//struct Particle {
-//    vec2 position;
-//};
 
 layout(std430, binding = 1) buffer Particles {
     vec2 particles[];

@@ -79,9 +79,6 @@ public:
         m_movementComputeShader = std::make_unique<ShaderProgram>();
         m_movementComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/movement.shader");
         m_movementComputeShader->linkProgram();
-        //m_smoothingComputeShader = std::make_unique<ShaderProgram>();
-        //m_smoothingComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/smoothingHashed.shader");
-        //m_smoothingComputeShader->linkProgram();
         m_accelerationComputeShader = std::make_unique<ShaderProgram>();
         m_accelerationComputeShader->addShader(GL_COMPUTE_SHADER, "shaders/FluidSPH/accelerationHashed.shader");
         m_accelerationComputeShader->linkProgram();
@@ -140,12 +137,10 @@ public:
         if (m_dimension == SimDim::DIMENSION_3)
         {
             m_fluid.volume = m_initialDomain.size.x * m_initialDomain.size.y * m_initialDomain.size.z;
-            //m_numOfParticles = m_fluid.volume / (1.33 * std::pow(m_particleRadius, 3) * M_PI);
         }
         else if (m_dimension == SimDim::DIMENSION_2)
         {
-            m_fluid.volume = m_initialDomain.size.x * m_initialDomain.size.y*m_particleRadius * m_particleRadius*2;// *m_initialDomain.size.z;
-            //m_numOfParticles = m_fluid.volume / (std::pow(m_particleRadius, 2) * M_PI);
+            m_fluid.volume = m_initialDomain.size.x * m_initialDomain.size.y*m_particleRadius * m_particleRadius*2;
         }
     }
     void setFluidDomainPosition(glm::vec3 position) { m_initialDomain.position = position; }
@@ -179,7 +174,6 @@ private:
     std::unique_ptr<ShaderProgram> m_movementComputeShader;
     std::unique_ptr<ShaderProgram> m_accelerationComputeShader;
     std::unique_ptr<ShaderProgram> m_pressureNdensityComputeShader;
-    //std::unique_ptr<ShaderProgram> m_smoothingComputeShader;
     std::unique_ptr<ShaderProgram> m_boundaryParticleMassComputeShader;
     Domain m_simulationDomain, m_initialDomain;
     Fluid m_fluid, refFluid;

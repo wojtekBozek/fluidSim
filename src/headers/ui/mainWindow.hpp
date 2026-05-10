@@ -19,7 +19,5 @@ private:
     
     void chooseMixedSimButton();
     void exitButton();
-    //std::shared_ptr<ProgramState> m_state;
-    //GLFWwindow *m_window;
     MainMenuState m_menuState;
 };

@@ -8,7 +8,6 @@ class Object {
 		Object(std::shared_ptr<Mesh> mesh_ptr_)
 		{
 			mesh_ptr = mesh_ptr_;
-			//std::cout << mesh_ptr.get() << " object Mesh ptr\n";
 			setDefault();
 			instance_id = mesh_ptr->addNewInstance(translation * rotation * scaling);
 		}

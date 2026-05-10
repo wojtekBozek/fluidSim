@@ -7,7 +7,6 @@
 class MixedSimulationUI : public BaseUI
 {
 public:
-	//SPHsimulationUI() = default;
 	MixedSimulationUI(std::shared_ptr<ContextState> context, std::shared_ptr<MixedRenderer> renderer, std::shared_ptr<ParticleInCell2D> simulation, GLFWwindow* window, std::shared_ptr<ProgramState> state) : BaseUI(window, state)
 	{
 		refContext = context;

@@ -24,5 +24,5 @@ void main() {
     vec4 pos = vec4(worldPos + offset, 1.0);
 
     gl_Position = viewProj * pos;
-    vertColor = vec4(1.0, 0.3, 0.3, 1.0); // fixed red-ish color
+    vertColor = vec4(1.0, 0.3, 0.3, 1.0);
 }

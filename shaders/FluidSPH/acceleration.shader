@@ -7,15 +7,15 @@ struct FluidParticle{
     float pressure;
     float density;
     float mass;
-    float pad0;
+    float type;
 };
 
 struct Fluid
 {
     float fluidDensity; // kg
     float volume; // m^3
-    float soundSpeed;// nazewnictwo luźno powiązane z prędkością dźwięku 
-    float pad0;
+    float stiffnessK;
+    float stiffnessY;
 };
 
 layout(std430, binding = 0) buffer PartBuffer {
@@ -35,7 +35,6 @@ uniform vec3 domainRefPos;
 uniform vec3 domainDimennsions;
 uniform float boundaryMaxDist;
 
-//uniform float timeStep;
 uniform uint toonerP;
 uniform float stiffnessK = 100.0;//n/m
 

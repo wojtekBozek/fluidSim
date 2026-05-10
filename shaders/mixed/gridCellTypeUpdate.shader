@@ -30,7 +30,6 @@ void main()
     vec2 pos = particles[id].position;
 
     vec2 uv = (pos - gridMin) / (gridMax - gridMin);
-    //ivec2 cell = ivec2(uv * vec2(gridSize));
 
     ivec2 cell = clamp(
         ivec2(floor(uv * vec2(gridSize))),
