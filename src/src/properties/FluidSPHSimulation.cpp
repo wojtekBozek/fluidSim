@@ -80,7 +80,7 @@ void FluidSPHSimulation::setFluidAndParticles()
 {    
     m_particles.clear();
     FluidParticle initialParticle;
-    float particleDiameter = m_particleRadius *2.0f;
+    float particleDiameter = m_particleRadius *1.95f;
     initialParticle.mass = (m_fluid.fluidDensity * m_fluid.volume) /static_cast<float>(m_numOfParticles); // masa cząstki
     std::cout << "Num of particles: " << m_numOfParticles << "\n";
     std::cout << m_particleRadius << ", " << initialParticle.mass << " - particle radius, mass\n";

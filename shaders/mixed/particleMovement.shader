@@ -357,15 +357,15 @@ Particle computeAPIC_N_PIC(vec2 position)
     float alpha = clamp(picFlipAlpha, 0.0, 1.0);
     mat2 Cp = B*4.0/(dx*dx);
     velocity = alpha*velocity + (1.0-alpha)*picVelocity;
-    vec2 newPosition = position + velocity*dt;
-    ivec2 newCell = ivec2(newPosition.x/dx, newPosition.y/dx);
-    if(newCell.x < 0 || newCell.x >= gridSize.x 
-        || newCell.y < 0 || newCell.y >= gridSize.y 
-        ||texelFetch(cellType, newCell, 0).r == SOLID)
-    {
-        newPosition = position;
-    }
-    //vec2 newPosition = forwardRK2Position(position, velocity);
+    //vec2 newPosition = position + velocity*dt;
+    //ivec2 newCell = ivec2(newPosition.x/dx, newPosition.y/dx);
+    //if(newCell.x < 0 || newCell.x >= gridSize.x 
+    //    || newCell.y < 0 || newCell.y >= gridSize.y 
+    //    ||texelFetch(cellType, newCell, 0).r == SOLID)
+    //{
+    //    newPosition = position;
+    //}
+    vec2 newPosition = forwardRK2Position(position, velocity);
     return Particle(newPosition, velocity, Cp);
 }
 
