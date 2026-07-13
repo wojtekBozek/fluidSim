@@ -80,11 +80,9 @@ void Grid2D::JacobiSolver()
     m_divergenceShader->setIVec2("gridSize", glm::ivec2(nx,ny));
     m_divergenceShader->setFloat("dt", dt);
     m_divergenceShader->setFloat("dx", dx);
-    m_divergenceShader->setFloat("overrelaxation", 1.9f);
     
     glDispatchCompute((nx+15) / 16, (ny+15) / 16, 1);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-    
 }
 
 void Grid2D::GaussSiedelSolver()
