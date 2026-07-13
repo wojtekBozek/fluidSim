@@ -401,24 +401,12 @@ glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BI
     m_addForcesShader->setFloat("dt", dt);
     glm::ivec3 size = glm::ivec3(nx,ny,nz);
     m_addForcesShader->setIVec3("gridSize", size);
-    std::cout << size.x << " " << size.y << " " << size.z << "\n";
     glBindImageTexture(0, uInTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32F);    
     glBindImageTexture(1, vInTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32F);    
     glBindImageTexture(2, wInTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32F);    
     glDispatchCompute((nx + 1 + 7) / 8, (ny +1 + 7) / 8, (nz + 1 + 7) / 8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
-    std::vector<float> data(nx * (ny + 1) * nz);
-
-glGetTextureImage(
-    vInTex,
-    0,
-    GL_RED,
-    GL_FLOAT,
-    data.size() * sizeof(float),
-    data.data());
-
-std::cout << data[0] << '\n';
     /*
     m_extrapolateUVelocityShader->useProgram();
     glActiveTexture(GL_TEXTURE1);
