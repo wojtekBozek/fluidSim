@@ -68,6 +68,8 @@ public:
 	uint32_t getBorderSize() {return borderSize;}
 	float getTimeStep() {return dt;}
 	uint32_t getPSolverIterations() {return pressureIterations;}
+	glm::vec3 getExternalForces() const{return externalForces;}
+	void setExternalForces(glm::vec3 forces){externalForces = forces;}
 
 	const std::vector<glm::vec4>& getParticles() const;
 private:
@@ -93,6 +95,7 @@ private:
 	GLuint pressureInTex, pressureOutTex;
 	GLuint divergenceTex;
 	GLuint cellTypeTex;
+	glm::vec3 externalForces{0.0f,-9.81f,0.0f};
 	std::vector<glm::vec4> particles;
 	bool zeroPressure = false;
 	GLuint m_particleBuffer;

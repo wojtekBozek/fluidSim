@@ -24,6 +24,7 @@ private:
 	void setCellSize();
 	void setBorderSize();
 
+	void setAccelerations();
 	
 	void setDensity();
 	void setSolver();

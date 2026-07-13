@@ -20,6 +20,7 @@ void Grid3dSimulationUI::showUI()
 	visualShader();
 	particleShader();
 	setDensity();
+	setAccelerations();
 
 	setOverrelaxation();
 	setPressurePolicy();
@@ -149,6 +150,15 @@ void Grid3dSimulationUI::setBorderSize()
 	{
 		refSimulation->setBorderSize(size);
 	}
+}
+
+void Grid3dSimulationUI::setAccelerations()
+{
+	glm::vec3 acc = refSimulation->getExternalForces();
+
+	float data[3] = {acc.x,acc.y,acc.z};
+	ImGui::InputFloat3("External accelerations", data,"%.2f");
+	refSimulation->setExternalForces({data[0],data[1],data[2]});
 }
 
 void Grid3dSimulationUI::setDensity()

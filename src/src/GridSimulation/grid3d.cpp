@@ -395,15 +395,17 @@ glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BI
     */
     
     m_addForcesShader->useProgram();    
-    glActiveTexture(GL_TEXTURE1);
+    glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_3D, cellTypeTex);
-    m_addForcesShader->setFloat("vAccelerations", -9.8f);
+    m_addForcesShader->setVec3("accelerations", externalForces);
     m_addForcesShader->setFloat("dt", dt);
     glm::ivec3 size = glm::ivec3(nx,ny,nz);
     m_addForcesShader->setIVec3("gridSize", size);
     std::cout << size.x << " " << size.y << " " << size.z << "\n";
-    glBindImageTexture(0, vInTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32F);    
-    glDispatchCompute((nx + 7) / 8, ((ny+1)+7) / 8, (nz+7) / 8);
+    glBindImageTexture(0, uInTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32F);    
+    glBindImageTexture(1, vInTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32F);    
+    glBindImageTexture(2, wInTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32F);    
+    glDispatchCompute((nx + 1 + 7) / 8, (ny +1 + 7) / 8, (nz + 1 + 7) / 8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     std::vector<float> data(nx * (ny + 1) * nz);
@@ -647,7 +649,6 @@ void Grid3D::initilizeGrid()
                                                         randY/float(cbr) * dx + y * dx + 0.1*dx, 
                                                         randZ/float(cbr) * dx + z * dx+0.1*dx, 
                                                         1.0));
-                        //std::cout << particles.back().x<<"/" << particles.back().y << "/"<< particles.back().z << "\n";
                     }
                 }
                 else
@@ -657,15 +658,7 @@ void Grid3D::initilizeGrid()
             }
         }
     }
-    //particles.clear();
-    //std::cout << "Num of Particles: " << particles.size() << ".\n";
-    //std::cout << sizeof(glm::vec4) << "\n";
-    //particles.push_back({5.0,1.0,1.0,1.0});
-    //particles.push_back({2.0,1.0,1.0,1.0});
-    //particles.push_back({3.0,1.0,1.0,1.0});
-    //particles.push_back({4.0,1.0,1.0,1.0});
     GLuint bufsize = particles.size() * sizeof(glm::vec4);
-    //static_assert(sizeof(glm::vec4) == 12, "glm::vec3 is padded!");
     std::cout <<particles.size() << "\n";
     std::cout << bufsize << "\n";
     

@@ -357,7 +357,7 @@ void main()
     if(id >= numOfParticles) return;
 
     vec3 position = particles[id];
-    vec3 velocity = vec3(0.0, sampleV(position), 0.0);//vec3(sampleU(position), sampleV(position), sampleW(position));
+    vec3 velocity = vec3(sampleU(position), sampleV(position), sampleW(position));
     vec3 newPosition = position+velocity*dt;//forwardRK2Position(position, velocity);
     particles[id] = newPosition;
 }
