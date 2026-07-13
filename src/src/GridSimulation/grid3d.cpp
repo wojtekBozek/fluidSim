@@ -321,7 +321,7 @@ void Grid3D::run()
 
     glBeginQuery(GL_TIME_ELAPSED, query);
     //czyszczenie
-/*
+
 m_clearFluidShader->useProgram();
 glBindImageTexture(0, cellTypeTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32UI);
 glBindImageTexture(1, divergenceTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32F);
@@ -341,7 +341,7 @@ glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 1, m_particleBuffer);
 glDispatchCompute((particles.size() + 255) / 256, 1, 1);
 glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
-*/
+
    /*
    m_velocityUAdvectionShader->useProgram();
    glActiveTexture(GL_TEXTURE0);
