@@ -17,6 +17,8 @@ void MainWindow::showUI()
         chooseSPHSimButton();
         chooseGRIDSimButton(); 
         chooseMixedSimButton();
+        chooseGRID3dSimButton();
+        texture3DTestButton();
         exitButton();
         ImGui::End();
         ImGui::Render();
@@ -61,6 +63,14 @@ void MainWindow::textureTestButton()
     if (ImGui::Button("Texture Test"))
     {
         *m_state = ProgramState::TEXTURE_TEST;
+    }
+}
+
+void MainWindow::texture3DTestButton()
+{
+    if (ImGui::Button("3D Texture Test"))
+    {
+        *m_state = ProgramState::TEXTURE_TEST3D;
     }
 }
 

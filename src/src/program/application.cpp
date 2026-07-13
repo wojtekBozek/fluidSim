@@ -10,6 +10,7 @@
 #include "grid3dContext.hpp"
 #include "textureTest.hpp"
 #include "mixedContext.hpp"
+#include "texture3dTest.hpp"
 
 constexpr GLint WIDTH = 1200, HEIGHT = 900;
 constexpr int layoutPos = 0;
@@ -71,6 +72,7 @@ void MyApp::setupResources()
     contextMap[ProgramState::GRID_SIM_3D] = std::make_shared<Grid3DSimulationContext>(window, programState);
     contextMap[ProgramState::TEXTURE_TEST] = std::make_shared<TextureTestContext>(window, programState);
     contextMap[ProgramState::MIXED_SIM] = std::make_shared<MixedSimulationContext>(window, programState);
+    contextMap[ProgramState::TEXTURE_TEST3D] = std::make_shared<Texture3DTestContext>(window, programState);
     activeContext = contextMap[ProgramState::MAIN_MENU];
     lastProgramState = ProgramState::MAIN_MENU;
     activeContext->initContext();

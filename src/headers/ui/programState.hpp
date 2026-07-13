@@ -7,7 +7,8 @@ enum class ProgramState
     GRID_SIM,
     GRID_SIM_3D,
     MIXED_SIM,
-    TEXTURE_TEST
+    TEXTURE_TEST,
+    TEXTURE_TEST3D
 };
 
 enum class MainMenuState

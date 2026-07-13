@@ -15,6 +15,7 @@ private:
     void chooseSPHSimButton();
     void chooseGRIDSimButton();
     void textureTestButton();
+    void texture3DTestButton();
     void chooseGRID3dSimButton();
     
     void chooseMixedSimButton();

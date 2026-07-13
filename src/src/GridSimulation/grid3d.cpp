@@ -395,15 +395,28 @@ glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BI
     */
     
     m_addForcesShader->useProgram();    
-    glBindImageTexture(0, vInTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32F);
-    //glActiveTexture(GL_TEXTURE1);
-    //glBindTexture(GL_TEXTURE_3D, cellTypeTex);
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_3D, cellTypeTex);
     m_addForcesShader->setFloat("vAccelerations", -9.8f);
     m_addForcesShader->setFloat("dt", dt);
-    m_addForcesShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));    
-    glDispatchCompute((nx + 7) / 8, ((ny+1)+7) / 8, (nz+7)/8);
+    glm::ivec3 size = glm::ivec3(nx,ny,nz);
+    m_addForcesShader->setIVec3("gridSize", size);
+    std::cout << size.x << " " << size.y << " " << size.z << "\n";
+    glBindImageTexture(0, vInTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32F);    
+    glDispatchCompute((nx + 7) / 8, ((ny+1)+7) / 8, (nz+7) / 8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-    
+
+    std::vector<float> data(nx * (ny + 1) * nz);
+
+glGetTextureImage(
+    vInTex,
+    0,
+    GL_RED,
+    GL_FLOAT,
+    data.size() * sizeof(float),
+    data.data());
+
+std::cout << data[0] << '\n';
     /*
     m_extrapolateUVelocityShader->useProgram();
     glActiveTexture(GL_TEXTURE1);
@@ -507,7 +520,7 @@ glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BI
     m_particleAdvectionShader->useProgram();
     glBindTextureUnit(0, cellTypeTex);
     glBindTextureUnit(2, uInTex);
-    glBindTextureUnit(3, vOutTex);
+    glBindTextureUnit(3, vInTex);
     glBindTextureUnit(4, wInTex);
     m_particleAdvectionShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));    
     m_particleAdvectionShader->setUint("numOfParticles", particles.size());
@@ -618,7 +631,10 @@ void Grid3D::initilizeGrid()
                     type[idx] = AIR;
                     continue;
                 }
-                if ((x >= initFluidX && x < initFluidX + initFluidWidth) && (y >= initFluidY && y < initFluidY + initFluidHeight) && (z >= initFluidZ && z < initFluidZ + initFluidDepth))
+                if ((x >= initFluidX && x < initFluidX + initFluidWidth)
+                     && (y >= initFluidY && y < initFluidY + initFluidHeight) 
+                     && (z >= initFluidZ && z < initFluidZ + initFluidDepth)
+                    )
                 {
                     type[idx] = FLUID;
 
@@ -627,7 +643,10 @@ void Grid3D::initilizeGrid()
                         float randX = p%cbr;
                         float randY = (p/cbr)%cbr;
                         float randZ = p/(cbr*cbr);
-                        particles.push_back(glm::vec4(randX/float(cbr) * dx + x * dx + 0.1*dx, randY/float(cbr) * dx + y * dx + 0.1*dx, randZ/float(cbr) * dx + z * dx+0.1*dx, 1.0));
+                        particles.push_back(glm::vec4(randX/float(cbr) * dx + x * dx + 0.1*dx, 
+                                                        randY/float(cbr) * dx + y * dx + 0.1*dx, 
+                                                        randZ/float(cbr) * dx + z * dx+0.1*dx, 
+                                                        1.0));
                         //std::cout << particles.back().x<<"/" << particles.back().y << "/"<< particles.back().z << "\n";
                     }
                 }
@@ -670,12 +689,12 @@ void Grid3D::setTextures()
     std:: cout << "Uin\n";
     glGenTextures(1, &uInTex);
     glBindTexture(GL_TEXTURE_3D, uInTex);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx + 1, ny, nz);
     std::vector<GLfloat> zeros((nx + 1) * ny *nz, 0.0);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx+1, ny, nz, GL_RED, GL_FLOAT, zeros.data());
@@ -683,37 +702,37 @@ void Grid3D::setTextures()
     std:: cout << "Uout\n";
     glGenTextures(1, &uOutTex);
     glBindTexture(GL_TEXTURE_3D, uOutTex);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx + 1, ny, nz);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx + 1, ny, nz, GL_RED, GL_FLOAT, zeros.data());
 
     std:: cout << "Vin\n";
     glGenTextures(1, &vInTex);
     glBindTexture(GL_TEXTURE_3D, vInTex);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx, ny+1, nz);
-    zeros = std::vector<GLfloat>(nx * (ny + 1) *nz, 1.0);
+    zeros = std::vector<GLfloat>(nx * (ny + 1) *nz, 0.0);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx, ny + 1, nz, GL_RED, GL_FLOAT, zeros.data());
 
     std:: cout << "Vout\n";
     glGenTextures(1, &vOutTex);
     glBindTexture(GL_TEXTURE_3D, vOutTex);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx, ny+1, nz);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx, ny + 1, nz, GL_RED, GL_FLOAT, zeros.data());
 
@@ -721,12 +740,12 @@ void Grid3D::setTextures()
     std:: cout << "Win\n";
     glGenTextures(1, &wInTex);
     glBindTexture(GL_TEXTURE_3D, wInTex);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx, ny, nz+1);
     zeros = std::vector<GLfloat>(nx * ny * (nz+1), 0.0);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx, ny, nz+1, GL_RED, GL_FLOAT, zeros.data());
@@ -734,12 +753,12 @@ void Grid3D::setTextures()
     std:: cout << "Wout\n";
     glGenTextures(1, &wOutTex);
     glBindTexture(GL_TEXTURE_3D, wOutTex);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx, ny, nz+1);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx, ny, nz+1, GL_RED, GL_FLOAT, zeros.data());
 
@@ -747,12 +766,12 @@ void Grid3D::setTextures()
     std:: cout << "PressureIn\n";
     glGenTextures(1, &pressureInTex);
     glBindTexture(GL_TEXTURE_3D, pressureInTex);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx, ny, nz);
     zeros = std::vector<GLfloat>(nx * ny * nz, 0.0);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx, ny, nz, GL_RED, GL_FLOAT, zeros.data());
@@ -761,24 +780,24 @@ void Grid3D::setTextures()
     std:: cout << "PressureOut\n";
     glGenTextures(1, &pressureOutTex);
     glBindTexture(GL_TEXTURE_3D, pressureOutTex);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx, ny, nz);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx, ny, nz, GL_RED, GL_FLOAT, zeros.data());
 
     std:: cout << "Divergence\n";
     glGenTextures(1, &divergenceTex);
     glBindTexture(GL_TEXTURE_3D, divergenceTex);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32F, nx, ny, nz);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx, ny, nz, GL_RED, GL_FLOAT, zeros.data());
 
@@ -786,12 +805,12 @@ void Grid3D::setTextures()
     std:: cout << "CellType\n";
     glGenTextures(1, &cellTypeTex);
     glBindTexture(GL_TEXTURE_3D, cellTypeTex);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
-    glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    //glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    //glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
     glTexStorage3D(GL_TEXTURE_3D, 1, GL_R32UI, nx, ny, nz);
     std::vector<GLuint> type(nz * nx * ny, 0);
     glTexSubImage3D(GL_TEXTURE_3D, 0, 0, 0, 0, nx, ny, nz, GL_RED_INTEGER, GL_UNSIGNED_INT, type.data());
