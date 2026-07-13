@@ -18,7 +18,7 @@ void Grid3D::JacobiSolver()
     m_divergenceShader->setFloat("dt", dt);
     m_divergenceShader->setFloat("dx", dx);
     
-    glDispatchCompute((nx+15) / 16, (ny+15) / 16, (nz+15)/16);
+    glDispatchCompute((nx+7) / 8, (ny+7) / 8, (nz+7)/8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
     
     m_jacobiPSolverShader->useProgram();
@@ -29,7 +29,7 @@ void Grid3D::JacobiSolver()
     m_jacobiPSolverShader->setFloat("dens", m_dens);
     m_jacobiPSolverShader->setFloat("dt", dt);
     m_jacobiPSolverShader->setFloat("weight", m_overrelaxation);
-    //glBindImageTexture(1, divergenceTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R32F);
+    glBindImageTexture(1, divergenceTex, 0, GL_FALSE, 0, GL_READ_ONLY, GL_R32F);
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_3D, divergenceTex);
     glActiveTexture(GL_TEXTURE2);
@@ -39,7 +39,7 @@ void Grid3D::JacobiSolver()
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_3D, pressureInTex);
         glBindImageTexture(3, pressureOutTex, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_R32F);
-        glDispatchCompute((nx+15) / 16, (ny+15) / 16, (nz+15)/16);
+        glDispatchCompute((nx+7) / 8, (ny+7) / 8, (nz+7)/8);
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
         std::swap(pressureInTex, pressureOutTex);     
     }
@@ -54,7 +54,7 @@ void Grid3D::JacobiSolver()
     m_pressureProjectionUShader->setFloat("dx", dx);
     m_pressureProjectionUShader->setFloat("dens", m_dens);
     
-    glDispatchCompute(((nx+1) + 15) / 16, (ny+15) / 16, (nz+15)/16);
+    glDispatchCompute(((nx+1) + 7) / 8, (ny+7) / 8, (nz+7)/8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     m_pressureProjectionVShader->useProgram();
@@ -67,7 +67,7 @@ void Grid3D::JacobiSolver()
     m_pressureProjectionVShader->setFloat("dt", dt);
     m_pressureProjectionVShader->setFloat("dx", dx);
     m_pressureProjectionVShader->setFloat("dens", m_dens);
-    glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, (nz+15)/16);
+    glDispatchCompute((nx + 7) / 8, ((ny+1)+7) / 8, (nz+7)/8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     m_pressureProjectionWShader->useProgram();
@@ -80,7 +80,7 @@ void Grid3D::JacobiSolver()
     m_pressureProjectionWShader->setFloat("dt", dt);
     m_pressureProjectionWShader->setFloat("dx", dx);
     m_pressureProjectionWShader->setFloat("dens", m_dens);
-    glDispatchCompute((nx + 15) / 16, (ny+15) / 16, (nz+1+15)/16);
+    glDispatchCompute((nx + 7) / 8, (ny+7) / 8, (nz+1+7)/8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
     m_divergenceShader->useProgram();
@@ -98,7 +98,7 @@ void Grid3D::JacobiSolver()
     m_divergenceShader->setFloat("dt", dt);
     m_divergenceShader->setFloat("dx", dx);
     
-    glDispatchCompute((nx+15) / 16, (ny+15) / 16, (nz+15)/16);
+    glDispatchCompute((nx+7) / 8, (ny+7) / 8, (nz+7)/8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
     
 }
@@ -331,7 +331,7 @@ glBindImageTexture(1, divergenceTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32F);
 glBindImageTexture(2, pressureInTex, 0, GL_TRUE, 0, GL_READ_WRITE, GL_R32F);
 m_clearFluidShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
 m_clearFluidShader->setBool("zeroPressure", zeroPressure);
-glDispatchCompute((nx+15) / 16, (ny+15) / 16, (nz+15)/16);
+glDispatchCompute((nx+7) / 8, (ny+7) / 8, (nz+7)/8);
 glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT);
 
 m_cellUpdateShader->useProgram();
@@ -360,7 +360,7 @@ glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BI
     m_velocityUAdvectionShader->setFloat("dt", dt);
     m_velocityUAdvectionShader->setFloat("dx", dx);
     
-    glDispatchCompute(((nx+1) + 15) / 16, (ny+15) / 16, (nz+15)/16);
+    glDispatchCompute(((nx+1) + 7) / 8, (ny+7) / 8, (nz+7)/8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
     
     m_velocityVAdvectionShader->useProgram();
@@ -376,7 +376,7 @@ glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BI
     m_velocityVAdvectionShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
     m_velocityVAdvectionShader->setFloat("dt", dt);
     m_velocityVAdvectionShader->setFloat("dx", dx);
-    glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, (nz+15)/16);
+    glDispatchCompute((nx + 7) / 8, ((ny+1)+7) / 8, (nz+7)/8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
     
     m_velocityWAdvectionShader->useProgram();
@@ -393,7 +393,7 @@ glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BI
     m_velocityWAdvectionShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
     m_velocityWAdvectionShader->setFloat("dt", dt);
     m_velocityWAdvectionShader->setFloat("dx", dx);
-    glDispatchCompute((nx + 15) / 16, (ny+15) / 16, ((nz+1)+15)/16);
+    glDispatchCompute((nx + 7) / 8, (ny+7) / 8, ((nz+1)+7)/8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
     
     
@@ -421,7 +421,7 @@ glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BI
     m_extrapolateUVelocityShader->setFloat("dt", dt);
     m_extrapolateUVelocityShader->setFloat("dx", dx);
     m_extrapolateUVelocityShader->setInt("borderSize", borderSize);
-    glDispatchCompute(((nx+1) + 15) / 16, (ny+15) / 16, (nz+15)/16);
+    glDispatchCompute(((nx+1) + 7) / 8, (ny+7) / 8, (nz+7)/8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
     
     m_extrapolateVVelocityShader->useProgram();
@@ -434,7 +434,7 @@ glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BI
     m_extrapolateVVelocityShader->setFloat("dt", dt);
     m_extrapolateVVelocityShader->setFloat("dx", dx);
     m_extrapolateVVelocityShader->setInt("borderSize", borderSize);
-    glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, (nz+15)/16);
+    glDispatchCompute((nx + 7) / 8, ((ny+1)+7) / 8, (nz+7)/8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);    
     
     m_extrapolateWVelocityShader->useProgram();
@@ -447,7 +447,7 @@ glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BI
     m_extrapolateWVelocityShader->setFloat("dt", dt);
     m_extrapolateWVelocityShader->setFloat("dx", dx);
     m_extrapolateWVelocityShader->setInt("borderSize", borderSize);
-    glDispatchCompute((nx + 15) / 16, (ny+15) / 16, (nz+1+15)/16);
+    glDispatchCompute((nx + 7) / 8, (ny+7) / 8, (nz+1+7)/8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
     
     std::swap(uInTex, uOutTex);
@@ -479,7 +479,7 @@ glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BI
     m_extrapolateUVelocityShader->setFloat("dt", dt);
     m_extrapolateUVelocityShader->setFloat("dx", dx);
     m_extrapolateUVelocityShader->setInt("borderSize", borderSize);
-    glDispatchCompute(((nx+1) + 15) / 16, (ny+15) / 16, (nz+15)/16);
+    glDispatchCompute(((nx+1) + 7) / 8, (ny+7) / 8, (nz+7)/8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
     
     m_extrapolateVVelocityShader->useProgram();
@@ -492,7 +492,7 @@ glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BI
     m_extrapolateVVelocityShader->setFloat("dt", dt);
     m_extrapolateVVelocityShader->setFloat("dx", dx);
     m_extrapolateVVelocityShader->setInt("borderSize", borderSize);
-    glDispatchCompute((nx + 15) / 16, ((ny+1)+15) / 16, (nz+15)/16);
+    glDispatchCompute((nx + 7) / 8, ((ny+1)+7) / 8, (nz+7)/8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
     
     m_extrapolateWVelocityShader->useProgram();
@@ -505,7 +505,7 @@ glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BI
     m_extrapolateWVelocityShader->setFloat("dt", dt);
     m_extrapolateWVelocityShader->setFloat("dx", dx);
     m_extrapolateWVelocityShader->setInt("borderSize", borderSize);
-    glDispatchCompute((nx + 15) / 16, (ny+15) / 16, ((nz+1)+15)/16);
+    glDispatchCompute((nx + 7) / 8, (ny+7) / 8, ((nz+1)+7)/8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
     
    
