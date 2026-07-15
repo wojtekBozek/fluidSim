@@ -8,10 +8,6 @@ uniform ivec3 gridSize;
 uniform vec3 gridMin;
 uniform vec3 gridMax;
 uniform uint numOfParticles;
-//struct Particle {
-//    vec2 position;
-//};
-
 layout(std430, binding = 1) buffer Particles {
     vec3 particles[];
 };
@@ -28,8 +24,6 @@ void main()
     vec3 pos = particles[id];
 
     vec3 uv = (pos - gridMin) / (gridMax - gridMin);
-    //ivec2 cell = ivec2(uv * vec2(gridSize));
-
     ivec3 cell = clamp(
         ivec3(floor(uv * vec3(gridSize))),
         ivec3(0),
