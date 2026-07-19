@@ -86,7 +86,7 @@ private:
 	uint32_t initFluidX = 5, initFluidY=5,initFluidZ=5;
 	uint32_t borderSize = 3;
 	uint32_t pressureIterations = 200;
-	uint32_t initFluidWidth=1, initFluidHeight=1, initFluidDepth=1;
+	uint32_t initFluidWidth=10, initFluidHeight=10, initFluidDepth=10;
 	int32_t nx = 64, ny=64, nz=64;
 	float dx = 0.5f;
 	float dt = 0.0025f;
