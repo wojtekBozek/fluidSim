@@ -14,9 +14,9 @@ uniform ivec3 gridSize;
 uniform float dt;
 uniform float dx;
 
-const int Nx = gridSize.x; 
-const int Ny = gridSize.y;
-const int Nz = gridSize.z;
+const int Nx() {return gridSize.x;} 
+const int Ny() {return gridSize.y;}
+const int Nz() {return gridSize.z;}
 
 const uint FLUID = 0u;
 const uint AIR = 1u;
@@ -51,13 +51,13 @@ bool wBlocked(int i, int j, int k)
 
 float interpolateVonUFace(int i, int j, int k)
 {
-    int i0 = clamp(i-1, 0, Nx-1);
-    int i1 = clamp(i, 0, Nx-1);
+    int i0 = clamp(i-1, 0, Nx()-1);
+    int i1 = clamp(i, 0, Nx()-1);
 
-    int j0 = clamp(j, 0, Ny);
-    int j1 = clamp(j+1, 0, Ny);
+    int j0 = clamp(j, 0, Ny());
+    int j1 = clamp(j+1, 0, Ny());
 
-    int k0 = clamp(k, 0, Nz);
+    int k0 = clamp(k, 0, Nz());
 
     float value = 0.0;
     float div = 0.0;
@@ -86,14 +86,14 @@ float interpolateVonUFace(int i, int j, int k)
 
 float interpolateWonUFace(int i, int j, int k)
 {
-    int i0 = clamp(i-1, 0, Nx-1);
-    int i1 = clamp(i + 1, 0, Nx-1);
+    int i0 = clamp(i-1, 0, Nx()-1);
+    int i1 = clamp(i + 1, 0, Nx()-1);
 
-    int j0 = clamp(j, 0, Ny);
-    int j1 = clamp(j+1, 0, Ny);
+    int j0 = clamp(j, 0, Ny());
+    int j1 = clamp(j+1, 0, Ny());
 
-    int k0 = clamp(k, 0, Nz);
-    int k1 = clamp(k+1, 0, Nz);
+    int k0 = clamp(k, 0, Nz());
+    int k1 = clamp(k+1, 0, Nz());
 
     float value = 0.0;
     float div = 0.0;
@@ -129,14 +129,14 @@ float interpolateWinGrid(vec3 position)
     int k = int(position.z/dx);
     float depthDistance = (position.z - k*dx);
 
-    int i0 = clamp(i,0, Nx);
-    int i1 = clamp(i + 1, 0, Nx);
+    int i0 = clamp(i,0, Nx());
+    int i1 = clamp(i + 1, 0, Nx());
 
-    int k0 = clamp(k,0, Nz-1);
-    int k1 = clamp(k + 1, 0, Nz-1);
+    int k0 = clamp(k,0, Nz()-1);
+    int k1 = clamp(k + 1, 0, Nz()-1);
 
-    int j0 = clamp(j, 0, Ny-1);
-    int j1 = clamp(j + 1, 0, Ny-1);
+    int j0 = clamp(j, 0, Ny()-1);
+    int j1 = clamp(j + 1, 0, Ny()-1);
 
     float w00 = 1.0 - downDistance/dx; 
     float w01 = downDistance/dx; 
@@ -209,14 +209,14 @@ float interpolateUinGrid(vec3 position)
     int k = int((position.z-0.5*dx)/dx);
     float depthDistance = (position.z - k*dx);
 
-    int i0 = clamp(i,0, Nx);
-    int i1 = clamp(i + 1, 0, Nx);
+    int i0 = clamp(i,0, Nx());
+    int i1 = clamp(i + 1, 0, Nx());
 
-    int k0 = clamp(k,0, Nz-1);
-    int k1 = clamp(k + 1, 0, Nz-1);
+    int k0 = clamp(k,0, Nz()-1);
+    int k1 = clamp(k + 1, 0, Nz()-1);
 
-    int j0 = clamp(j, 0, Ny-1);
-    int j1 = clamp(j + 1, 0, Ny-1);
+    int j0 = clamp(j, 0, Ny()-1);
+    int j1 = clamp(j + 1, 0, Ny()-1);
 
     float wX0 = 1.0 - backDistance/dx;
     float wX1 = backDistance/dx; 
@@ -288,14 +288,14 @@ float interpolateVinGrid(vec3 position)
     int k = int((position.z-0.5*dx)/dx);
     float depthDistance = (position.z - k*dx);
 
-    int i0 = clamp(i,0, Nx);
-    int i1 = clamp(i + 1, 0, Nx);
+    int i0 = clamp(i,0, Nx());
+    int i1 = clamp(i + 1, 0, Nx());
 
-    int k0 = clamp(k,0, Nz-1);
-    int k1 = clamp(k + 1, 0, Nz-1);
+    int k0 = clamp(k,0, Nz()-1);
+    int k1 = clamp(k + 1, 0, Nz()-1);
 
-    int j0 = clamp(j, 0, Ny-1);
-    int j1 = clamp(j + 1, 0, Ny-1);
+    int j0 = clamp(j, 0, Ny()-1);
+    int j1 = clamp(j + 1, 0, Ny()-1);
 
     float wX0 = 1.0 - downDistance/dx; 
     float wX1 = downDistance/dx; 
