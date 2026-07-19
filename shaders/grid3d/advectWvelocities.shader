@@ -121,24 +121,12 @@ float interpolateUonWFace(int i, int j, int k)
 
 float interpolateWinGrid(vec3 position)
 { 
-    int i = int(position.x/dx);
+    int i = int((position.x-0.5*dx)/dx);
     float backDistance = position.x - i*dx;
-    int j = int(position.y/dx);
+    int j = int((position.y-0.5*dx)/dx);
     float downDistance = (position.y - j*dx);
     int k = int(position.z/dx);
     float depthDistance = (position.z - k*dx);
-
-    if(backDistance < dx/2.0)
-    {
-        i--;
-        backDistance += dx/2.0;
-    }
-
-    if(downDistance < dx/2.0)
-    {
-        j--;
-        downDistance += dx/2.0;
-    }
 
     int i0 = clamp(i,0, Nx);
     int i1 = clamp(i + 1, 0, Nx);
@@ -215,9 +203,9 @@ float interpolateUinGrid(vec3 position)
 { 
     int i = int(position.x/dx);
     float backDistance = position.x - i*dx;
-    int j = int(position.y/dx);
+    int j = int((position.y-0.5*dx)/dx);
     float downDistance = (position.y - j*dx);
-    int k = int(position.z/dx);
+    int k = int((position.z-0.5*dx)/dx);
     float depthDistance = (position.z - k*dx);
 
     if(downDistance < dx/2.0)
@@ -304,24 +292,12 @@ float interpolateUinGrid(vec3 position)
 
 float interpolateVinGrid(vec3 position)
 { 
-    int i = int(position.x/dx);
+    int i = int((position.x-0.5*dx)/dx);
     float backDistance = position.x - i*dx;
     int j = int(position.y/dx);
     float downDistance = (position.y - j*dx);
-    int k = int(position.z/dx);
+    int k = int((position.z-0.5*dx)/dx);
     float depthDistance = (position.z - k*dx);
-
-    if(backDistance < dx/2.0)
-    {
-        i--;
-        backDistance += dx/2.0;
-    }
-
-    if(depthDistance < dx/2.0)
-    {
-        k--;
-        depthDistance += dx/2.0;
-    }
 
     int i0 = clamp(i,0, Nx);
     int i1 = clamp(i + 1, 0, Nx);
