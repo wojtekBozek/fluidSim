@@ -345,7 +345,7 @@ vec3 forwardRK2Position(vec3 position, vec3 velocity)
         || newCell.z < 0 || newCell.z >= gridSize.z 
         ||texelFetch(cellType, newCell, 0).r == SOLID)
     {
-        newPosition = position;
+        newPosition = halfPosition;
     }
     return newPosition;
 }
@@ -357,6 +357,6 @@ void main()
 
     vec3 position = particles[id];
     vec3 velocity = vec3(sampleU(position), sampleV(position), sampleW(position));
-    vec3 newPosition = position+velocity*dt;//forwardRK2Position(position, velocity);
+    vec3 newPosition = forwardRK2Position(position, velocity);
     particles[id] = newPosition;
 }
