@@ -48,7 +48,7 @@ void main()
     if (typeAt(i,j,k+1) == FLUID) { sum += P(i,j,k+1); count++; } else if(typeAt(i,j,k+1) == AIR) { sum += 0.0; count++; }  
     float div = texelFetch(divergence, id, 0).r;
     // Free-surface Poisson update
-    float newPressure = (sum - dens*dx*div/dt) / (float(max(count,1)));
+    float newPressure = count > 0 ? (sum - dens*dx*div/dt) / (float(count)) : 0.0;
     float oldPressure = P(i,j,k);
     //newPressure = mix(oldPressure, newPressure, overrelaxation);
     newPressure = oldPressure + (newPressure-oldPressure)*overrelaxation;

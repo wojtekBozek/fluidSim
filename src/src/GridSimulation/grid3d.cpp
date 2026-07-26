@@ -386,7 +386,6 @@ void Grid3D::run()
     glBindTexture(GL_TEXTURE_3D, wInTex);
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_3D, cellTypeTex);
-    glBindTexture(GL_TEXTURE_3D, cellTypeTex);
     glBindImageTexture(4, wOutTex, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_R32F);
     m_velocityWAdvectionShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
     m_velocityWAdvectionShader->setFloat("dt", dt);
@@ -408,7 +407,7 @@ void Grid3D::run()
     glDispatchCompute((nx + 1 + 7) / 8, (ny +1 + 7) / 8, (nz + 1 + 7) / 8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
-    
+    /*
     m_extrapolateUVelocityShader->useProgram();
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_3D, cellTypeTex);
@@ -447,7 +446,7 @@ void Grid3D::run()
     m_extrapolateWVelocityShader->setInt("borderSize", borderSize);
     glDispatchCompute((nx + 7) / 8, (ny+7) / 8, (nz+1+7)/8);
     glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-    
+    */
     //std::swap(uInTex, uOutTex);
     //std::swap(vInTex, vOutTex);
     //std::swap(wInTex, wOutTex);

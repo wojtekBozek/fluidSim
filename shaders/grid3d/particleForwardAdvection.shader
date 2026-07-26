@@ -41,22 +41,21 @@ int checkCellType(ivec3 c)
 
 bool uBlocked(int i, int j, int k)
 {
-    if(0 == i) return true;
+    if(0 == i || Nx() == i) return true;
     return checkCellType(ivec3(i-1, j, k)) == SOLID ||
            checkCellType(ivec3(i,   j, k)) == SOLID;
 }
 
 bool vBlocked(int i, int j, int k)
 {
-    return false;
-    if(0 == j || j >= gridSize.y) return true;
+    if(0 == j || Ny() == j) return true;
     return checkCellType(ivec3(i, j-1, k)) == SOLID ||
            checkCellType(ivec3(i, j  , k)) == SOLID;
 }
 
 bool wBlocked(int i, int j, int k)
 {
-    if(0 == k) return true;
+    if(0 == k || Nz() == k) return true;
     return checkCellType(ivec3(i, j, k)) == SOLID ||
            checkCellType(ivec3(i, j, k-1)) == SOLID;
 }

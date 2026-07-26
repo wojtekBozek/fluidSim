@@ -30,21 +30,21 @@ int checkCellType(ivec3 c)
 
 bool uBlocked(int i, int j, int k)
 {
-    if(0 == i) return true;
+    if(0 == i || Nx() == i) return true;
     return checkCellType(ivec3(i-1, j, k)) == SOLID ||
            checkCellType(ivec3(i,   j, k)) == SOLID;
 }
 
 bool vBlocked(int i, int j, int k)
 {
-    if(0 == j) return true;
+    if(0 == j || Ny() == j) return true;
     return checkCellType(ivec3(i, j-1, k)) == SOLID ||
            checkCellType(ivec3(i, j  , k)) == SOLID;
 }
 
 bool wBlocked(int i, int j, int k)
 {
-    if(0 == k) return true;
+    if(0 == k || Nz() == k) return true;
     return checkCellType(ivec3(i, j, k)) == SOLID ||
            checkCellType(ivec3(i, j, k-1)) == SOLID;
 }
@@ -87,7 +87,7 @@ float interpolateVonUFace(int i, int j, int k)
 float interpolateWonUFace(int i, int j, int k)
 {
     int i0 = clamp(i-1, 0, Nx()-1);
-    int i1 = clamp(i + 1, 0, Nx()-1);
+    int i1 = clamp(i, 0, Nx()-1);
 
     int j0 = clamp(j, 0, Ny()-1);
 
@@ -96,22 +96,22 @@ float interpolateWonUFace(int i, int j, int k)
 
     float value = 0.0;
     float div = 0.0;
-    if(!vBlocked(i0,j1,k0))
+    if(!wBlocked(i0,j0,k0))
     {
       value += texelFetch(wTex, ivec3(i0,j0,k0),0).r;
       div += 1.0;
     }
-    if(!vBlocked(i0,j0,k0))
+    if(!wBlocked(i0,j0,k1))
     {
        value += texelFetch(wTex, ivec3(i0,j0,k1),0).r;
        div += 1.0;
     }
-    if(!vBlocked(i1,j1,k0))
+    if(!wBlocked(i1,j0,k0))
     {
       value += texelFetch(wTex, ivec3(i1,j0,k0),0).r;
       div += 1.0;
     }
-    if(!vBlocked(i1, j0,k0))
+    if(!wBlocked(i1, j0,k1))
     {
       value += texelFetch(wTex, ivec3(i1,j0,k1),0).r;
       div += 1.0;
@@ -324,7 +324,7 @@ float interpolateVinGrid(vec3 position)
     }
     if(!vBlocked(i1,j0,k0))
     {
-      value0 += texelFetch(vTex, ivec3(i1,j0,k0),0).r * w11 * w10;
+      value0 += texelFetch(vTex, ivec3(i1,j0,k0),0).r * w01 * w10;
       sumW0 += w01 * w10;
     }
 
@@ -336,14 +336,14 @@ float interpolateVinGrid(vec3 position)
       value1 += texelFetch(vTex, ivec3(i0,j1,k0),0).r * w00 * w10;
       sumW1 += w00 * w10;
     }
-    if(!vBlocked(i0,j1,k0))
+    if(!vBlocked(i0,j1,k1))
     {
-      value1 += texelFetch(vTex, ivec3(i0,j1,k0),0).r * w00 * w10;
-      sumW1 += w00 * w10;
+      value1 += texelFetch(vTex, ivec3(i0,j1,k1),0).r * w00 * w11;
+      sumW1 += w00 * w11;
     }
-    if(!vBlocked(i1,j1,k1))
+    if(!vBlocked(i1,j1,k0))
     {
-      value1 += texelFetch(vTex, ivec3(i1,j1,k1),0).r * w01 * w10;
+      value1 += texelFetch(vTex, ivec3(i1,j1,k0),0).r * w01 * w10;
       sumW1 += w01 * w10;
     }
     if(!vBlocked(i1,j1,k1))
