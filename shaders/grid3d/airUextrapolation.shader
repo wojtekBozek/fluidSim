@@ -30,16 +30,16 @@ uint typeAt(int i, int j, int k)
 
 bool isAirOnlyUFace(int i, int j, int k)
 {
-    if(i <= 0 || i >= gridSize.x) return false;
-    return checkCellType(ivec3(i-1, j, k)) == AIR &&
-           checkCellType(ivec3(i,   j, k)) == AIR;
+    if(i <= 0 || i > gridSize.x) return false;
+    return typeAt(i-1, j, k) == AIR &&
+           typeAt(i,   j, k) == AIR;
 }
 
-bool isFluidAirUFace(int i, int j, int k)
+bool isFluidAirUFace(int i, int j, int k) 
 {
-    if(j <= 0 || j >= gridSize.y || i <= 0 || i >=gridSize.x) return false;
-    return ((checkCellType(ivec3(i-1, j, k)) == FLUID && checkCellType(ivec3(i, j, k)) == AIR) 
-    || (checkCellType(ivec3(i-1, j, k)) == AIR && checkCellType(ivec3(i, j, k)) == FLUID));
+    if(j < 0 || j >= gridSize.y || i < 0 || i > gridSize.x || k < 0 || k >=gridSize.z) return false;
+    return ((typeAt(i-1, j, k) == FLUID && typeAt(i, j, k) == AIR) 
+    || (typeAt(i-1, j, k) == AIR && typeAt(i, j, k) == FLUID));
 }
 
 void main()
@@ -52,7 +52,7 @@ void main()
     if(!isAirOnlyUFace(i,j,k))
     {
         float extU = texelFetch(uTex, ivec3(i, j,k),0).r;
-        imageStore(uOut, ivec3(i,j,j),vec4(extU));
+        imageStore(uOut, ivec3(i,j,k),vec4(extU));
         return;
     }
     int real_ii = borderSize+1;

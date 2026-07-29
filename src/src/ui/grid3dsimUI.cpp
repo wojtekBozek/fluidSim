@@ -145,7 +145,7 @@ void Grid3dSimulationUI::setBorderSize()
 	int size = static_cast<int>(refSimulation->getBorderSize());
 	const int ref = size;
 	ImGui::InputInt("Border size [in cells]", &size, 1, 5);
-	size = std::clamp(size, 1, int(std::min(refSimulation->getFluidSize().x,refSimulation->getFluidSize().y)));
+	size = std::clamp(size, 0, int(std::min(refSimulation->getFluidSize().x,refSimulation->getFluidSize().y)));
 	if(ref != size)
 	{
 		refSimulation->setBorderSize(size);

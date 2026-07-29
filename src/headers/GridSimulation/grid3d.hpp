@@ -83,10 +83,10 @@ private:
 	const GLuint FLUID = 0u;
 	const GLuint AIR = 1u;
 	const GLuint SOLID = 2u;
-	uint32_t initFluidX = 5, initFluidY=5,initFluidZ=5;
-	uint32_t borderSize = 3;
+	uint32_t initFluidX = 1, initFluidY=1,initFluidZ=1;
+	uint32_t borderSize = 1;
 	uint32_t pressureIterations = 200;
-	uint32_t initFluidWidth=10, initFluidHeight=10, initFluidDepth=10;
+	uint32_t initFluidWidth=25, initFluidHeight=25, initFluidDepth=25;
 	int32_t nx = 64, ny=64, nz=64;
 	float dx = 0.5f;
 	float dt = 0.0025f;

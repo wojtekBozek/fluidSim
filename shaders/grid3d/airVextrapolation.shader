@@ -30,16 +30,16 @@ uint typeAt(int i, int j, int k)
 
 bool isAirOnlyVFace(int i, int j, int k)
 {
-    if(j <= 0 || j >= gridSize.y) return false;
-    return checkCellType(ivec3(i, j-1,k)) == AIR &&
-           checkCellType(ivec3(i,   j,k)) == AIR;
+    if(j <= 0 || j > gridSize.y) return false;
+    return typeAt(i, j-1,k) == AIR &&
+           typeAt(i,   j,k) == AIR;
 }
 
 bool isFluidAirVFace(int i, int j, int k)
 {
-    if(j <= 0 || j >= gridSize.y || i <= 0 || i >=gridSize.x) return false;
-    return ((checkCellType(ivec3(i, j-1, k)) == FLUID && checkCellType(ivec3(i, j, k)) == AIR) 
-    || (checkCellType(ivec3(i, j-1, k)) == AIR && checkCellType(ivec3(i, j, k)) == FLUID));
+    if(j <= 0 || j > gridSize.y || i < 0 || i >=gridSize.x || k < 0 || k >=gridSize.z) return false;
+    return ((typeAt(i, j-1, k) == FLUID && typeAt(i, j, k) == AIR) 
+    || (typeAt(i, j-1, k) == AIR && typeAt(i, j, k) == FLUID));
 }
 
 void main()

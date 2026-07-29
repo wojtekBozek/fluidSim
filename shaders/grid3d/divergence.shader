@@ -42,7 +42,7 @@ bool vBlocked(int i, int j, int k)
 
 bool wBlocked(int i, int j, int k)
 {
-    if(0 == k || k >= gridSize.x) return true;
+    if(0 == k || k >= gridSize.z) return true;
     return checkCellType(ivec3(i, j, k-1)) == SOLID ||
            checkCellType(ivec3(i,   j, k)) == SOLID;
 }

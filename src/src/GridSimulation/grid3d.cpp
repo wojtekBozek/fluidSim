@@ -465,47 +465,52 @@ void Grid3D::run()
         //GaussSiedelPressureSolver();
     }
     
-    
-    m_extrapolateUVelocityShader->useProgram();
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_3D, cellTypeTex);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_3D, uOutTex);
-    glBindImageTexture(2, uInTex, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_R32F);
-    m_extrapolateUVelocityShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
-    m_extrapolateUVelocityShader->setFloat("dt", dt);
-    m_extrapolateUVelocityShader->setFloat("dx", dx);
-    m_extrapolateUVelocityShader->setInt("borderSize", borderSize);
-    glDispatchCompute(((nx+1) + 7) / 8, (ny+7) / 8, (nz+7)/8);
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-    
-    m_extrapolateVVelocityShader->useProgram();
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_3D, cellTypeTex);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_3D, vOutTex);
-    glBindImageTexture(2, vInTex, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_R32F);
-    m_extrapolateVVelocityShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
-    m_extrapolateVVelocityShader->setFloat("dt", dt);
-    m_extrapolateVVelocityShader->setFloat("dx", dx);
-    m_extrapolateVVelocityShader->setInt("borderSize", borderSize);
-    glDispatchCompute((nx + 7) / 8, ((ny+1)+7) / 8, (nz+7)/8);
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-    
-    m_extrapolateWVelocityShader->useProgram();
-    glActiveTexture(GL_TEXTURE1);
-    glBindTexture(GL_TEXTURE_3D, cellTypeTex);
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_3D, wOutTex);
-    glBindImageTexture(2, wInTex, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_R32F);
-    m_extrapolateWVelocityShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
-    m_extrapolateWVelocityShader->setFloat("dt", dt);
-    m_extrapolateWVelocityShader->setFloat("dx", dx);
-    m_extrapolateWVelocityShader->setInt("borderSize", borderSize);
-    glDispatchCompute((nx + 7) / 8, (ny+7) / 8, ((nz+1)+7)/8);
-    glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
-    
-   
+    if(borderSize > 0)
+    {
+        m_extrapolateUVelocityShader->useProgram();
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_3D, cellTypeTex);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_3D, uOutTex);
+        glBindImageTexture(2, uInTex, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_R32F);
+        m_extrapolateUVelocityShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
+        m_extrapolateUVelocityShader->setFloat("dt", dt);
+        m_extrapolateUVelocityShader->setFloat("dx", dx);
+        m_extrapolateUVelocityShader->setInt("borderSize", borderSize);
+        glDispatchCompute(((nx+1) + 7) / 8, (ny+7) / 8, (nz+7)/8);
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+        
+        m_extrapolateVVelocityShader->useProgram();
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_3D, cellTypeTex);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_3D, vOutTex);
+        glBindImageTexture(2, vInTex, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_R32F);
+        m_extrapolateVVelocityShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
+        m_extrapolateVVelocityShader->setFloat("dt", dt);
+        m_extrapolateVVelocityShader->setFloat("dx", dx);
+        m_extrapolateVVelocityShader->setInt("borderSize", borderSize);
+        glDispatchCompute((nx + 7) / 8, ((ny+1)+7) / 8, (nz+7)/8);
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+        
+        m_extrapolateWVelocityShader->useProgram();
+        glActiveTexture(GL_TEXTURE1);
+        glBindTexture(GL_TEXTURE_3D, cellTypeTex);
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_3D, wOutTex);
+        glBindImageTexture(2, wInTex, 0, GL_TRUE, 0, GL_WRITE_ONLY, GL_R32F);
+        m_extrapolateWVelocityShader->setIVec3("gridSize", glm::ivec3(nx,ny,nz));
+        m_extrapolateWVelocityShader->setFloat("dt", dt);
+        m_extrapolateWVelocityShader->setFloat("dx", dx);
+        m_extrapolateWVelocityShader->setInt("borderSize", borderSize);
+        glDispatchCompute((nx + 7) / 8, (ny+7) / 8, ((nz+1)+7)/8);
+        glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
+    }    
+    else{
+        std::swap(uInTex, uOutTex);
+        std::swap(vInTex, vOutTex);
+        std::swap(wInTex, wOutTex);
+    }
     m_particleAdvectionShader->useProgram();
     glBindTextureUnit(0, cellTypeTex);
     glBindTextureUnit(2, uInTex);

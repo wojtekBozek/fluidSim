@@ -30,22 +30,22 @@ uint typeAt(int i, int j, int k)
 
 bool isAirOnlyWFace(int i, int j, int k)
 {
-    if(k <= 0 || k >= gridSize.y) return false;
-    return checkCellType(ivec3(i, j,k-1)) == AIR &&
-           checkCellType(ivec3(i, j,k)) == AIR;
+    if(k <= 0 || k > gridSize.z) return false;
+    return typeAt(i, j,k-1) == AIR &&
+           typeAt(i, j,k) == AIR;
 }
 
 bool isFluidAirWFace(int i, int j, int k)
 {
-    if(j <= 0 || j >= gridSize.y || i <= 0 || i >=gridSize.x) return false;
-    return ((checkCellType(ivec3(i, j, k-1)) == FLUID && checkCellType(ivec3(i, j, k)) == AIR) 
-    || (checkCellType(ivec3(i, j, k-1)) == AIR && checkCellType(ivec3(i, j, k)) == FLUID));
+    if(j < 0 || j >= gridSize.y || i < 0 || i >=gridSize.x || k <= 0 || k > gridSize.z) return false;
+    return ((typeAt(i, j, k-1) == FLUID && typeAt(i, j, k) == AIR) 
+    || (typeAt(i, j, k-1) == AIR && typeAt(i, j, k) == FLUID));
 }
 
 void main()
 {
     ivec3 id = ivec3(gl_GlobalInvocationID.xyz);
-    if(id.x >= gridSize.x || id.y >= gridSize.y || id.z > gridSize.z + 1) return;
+    if(id.x >= gridSize.x || id.y >= gridSize.y || id.z >= gridSize.z + 1) return;
     int i = id.x;
     int j = id.y;
     int k = id.z;
