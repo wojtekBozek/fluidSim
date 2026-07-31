@@ -49,7 +49,7 @@ void main()
     int i = id.x;
     int j = id.y;
     int k = id.z;
-    if(!isAirOnlyUFace(i,j,k))
+    if(!isAirOnlyUFace(i,j,k))  
     {
         float extU = texelFetch(uTex, ivec3(i, j,k),0).r;
         imageStore(uOut, ivec3(i,j,k),vec4(extU));
