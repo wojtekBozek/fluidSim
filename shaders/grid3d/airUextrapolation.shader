@@ -30,14 +30,12 @@ uint typeAt(int i, int j, int k)
 
 bool isAirOnlyUFace(int i, int j, int k)
 {
-    if(i <= 0 || i > gridSize.x) return false;
     return typeAt(i-1, j, k) == AIR &&
            typeAt(i,   j, k) == AIR;
 }
 
 bool isFluidAirUFace(int i, int j, int k) 
 {
-    if(j < 0 || j >= gridSize.y || i < 0 || i > gridSize.x || k < 0 || k >=gridSize.z) return false;
     return ((typeAt(i-1, j, k) == FLUID && typeAt(i, j, k) == AIR) 
     || (typeAt(i-1, j, k) == AIR && typeAt(i, j, k) == FLUID));
 }
