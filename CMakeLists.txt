@@ -37,7 +37,13 @@ ${CMAKE_SOURCE_DIR}/src/src/camera/orthographicCamera.cpp
 ${CMAKE_SOURCE_DIR}/src/src/program/context.cpp
 ${CMAKE_SOURCE_DIR}/src/src/program/mixedContext.cpp
 ${CMAKE_SOURCE_DIR}/src/src/program/texture3dTest.cpp
-${CMAKE_SOURCE_DIR}/src/src/ui/sphSimulationUI.cpp "src/src/program/gridContext.cpp" "src/src/GridSimulation/mixed.cpp" "src/src/GridSimulation/grid3d.cpp" "src/src/program/grid3dContext.cpp" "src/src/GridSimulation/grid2d.cpp"  "src/src/program/textureTest.cpp")
+${CMAKE_SOURCE_DIR}/src/src/ui/sphSimulationUI.cpp
+${CMAKE_SOURCE_DIR}/src/src/program/gridContext.cpp
+${CMAKE_SOURCE_DIR}/src/src/GridSimulation/mixed.cpp
+${CMAKE_SOURCE_DIR}/src/src/GridSimulation/grid3d.cpp
+${CMAKE_SOURCE_DIR}/src/src/program/grid3dContext.cpp
+${CMAKE_SOURCE_DIR}/src/src/GridSimulation/grid2d.cpp
+${CMAKE_SOURCE_DIR}/src/src/program/textureTest.cpp)
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
 ${CMAKE_SOURCE_DIR}/src/headers/camera/
