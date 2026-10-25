@@ -21,6 +21,10 @@ This project allows for coomparing following methods of fluid simulations:
 - MAC simulation for 2D and 3D available in separate contexts.
 - Hybrid simulation utilizing PIC and APIC algorithms (only 2D solution).
 
+`WSAD` allows you to move in planar diorections while `pgUp` and `pgDown` allows you to move vertically. `o` centers the screen to original view. 
+`TAB` hides and restores GUI view. When GUI is hidden camera rotation by mouse movement is available, while active GUI prevents user from rotating the view.
+`F1` sets perspective view as active, while `F2` changes the viewport to ortographic. Mouse scroll changes FOV of camera.
+
 ## Simulations 
 
 Samples of simulations are available in following youtube videos:
