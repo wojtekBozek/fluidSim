@@ -6,10 +6,6 @@ uniform vec3 color;
 flat in uint isFluid;
 in vec3 velocityColor;
 
-float maxColor(vec3 col)
-{
-    return max(col.x, max(col.y, col.z));
-}
 void main() {
     
     // gl_PointCoord gives the fragment’s coordinate in [0,1] range
@@ -26,7 +22,7 @@ void main() {
     if(dist+0.01 < 1.0)
     {
         if(isFluid == 0)
-            FragColor = vec4(color*max(0.3, maxColor(abs(normalize(velocityColor)))), 1.0);
+            FragColor = length(velocityColor) > 0 ? vec4(color+color*dot(color, normalize(velocityColor)), 1.0) : vec4(color, 1.0);
         else
             FragColor = vec4(0.1, 0.1, 0.1, 0.2);
     }

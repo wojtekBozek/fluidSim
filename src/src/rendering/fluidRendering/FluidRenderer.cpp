@@ -25,7 +25,7 @@ void SPHSimulationRenderer::render(std::shared_ptr<rendering::Camera> camera)
         shaderProgram->setFloat("top", static_cast<rendering::OrthographicCamera*>(camera.get())->getTop());
         shaderProgram->setFloat("bottom", static_cast<rendering::OrthographicCamera*>(camera.get())->getBottom());
     }
-    shaderProgram->setVec3("color", glm::vec3(0.0, 0.3, 0.8));
+    shaderProgram->setVec3("color", glm::vec3(0.0, 0.3, 1.0));
     shaderProgram->setFloat("particleRadius", simulation->getParticleRadius());
     glBindVertexArray(quadVAO);
     glDrawArraysInstanced(GL_POINTS, 0, 1, simulation->getNumOfParticles());
