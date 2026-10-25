@@ -27,7 +27,7 @@ uniform float particleRadius;
 uniform bool perspectiveProjection;
 
 flat out uint isFluid;
-
+out vec3 velocityColor;
 void main() {
     
     uint particleID = uint(gl_InstanceID);
@@ -51,4 +51,5 @@ void main() {
     {  
         gl_PointSize = 2*particleRadius * viewportHeight / (top-bottom);
     }
+    velocityColor = particles[particleID].velocity.xyz;
 }

@@ -146,6 +146,7 @@ void FluidSPHSimulation::setFluidAndParticles()
 
     boundaryParticles.reserve(numOfBoundaryParticles);
     initialParticle.position = glm::vec4(m_simulationDomain.position, 1.0f);
+    initialParticle.velocity = glm::vec4(0.0, 0.0, 0.0, 0.0);
     //initialParticle.density = 1000.0/static_cast<float>(numOfBoundaryParticles);
     initialParticle.type = particleType::BOUNDARY;
 
