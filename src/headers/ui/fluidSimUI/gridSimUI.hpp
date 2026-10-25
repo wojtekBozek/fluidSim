@@ -3,7 +3,7 @@
 #include "baseGrid.hpp"
 #include "grid2d.hpp"
 #include "gridrenderer.hpp"
-#include "SPHContextState.hpp"
+#include "contextState.hpp"
 class GridSimulationUI : public BaseUI
 {
 public:

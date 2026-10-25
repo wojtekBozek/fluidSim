@@ -1,7 +1,7 @@
 #pragma once
 #include "baseUI.hpp"
 #include "FluidSPHSimulation.hpp"
-#include "SPHContextState.hpp"
+#include "contextState.hpp"
 
 class SPHsimulationUI : public BaseUI
 {

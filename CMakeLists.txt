@@ -46,15 +46,26 @@ ${CMAKE_SOURCE_DIR}/src/src/GridSimulation/grid2d.cpp
 ${CMAKE_SOURCE_DIR}/src/src/program/textureTest.cpp)
 
 target_include_directories(${PROJECT_NAME} PRIVATE 
-${CMAKE_SOURCE_DIR}/src/headers/camera/
-${CMAKE_SOURCE_DIR}/src/headers/geometry/
-${CMAKE_SOURCE_DIR}/src/headers/math/
-${CMAKE_SOURCE_DIR}/src/headers/objects/
 ${CMAKE_SOURCE_DIR}/src/headers/commons/
+${CMAKE_SOURCE_DIR}/src/headers/commons/handlers/
+${CMAKE_SOURCE_DIR}/src/headers/commons/debug/
+${CMAKE_SOURCE_DIR}/src/headers/commons/camera/
+${CMAKE_SOURCE_DIR}/src/headers/commons/math/
+${CMAKE_SOURCE_DIR}/src/headers/commons/shaders/
+${CMAKE_SOURCE_DIR}/src/headers/contexts/
+${CMAKE_SOURCE_DIR}/src/headers/contexts/testContext/
+${CMAKE_SOURCE_DIR}/src/headers/fluidSim/
+${CMAKE_SOURCE_DIR}/src/headers/fluidSim/gridSim/
+${CMAKE_SOURCE_DIR}/src/headers/fluidSim/particleSim/
 ${CMAKE_SOURCE_DIR}/src/headers/program/
+${CMAKE_SOURCE_DIR}/src/headers/rendering/
+${CMAKE_SOURCE_DIR}/src/headers/rendering/fluidRendering/
 ${CMAKE_SOURCE_DIR}/src/headers/properties/
 ${CMAKE_SOURCE_DIR}/src/headers/ui/
+${CMAKE_SOURCE_DIR}/src/headers/ui/fluidSimUI/
 ${CMAKE_SOURCE_DIR}/src/headers/lights/
+${CMAKE_SOURCE_DIR}/src/headers/geometry/
+${CMAKE_SOURCE_DIR}/src/headers/objects/
 ${CMAKE_SOURCE_DIR}/src/headers/GridSimulation/
 )
 

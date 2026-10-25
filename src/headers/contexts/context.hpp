@@ -4,7 +4,7 @@
 #include "FluidRenderer.hpp"
 #include "sphSimulationUI.hpp"
 #include "camera3D.hpp"
-#include "SPHContextState.hpp"
+#include "contextState.hpp"
 class AbstractContext : public BaseUI
 {
 public:

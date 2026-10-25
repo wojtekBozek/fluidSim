@@ -3,7 +3,7 @@
 #include "baseGrid.hpp"
 #include "mixed.hpp"
 #include "mixedRenderer.hpp"
-#include "SPHContextState.hpp"
+#include "contextState.hpp"
 class MixedSimulationUI : public BaseUI
 {
 public:
