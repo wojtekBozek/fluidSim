@@ -4,11 +4,15 @@
 
 ### CMAKE
 
-This project utilizes CMAKE with all dependencies fetched from 'external' dircetory.
+This project utilizes CMAKE with all dependencies fetched from `external` dircetory.
 
-### OPENGL
+### OpenGL
 
 For full functionality OPENGL 4.6 is required.
+
+## Nvidia
+
+For hybrid simulations nvidia: extension `GL_NV_shader_atomic_float` is required
 
 ### Usage
 
