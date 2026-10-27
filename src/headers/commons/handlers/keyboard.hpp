@@ -1,66 +1,48 @@
 #pragma once
 #include "GL/glew.h"
 #include "GLFW/glfw3.h"
+#include <functional>
+#include <type_traits>
+#include <utility>
+#include <optional>
+#include <concepts>
 
-template<typename T, typename... Args>
-T ProcessInput(GLFWwindow* window, int key,int action, T (*func)( Args ...), Args ... args)
+template<typename F, typename... Args>
+	requires std::invocable<F, Args...>
+decltype(auto) ProcessInput(GLFWwindow* window, int key, int action, F&& func,Args&&... args) 
 {
-	if (glfwGetKey(window, key) == GLFW_PRESS)
-	{
-		return func(args...);
+	using Result = std::invoke_result_t<F, Args...>;
+
+	if(glfwGetKey(window, key) != action) {
+		if constexpr (std::is_void_v<Result>){
+			return false;
+		}
+		else if constexpr (!std::is_void_v<Result>) {
+			return std::optional<Result>{};
+		}
 	}
+
+	if constexpr (std::is_void_v<Result>) {
+			std::invoke(
+				std::forward<F>(func),
+				std::forward<Args>(args)...
+			);
+			return true;
+		}
+		else {
+			return std::optional<Result>{
+				std::in_place,
+				std::invoke(
+					std::forward<F>(func),
+					std::forward<Args>(args)...
+				)
+			};
+		}
 }
 
-template<typename T>
-T ProcessInput(GLFWwindow* window, int key, int action, T(*func)())
+template<typename F, typename... Args>
+	requires std::invocable<F, Args...>
+auto ProcessInput(GLFWwindow* window, int key, F&& func,Args&&... args)
 {
-	if (glfwGetKey(window, key) == GLFW_PRESS)
-	{
-		return func();
-	}
-}
-
-template<typename T, typename... Args>
-T ProcessInput(GLFWwindow* window, int key,int action, T (*func)( Args& ...), Args& ... args)
-{
-	if (glfwGetKey(window, key) == action)
-	{
-		return func(args...);
-	}
-}
-
-template<typename T, typename... Args>
-T ProcessInput(GLFWwindow* window, int key,int action, T (*func)( Args* ...), Args* ... args)
-{
-	if (glfwGetKey(window, key) == GLFW_PRESS)
-	{
-		return func(args...);
-	}
-}
-
-template<typename T, typename... Args>
-T ProcessInput(GLFWwindow* window, int key,int action, T (*func)( Args* ..., Args ...), Args* ... args, Args ... args2)
-{
-	if (glfwGetKey(window, key) == action)
-	{
-		return func(args..., args2...);
-	}
-}
-
-template<typename T, typename... Args>
-T ProcessInput(GLFWwindow* window, int key,int action, T (*func)( Args* ..., Args& ...), Args* ... args, Args& ... args2)
-{
-	if (glfwGetKey(window, key) == action)
-	{
-		return func(args..., args2...);
-	}
-}
-
-template<typename T, typename... Args>
-T ProcessInput(GLFWwindow* window, int key,int action, T (*func)( Args** ..., Args* ...), Args** ... args, Args* ... args2)
-{
-	if (glfwGetKey(window, key) == action)
-	{
-		return func(args..., args2...);
-	}
+	return ProcessInput(window, key, GLFW_PRESS, func, args);
 }
