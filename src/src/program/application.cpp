@@ -37,8 +37,7 @@ void MyApp::mainLoop()
         glBindVertexArray(0);
         glUseProgram(0);
 
-        if((rendering::CameraHandler::getInstance())->isRotationOn() == false)
-            activeContext->showUI();
+        activeContext->showUI();
         glfwSwapBuffers(window);
         processProgramState();
     }
@@ -77,6 +76,7 @@ void MyApp::setupResources()
     lastProgramState = ProgramState::MAIN_MENU;
     activeContext->initContext();
     setup::setupImGui(window); // needs to be called last, after creating window and opengl context
+    ProcessInput(window, GLFW_KEY_TAB, [=]{setOnTabEvent();});
 }
 
 void MyApp::processProgramState()
@@ -86,6 +86,15 @@ void MyApp::processProgramState()
         activeContext = contextMap[*programState.get()];
         lastProgramState = *programState.get();
         activeContext->initContext();
+    }
+}
+
+void MyApp::setOnTabEvent()
+{
+    showUI = !showUI;
+    for(auto& context : contextMap)
+    {
+        context.second.get()->toogleUI(showUI);
     }
 }
 

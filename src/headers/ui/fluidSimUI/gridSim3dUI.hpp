@@ -8,13 +8,13 @@ class Grid3dSimulationUI : public BaseUI
 {
 public:
 	//SPHsimulationUI() = default;
-	Grid3dSimulationUI(std::shared_ptr<ContextState> context, std::shared_ptr<Grid3dRenderer> renderer, std::shared_ptr<Grid3D> simulation, GLFWwindow* window, std::shared_ptr<ProgramState> state) : BaseUI(window, state)
+	Grid3dSimulationUI(std::shared_ptr<ContextState> context, std::shared_ptr<Grid3dRenderer> renderer, std::shared_ptr<Grid3D> simulation, std::shared_ptr<ProgramState> state) : BaseUI(state)
 	{
 		refContext = context;
 		refRenderer = renderer;
 		refSimulation = simulation;
 	}
-	void showUI() override;
+	void show() override;
 private:
 	void setTimeStep();
 	void setSimDim();

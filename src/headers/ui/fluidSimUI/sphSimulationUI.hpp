@@ -6,9 +6,9 @@
 class SPHsimulationUI : public BaseUI
 {
 public:
-	SPHsimulationUI(std::shared_ptr<FluidSPHSimulation> simulation, std::shared_ptr<ContextState> context, GLFWwindow* window, std::shared_ptr<ProgramState> state) : BaseUI(window, state)
+	SPHsimulationUI(std::shared_ptr<FluidSPHSimulation> simulation, std::shared_ptr<ContextState> context,std::shared_ptr<ProgramState> state) : BaseUI(state)
 	{ refSimulation = simulation; simulationContext = context; }
-	void showUI() override;
+	void show() override;
 private:
 	enum SimulationState
 	{

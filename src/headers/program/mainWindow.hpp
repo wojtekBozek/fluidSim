@@ -8,17 +8,25 @@ class MainWindow : public AbstractContext
 {
 public:
     MainWindow(GLFWwindow *window, std::shared_ptr<ProgramState> state);
-    void showUI() override;
+    class InternalUI : public BaseUI {
+        public:
+        InternalUI(GLFWwindow *window, std::shared_ptr<ProgramState> state) : BaseUI(state), m_window(window) {}
+        void show() override;
+        private:
+        
+        GLFWwindow *m_window;
+    
+        void chooseSPHSimButton();
+        void chooseGRIDSimButton();
+        void textureTestButton();
+        void texture3DTestButton();
+        void chooseGRID3dSimButton();
+        
+        void chooseMixedSimButton();
+        void exitButton();
+    };
     void initContext() override;
     void processContext(std::shared_ptr<rendering::Camera> camera) override;
 private:    
-    void chooseSPHSimButton();
-    void chooseGRIDSimButton();
-    void textureTestButton();
-    void texture3DTestButton();
-    void chooseGRID3dSimButton();
-    
-    void chooseMixedSimButton();
-    void exitButton();
     MainMenuState m_menuState;
 };

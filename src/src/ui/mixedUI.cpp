@@ -5,7 +5,7 @@
 #include <imgui_impl_opengl3.h>
 #include "contextState.hpp"
 
-void MixedSimulationUI::showUI()
+void MixedSimulationUI::show()
 {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();

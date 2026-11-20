@@ -4,9 +4,11 @@
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_opengl3.h>
 
-MainWindow::MainWindow(GLFWwindow* window, std::shared_ptr<ProgramState> state) : AbstractContext(window, state), m_menuState(MainMenuState::MAIN){}
+MainWindow::MainWindow(GLFWwindow* window, std::shared_ptr<ProgramState> state) : AbstractContext(window, state), m_menuState(MainMenuState::MAIN) {    
+    ui = std::make_shared<InternalUI>(window, state);
+}
 
-void MainWindow::showUI()
+void MainWindow::InternalUI::show()
 {
     if(*m_state == ProgramState::MAIN_MENU)
     {
@@ -34,7 +36,7 @@ void MainWindow::processContext(std::shared_ptr<rendering::Camera> camera)
 {
 }
 
-void MainWindow::chooseSPHSimButton()
+void MainWindow::InternalUI::chooseSPHSimButton()
 {
     if(ImGui::Button("SPH Simulation"))
     {
@@ -42,7 +44,7 @@ void MainWindow::chooseSPHSimButton()
     }
 }
 
-void MainWindow::chooseGRIDSimButton()
+void MainWindow::InternalUI::chooseGRIDSimButton()
 {
     if (ImGui::Button("Grid Simulation"))
     {
@@ -50,7 +52,7 @@ void MainWindow::chooseGRIDSimButton()
     }
 }
 
-void MainWindow::chooseGRID3dSimButton()
+void MainWindow::InternalUI::chooseGRID3dSimButton()
 {
     if (ImGui::Button("Grid Simulation 3D"))
     {
@@ -58,7 +60,7 @@ void MainWindow::chooseGRID3dSimButton()
     }
 }
 
-void MainWindow::textureTestButton()
+void MainWindow::InternalUI::textureTestButton()
 {
     if (ImGui::Button("Texture Test"))
     {
@@ -66,7 +68,7 @@ void MainWindow::textureTestButton()
     }
 }
 
-void MainWindow::texture3DTestButton()
+void MainWindow::InternalUI::texture3DTestButton()
 {
     if (ImGui::Button("3D Texture Test"))
     {
@@ -74,7 +76,7 @@ void MainWindow::texture3DTestButton()
     }
 }
 
-void MainWindow::chooseMixedSimButton()
+void MainWindow::InternalUI::chooseMixedSimButton()
 {
     if (ImGui::Button("PIC-APIC simulation"))
     {
@@ -82,7 +84,7 @@ void MainWindow::chooseMixedSimButton()
     }
 }
 
-void MainWindow::exitButton()
+void MainWindow::InternalUI::exitButton()
 {
     if(ImGui::Button("Exit"))
     {

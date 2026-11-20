@@ -5,12 +5,13 @@
 #include <imgui_impl_opengl3.h>
 #include "contextState.hpp"
 
-void Grid3dSimulationUI::showUI()
+void Grid3dSimulationUI::show()
 {
+	if(isHide) return;
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	ImGui::Begin("MAC 3D Simulation");
+	ImGui::Begin("MAC 3D Simulation", nullptr, flags);
 	startSimulation();
 	resetSimulation();
 	vVelocityShader();

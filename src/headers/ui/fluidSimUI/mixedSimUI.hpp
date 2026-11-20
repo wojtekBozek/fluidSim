@@ -7,13 +7,13 @@
 class MixedSimulationUI : public BaseUI
 {
 public:
-	MixedSimulationUI(std::shared_ptr<ContextState> context, std::shared_ptr<MixedRenderer> renderer, std::shared_ptr<ParticleInCell2D> simulation, GLFWwindow* window, std::shared_ptr<ProgramState> state) : BaseUI(window, state)
+	MixedSimulationUI(std::shared_ptr<ContextState> context, std::shared_ptr<MixedRenderer> renderer, std::shared_ptr<ParticleInCell2D> simulation, std::shared_ptr<ProgramState> state) : BaseUI(state)
 	{
 		refContext = context;
 		refRenderer = renderer;
 		refSimulation = simulation;
 	}
-	void showUI() override;
+	void show() override;
 private:
 	void setTimeStep();
 	void setSimDim();

@@ -5,7 +5,7 @@
 #include <imgui_impl_opengl3.h>
 
 
-void SPHsimulationUI::showUI()
+void SPHsimulationUI::show()
 {
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();

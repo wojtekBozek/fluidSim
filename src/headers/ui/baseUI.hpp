@@ -3,13 +3,20 @@
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <memory>
+#include <imgui.h>
 class BaseUI
 {
 public:
-    BaseUI(GLFWwindow* window, std::shared_ptr<ProgramState> state) : m_window(window), m_state(state){}
-    virtual void showUI() = 0;
+    BaseUI(std::shared_ptr<ProgramState> state) : m_state(state){}
+    virtual void toogle(bool set) {
+        isHide = !set;
+        flags ^= ImGuiWindowFlags_NoInputs;
+        flags ^= ImGuiWindowFlags_NoNav;
+    }
+    virtual void show() = 0;
     virtual ~BaseUI() = default;
 protected:
-    GLFWwindow* m_window;
+    bool isHide = false;
+    ImGuiWindowFlags flags = ImGuiWindowFlags_NoMove;
     std::shared_ptr<ProgramState> m_state;
 };

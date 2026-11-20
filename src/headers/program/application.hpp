@@ -38,6 +38,7 @@ private:
     void setupResources();
     void processProgramState();
 
+    void setOnTabEvent();
     std::shared_ptr<ProgramState> programState;
     ProgramState lastProgramState;
     std::unordered_map<std::string, std::shared_ptr<rendering::Camera>> cameras;
@@ -46,4 +47,5 @@ private:
     double currentFrame = 0.0f;
     double lastFrame = 0.0f;
     GLFWwindow* window = nullptr;
+    bool showUI = true;
 };

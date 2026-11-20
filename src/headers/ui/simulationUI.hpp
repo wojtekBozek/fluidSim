@@ -7,8 +7,8 @@
 class SimulationUI : public BaseUI
 {
 public:
-    SimulationUI(GLFWwindow* window, std::shared_ptr<ProgramState> state);
-    void showUI() override;
+    SimulationUI(std::shared_ptr<ProgramState> state);
+    void show() override;
 private:
     void backToMenuButton();
     void openDialogButton();

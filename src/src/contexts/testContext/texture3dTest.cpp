@@ -5,6 +5,7 @@ Texture3DTestContext::Texture3DTestContext(
     std::shared_ptr<ProgramState> state)
     : AbstractContext(window, state)
 {
+    ui = std::make_shared<InternalUI>(state);
 }
 
 Texture3DTestContext::~Texture3DTestContext()
@@ -169,7 +170,7 @@ void Texture3DTestContext::processContext(
               << std::endl;
 }
 
-void Texture3DTestContext::exitButton()
+void Texture3DTestContext::InternalUI::exitButton()
 {
     if (ImGui::Button("Main Menu"))
     {
@@ -177,7 +178,7 @@ void Texture3DTestContext::exitButton()
     }
 }
 
-void Texture3DTestContext::showUI()
+void Texture3DTestContext::InternalUI::show()
 {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();

@@ -7,9 +7,9 @@
 #include <string>
 
 
-SimulationUI::SimulationUI(GLFWwindow *window, std::shared_ptr<ProgramState> state) : BaseUI(window, state) {}
+SimulationUI::SimulationUI(std::shared_ptr<ProgramState> state) : BaseUI( state) {}
 
-void SimulationUI::showUI()
+void SimulationUI::show()
 {
     if(*m_state == ProgramState::SPH_SIM)
     {

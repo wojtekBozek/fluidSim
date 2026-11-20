@@ -13,6 +13,15 @@
 #include <imgui_impl_opengl3.h>
 class Texture3DTestContext : public AbstractContext
 {
+    class InternalUI : public BaseUI {
+        public:
+        InternalUI(std::shared_ptr<ProgramState> state) : BaseUI(state){}
+	    void show() override;
+
+        void exitButton();
+        private:
+        std::shared_ptr<ProgramState> m_state;
+    };
 public:
     Texture3DTestContext(GLFWwindow* window,
                          std::shared_ptr<ProgramState> state);
@@ -21,9 +30,6 @@ public:
 
     void initContext() override;
     void processContext(std::shared_ptr<rendering::Camera> camera) override;
-
-    void exitButton();
-	void showUI() override;
 private:
     GLuint texture3D = 0;
     GLuint computeProgram = 0;

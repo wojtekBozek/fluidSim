@@ -13,29 +13,39 @@ static const int TEX_H = 512;
 class TextureTestContext : public AbstractContext
 {
 public:
-	TextureTestContext(GLFWwindow* window, std::shared_ptr<ProgramState> state) : AbstractContext(window, state) {}
+	TextureTestContext(GLFWwindow* window, std::shared_ptr<ProgramState> state) : AbstractContext(window, state)
+    {
+        ui = std::make_shared<InternalUI>(state, m_computeTime);
+    }
 	void processContext(std::shared_ptr<rendering::Camera> camera) override;
 	void initContext() override;
-    void exitButton() {
-        if (ImGui::Button("Main Menu"))
-        {
-            *m_state = ProgramState::MAIN_MENU;
+    class InternalUI : public BaseUI {
+        public:
+        InternalUI(std::shared_ptr<ProgramState> state, GLuint64& ref) : BaseUI(state), m_computeTime(ref) {}
+        void exitButton() {
+            if (ImGui::Button("Main Menu"))
+            {
+                *m_state = ProgramState::MAIN_MENU;
+            }
         }
-    }
-	void showUI() override
-	{
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
-        ImGui::Begin("TextureTest");
-        exitButton(); 
-        float fr = 1.0f / (static_cast<float>(m_computeTime) / 1000000000.0f);
+    	void show() override
+    	{
+            ImGui_ImplOpenGL3_NewFrame();
+            ImGui_ImplGlfw_NewFrame();
+            ImGui::NewFrame();
+            ImGui::Begin("TextureTest");
+            exitButton(); 
+            float fr = 1.0f / (static_cast<float>(m_computeTime) / 1000000000.0f);
 
-        ImGui::Value("FrameRate", fr, "%.001f");
-        ImGui::End();
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
-	}
+            ImGui::Value("FrameRate", fr, "%.001f");
+            ImGui::End();
+            ImGui::Render();
+            ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+    	}
+        private:
+        GLuint64& m_computeTime;
+
+    };
     GLuint createTexture()
     {
         GLuint tex;
