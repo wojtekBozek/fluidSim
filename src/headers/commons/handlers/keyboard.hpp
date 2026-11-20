@@ -44,5 +44,8 @@ template<typename F, typename... Args>
 	requires std::invocable<F, Args...>
 auto ProcessInput(GLFWwindow* window, int key, F&& func,Args&&... args)
 {
-	return ProcessInput(window, key, GLFW_PRESS, func, args);
+	return ProcessInput(window, key, GLFW_PRESS, 
+		std::forward<F>(func),
+        std::forward<Args>(args)...
+	);
 }
