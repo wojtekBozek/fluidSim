@@ -5,10 +5,69 @@
 #include <memory>
 #include <list>
 #include <mutex>
+#include <functional>
 #include "keyboard.hpp"
 #include <imgui.h>
 
 namespace rendering {	
+
+	class KeyboardCallbacks {
+		public:
+		static KeyboardCallbacks& getInstance() {
+			static KeyboardCallbacks instance;
+			return instance;
+		}
+
+		using Callback = std::function<void()>;
+		private:
+
+		KeyboardCallbacks () = default;
+
+		KeyboardCallbacks(const KeyboardCallbacks&) = delete;
+		KeyboardCallbacks& operator=(const KeyboardCallbacks&) = delete;
+
+		struct Entry {
+			int key;
+			int action;
+			Callback callback;
+		};
+
+		std::vector<Entry> callbacks;
+
+		public:
+
+		void executeCallbacks(int key, int action) {
+			for (auto& entry : callbacks) {
+				if(entry.key == key and entry.action == action) {
+					entry.callback();
+				}
+			}
+		}
+		void registerCallback(int key, int action, Callback callback) {
+			callbacks.push_back({key, action, std::move(callback)});
+		}
+		static void KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
+		{			
+			ImGuiIO& io = ImGui::GetIO();
+			if (io.WantCaptureKeyboard)
+    			return;
+			getInstance().executeCallbacks(key, action);
+		}
+
+		static void setCallbacks(GLFWwindow* window) {			
+			glfwSetKeyCallback(window, KeyboardCallbacks::KeyboardCallback);
+		}		
+
+		void clearCallbacks() {
+			callbacks.clear();
+		}
+
+	};
+
+	class UICallbacks{
+
+	};
+
 	class CameraHandler {
 	public:
 		CameraHandler(CameraHandler& other) = delete;
@@ -86,9 +145,6 @@ namespace rendering {
 			ProcessInput(window, handler->key_vertical_down, GLFW_PRESS, CameraHandler::moveVerticallyDown);
 			ProcessInput(window, handler->key_left, GLFW_PRESS, CameraHandler::moveLeft);
 			ProcessInput(window, handler->key_right, GLFW_PRESS, CameraHandler::moveRight);
-			ProcessInput(window, handler->key_origin, GLFW_PRESS, CameraHandler::origin); 
-			ProcessInput(window, handler->key_camera1, GLFW_PRESS, CameraHandler::setActiveCamera, 0);
-			ProcessInput(window, handler->key_camera2, GLFW_PRESS, CameraHandler::setActiveCamera, 1);
 		}
 		static void setCurrentSpeed(float value) 
 		{
@@ -107,7 +163,6 @@ namespace rendering {
 			glfwSetWindowUserPointer(window, handler);
 			glfwSetCursorPosCallback(window, CameraHandler::mouseCallback);
 			glfwSetScrollCallback(window, CameraHandler::scrollCallback);
-			glfwSetKeyCallback(window, CameraHandler::KeyboardCallback);
 			glfwSetFramebufferSizeCallback(window, CameraHandler::resizeCallback);
 		}
 		static void SetMouseCallbacks(GLFWwindow* window)
@@ -116,10 +171,6 @@ namespace rendering {
 			glfwSetScrollCallback(window, CameraHandler::scrollCallback);
 		}
 
-		static void setKeyboardCallback(GLFWwindow* window)
-		{
-			glfwSetKeyCallback(window, CameraHandler::KeyboardCallback);
-		}
 		static void mouseCallback(GLFWwindow* window, double xposIn, double yposIn)
 		{
 			ImGuiIO& io = ImGui::GetIO();
@@ -161,17 +212,14 @@ namespace rendering {
 		{
 			return rotation_on;
 		}
-
-		~CameraHandler() {}
-	private:
-		static void KeyboardCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
-		{
-			ImGuiIO& io = ImGui::GetIO();
-			if (io.WantCaptureKeyboard)	return;
-
+		
+		static void declareCallbacks(GLFWwindow* window) {
 			CameraHandler* handler = CameraHandler::getInstance();
-			if (key == handler->key_rotation_on && action == handler->activation_type)
-			{
+			KeyboardCallbacks& callbackHandler = KeyboardCallbacks::getInstance();
+			callbackHandler.registerCallback(handler->key_origin, handler->activation_type, [=](){handler->origin();});
+			callbackHandler.registerCallback(handler->key_camera1, handler->activation_type, [=](){handler->setActiveCamera(0);});
+			callbackHandler.registerCallback(handler->key_camera2, handler->activation_type, [=](){handler->setActiveCamera(1);});
+			callbackHandler.registerCallback(handler->key_rotation_on, handler->activation_type, [=](){
 				handler->rotation_on = !handler->rotation_on;
 				if(handler->rotation_on)
 				{
@@ -181,8 +229,11 @@ namespace rendering {
 				{
 					glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 				}
-			}
+			});
 		}
+
+		~CameraHandler() {}
+	private:
 
 		void setCamera(std::shared_ptr<Camera> camera)
 		{

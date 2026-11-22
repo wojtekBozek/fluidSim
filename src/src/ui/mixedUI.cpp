@@ -10,7 +10,7 @@ void MixedSimulationUI::show()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	ImGui::Begin("PIC-APIC Simulation");
+	ImGui::Begin("PIC-APIC Simulation", nullptr, flags);
 	startSimulation();
 	resetSimulation();
 	vVelocityShader();

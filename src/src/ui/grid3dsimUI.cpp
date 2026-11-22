@@ -7,7 +7,6 @@
 
 void Grid3dSimulationUI::show()
 {
-	if(isHide) return;
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();

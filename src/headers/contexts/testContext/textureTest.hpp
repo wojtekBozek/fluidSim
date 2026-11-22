@@ -33,7 +33,7 @@ public:
             ImGui_ImplOpenGL3_NewFrame();
             ImGui_ImplGlfw_NewFrame();
             ImGui::NewFrame();
-            ImGui::Begin("TextureTest");
+            ImGui::Begin("TextureTest", nullptr, flags);
             exitButton(); 
             float fr = 1.0f / (static_cast<float>(m_computeTime) / 1000000000.0f);
 

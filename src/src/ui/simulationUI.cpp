@@ -16,7 +16,7 @@ void SimulationUI::show()
         ImGui_ImplOpenGL3_NewFrame();
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
-        ImGui::Begin("Simulation settings");
+        ImGui::Begin("Simulation settings", nullptr, flags);
         backToMenuButton();
         openDialogButton();
         ImGui::End();

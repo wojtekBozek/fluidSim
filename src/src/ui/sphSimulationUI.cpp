@@ -10,7 +10,7 @@ void SPHsimulationUI::show()
 	ImGui_ImplOpenGL3_NewFrame();
 	ImGui_ImplGlfw_NewFrame();
 	ImGui::NewFrame();
-	ImGui::Begin("SPH-Simulation");
+	ImGui::Begin("SPH-Simulation", nullptr, flags);
 	fluidStiffKcoeffTextInput();
 	fluidStiffYcoeffTextInput();
 

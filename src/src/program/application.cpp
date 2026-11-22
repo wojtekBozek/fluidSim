@@ -37,7 +37,10 @@ void MyApp::mainLoop()
         glBindVertexArray(0);
         glUseProgram(0);
 
-        activeContext->showUI();
+        if(showUI) {
+            activeContext->showUI();
+        }
+        
         glfwSwapBuffers(window);
         processProgramState();
     }
@@ -63,6 +66,10 @@ void MyApp::setupResources()
      0.1f, 100.0f, window
     ));
     glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
+    rendering::CameraHandler::declareCallbacks(window);
+    rendering::KeyboardCallbacks& keyboardCallbacks = rendering::KeyboardCallbacks::getInstance();
+    keyboardCallbacks.registerCallback(GLFW_KEY_TAB, GLFW_PRESS, [=]{setOnTabEvent();});
+    rendering::KeyboardCallbacks::setCallbacks(window);
     rendering::CameraHandler::connectCallbacks(window);
     currentFrame = static_cast<float>(glfwGetTime());
     contextMap[ProgramState::SPH_SIM] = std::make_shared<SPHSimulationContext>(window, programState);
@@ -76,7 +83,6 @@ void MyApp::setupResources()
     lastProgramState = ProgramState::MAIN_MENU;
     activeContext->initContext();
     setup::setupImGui(window); // needs to be called last, after creating window and opengl context
-    ProcessInput(window, GLFW_KEY_TAB, [=]{setOnTabEvent();});
 }
 
 void MyApp::processProgramState()
@@ -92,10 +98,7 @@ void MyApp::processProgramState()
 void MyApp::setOnTabEvent()
 {
     showUI = !showUI;
-    for(auto& context : contextMap)
-    {
-        context.second.get()->toogleUI(showUI);
-    }
+    activeContext->toogleUI();
 }
 
 void MyApp::initialize()

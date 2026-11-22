@@ -11,9 +11,9 @@ public:
 	AbstractContext(GLFWwindow* window, std::shared_ptr<ProgramState> state) : m_state(state){};
 	virtual void initContext() = 0;
 	virtual void processContext(std::shared_ptr<rendering::Camera> camera) = 0;
-	void toogleUI(bool toogle){
+	void toogleUI(){
 		if(ui) {
-			ui.get()->toogle(toogle);
+			ui.get()->toogle();
 		}
 	}
 	void showUI() const {

@@ -183,7 +183,7 @@ void Texture3DTestContext::InternalUI::show()
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    ImGui::Begin("3DTextureTest");
+    ImGui::Begin("3DTextureTest", nullptr, flags);
     exitButton();
     ImGui::End();
     ImGui::Render();
